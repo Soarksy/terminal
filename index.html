@@ -1693,9 +1693,7 @@ const NEWS_RSS = [
 ];
 
 async function fetchRSSFeed(feedUrl, src){
-  const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
-  const r = await fetch(proxied, {signal: AbortSignal.timeout(9000)});
-  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const r = await proxyFetch(feedUrl, 9000);
   const text = await r.text();
   const xml  = new DOMParser().parseFromString(text, 'text/xml');
   return [...xml.querySelectorAll('item')].slice(0,12).map(item => {
@@ -3154,26 +3152,22 @@ document.addEventListener('mousedown', e=>{
 // ═══════════════════════════════════════════
 // KEYBOARD SHORTCUTS
 // ═══════════════════════════════════════════
-const KMAP={'h':'HOME','1':'FI','2':'EQ','3':'FX','4':'CMDTY','5':'MAP','6':'MACRO','7':'NEWS','8':'SPREAD','9':'INFL','0':'AUCTION','-':'VOL','=':'EQS','c':'CHART'};
+const KMAP={};
 document.addEventListener('keydown',e=>{
-  if(document.activeElement===document.getElementById('cmdbar'))return;
-  if(KMAP[e.key]&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
+  // Never fire shortcuts when user is typing in any input or textarea
+  const tag = document.activeElement?.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA') return;
+  // Ctrl+A = arrange
+  if(e.ctrlKey&&e.key==='a'){e.preventDefault();arrange();}
+  // Ctrl+F = fullscreen topmost window
+  if(e.ctrlKey&&e.key==='f'){
     e.preventDefault();
-    if(e.key==='h'||e.key==='H') OW('HOME');
-    else if(e.key==='c'||e.key==='C'){OW('CHART','SPY');setTimeout(loadChartData,300);}
-    else OW(KMAP[e.key]);
-  }
-  // F = fullscreen the topmost open window
-  if((e.key==='f'||e.key==='F')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
-    e.preventDefault();
-    // Find highest-z window
     let topKey=null, topZ=-1;
     Object.entries(WR).forEach(([k,w])=>{ const z=parseInt(w.style.zIndex)||0; if(z>topZ){topZ=z;topKey=k;} });
     if(topKey) toggleFS(topKey);
   }
-  if(e.key==='`'||e.key==='~'){e.preventDefault();Object.keys(WR).forEach(k=>CW(k))}
-  if(e.key==='/')  {e.preventDefault();document.getElementById('cmdbar').focus()}
-  if(e.ctrlKey&&e.key==='a'){e.preventDefault();arrange()}
+  // Ctrl+Backspace = close all windows
+  if(e.ctrlKey&&e.key==='Backspace'){e.preventDefault();Object.keys(WR).forEach(k=>CW(k));}
 });
 function arrange(){
   const keys=Object.keys(WR);

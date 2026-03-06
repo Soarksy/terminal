@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TERMINAL TERMINAL</title>
+<title>TERMINAL</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
@@ -444,6 +444,9 @@ canvas{display:block}
   <button class="scbtn" onclick="OW('FI')">TREAS</button>
   <button class="scbtn" onclick="OW('AUCTION')">AUCTION</button>
   <button class="scbtn" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)">CHART</button>
+  <button class="scbtn" onclick="OW('OPTIONS')">OPTIONS</button>
+  <button class="scbtn" onclick="OW('EARN')">EARNINGS</button>
+  <button class="scbtn" onclick="OW('ECON')">ECON</button>
   <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A ARRANGE &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
 </div>
 
@@ -634,6 +637,19 @@ const D = {
     {ts:'07:38',src:'RTRS',tag:'energy', hl:'Norway sovereign wealth fund divests remaining coal holdings, adds clean energy', detail:'Norges Bank Investment Management announced the completion of its divestment from coal-related companies and outlined plans to increase its allocation to clean energy infrastructure projects.'},
   ],
 
+  earnings:[
+    {ticker:'ORCL', date:'Mar 10', time:'AMC', epsEst:'$1.48', beat:null},
+    {ticker:'ADBE', date:'Mar 12', time:'AMC', epsEst:'$4.97', beat:null},
+    {ticker:'DG',   date:'Mar 13', time:'BMO', epsEst:'$1.51', beat:null},
+    {ticker:'FDX',  date:'Mar 19', time:'AMC', epsEst:'$4.56', beat:null},
+    {ticker:'NKE',  date:'Mar 20', time:'AMC', epsEst:'$0.29', beat:null},
+    {ticker:'MU',   date:'Mar 26', time:'AMC', epsEst:'$1.43', beat:null},
+    {ticker:'WBA',  date:'Apr 01', time:'BMO', epsEst:'$0.37', beat:null},
+    {ticker:'JPM',  date:'Apr 11', time:'BMO', epsEst:'$4.61', beat:null},
+    {ticker:'GS',   date:'Apr 14', time:'BMO', epsEst:'$12.35',beat:null},
+    {ticker:'NFLX', date:'Apr 15', time:'AMC', epsEst:'$5.74', beat:null},
+  ],
+
   companies:{
     AAPL:{name:'Apple Inc',sector:'Technology',px:184.40,pxChg:+.88,pxPct:+.48,
       mcap:'2.84T',pe:29.4,fwdPe:26.8,ev:2.96,revenue:'394.3B',netIncome:'97.0B',
@@ -819,12 +835,15 @@ function renderW(cmd,key,extra){
     case'VOL':    b.innerHTML=rVOL();setTimeout(()=>drawVOL(),30);break;
     case'EQS':    b.innerHTML=rEQS(extra);setTimeout(()=>{if(extra)fetchEQS(extra.toUpperCase())},30);break;
     case'CHART':  b.innerHTML=rCHART(extra);setTimeout(()=>loadChartData(),60);break;
+    case'OPTIONS':b.innerHTML=rOPTIONS();break;
+    case'EARN':   b.innerHTML=rEARN();break;
+    case'ECON':   b.innerHTML=rECON();break;
     case'HELP':   b.innerHTML=rHELP();break;
     case'SRCH':   b.innerHTML=rSRCH(extra);break;
     case'HOME':   b.innerHTML=rHOME();setTimeout(()=>initHOME(),30);break;
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
     case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
-    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MAP MACRO NEWS SPREAD INFL AUCTION VOL EQS HELP HOME HEAT SCRN</div>`;
+    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MAP MACRO NEWS SPREAD INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN</div>`;
   }
 }
 
@@ -1095,6 +1114,27 @@ function rINFL(){
     return`<tr><td>${m.name}</td><td class="hl">${m.val}</td><td class="w">${m.prev}</td>
       <td>${v>0?`<span class="dn">${m.d1}</span>`:v<0?`<span class="up">${m.d1}</span>`:`<span class="neu">${m.d1}</span>`}</td></tr>`;
   }).join('');
+
+  // FRED live section
+  const fred = D.macro.fred||{};
+  const fredKeys = ['CPIAUCSL','CPILFESL','PCEPILFE','UNRATE','PAYEMS','GDP','T10YIE','T5YIE'];
+  const fredRows = fredKeys.filter(k=>fred[k]).map(k=>{
+    const f=fred[k];
+    const chgCol = f.chg>0?'var(--red)':f.chg<0?'var(--green)':'#444'; // for inflation, up=bad
+    return`<tr><td style="color:var(--text-dim)">${f.label}</td>
+      <td class="hl">${f.val.toFixed(2)}${k==='PAYEMS'?'K':'%'}</td>
+      <td class="w">${f.prev.toFixed(2)}${k==='PAYEMS'?'K':'%'}</td>
+      <td style="color:${chgCol}">${f.chg>=0?'+':''}${f.chg.toFixed(2)}</td>
+      <td style="color:#2a2a2a;font-size:9px">${f.date}</td></tr>`;
+  }).join('');
+
+  const fredSection = fredRows
+    ? `<div class="sl" style="margin-top:6px">FRED LIVE — ECONOMIC INDICATORS</div>
+       <table class="t"><thead><tr><th>SERIES</th><th>LATEST</th><th>PREV</th><th>CHG</th><th>DATE</th></tr></thead><tbody>${fredRows}</tbody></table>`
+    : API_KEYS.FRED && API_KEYS.FRED!=='YOUR_FRED_KEY_HERE'
+      ? `<div style="color:#2a2a2a;font-size:9px;padding:6px">FETCHING FRED DATA...</div>`
+      : `<div style="color:#2a2a2a;font-size:9px;padding:6px">ADD FRED API KEY TO ENABLE LIVE ECONOMIC DATA</div>`;
+
   return`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div>
@@ -1109,8 +1149,9 @@ function rINFL(){
         <table class="t"><thead><tr><th>METRIC</th><th>CURR</th><th>PREV</th><th>CHG</th></tr></thead><tbody>${met}</tbody></table>
       </div>
     </div>
+    ${fredSection}
     <div class="sl" style="margin-top:6px">BREAKEVEN CURVE</div>
-    <canvas id="infl-c" height="80" style="width:100%"></canvas>`;
+    <canvas id="infl-c" height="80" style="width:100%">`;
 }
 function drawInfl(){
   const c=document.getElementById('infl-c');if(!c)return;
@@ -1192,6 +1233,191 @@ function drawVOL(){
   const g=ctx.createLinearGradient(0,pad.t,0,80-pad.b);g.addColorStop(0,'rgba(229,57,53,0.2)');g.addColorStop(1,'rgba(0,0,0,0)');
   ctx.beginPath();data.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));ctx.lineTo(xp(pts-1),80-pad.b);ctx.lineTo(pad.l,80-pad.b);ctx.closePath();ctx.fillStyle=g;ctx.fill();
   ctx.strokeStyle='#c62828';ctx.lineWidth=1.5;ctx.beginPath();data.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));ctx.stroke();
+}
+
+// ═══════════════════════════════════════════
+// RENDER: OPTIONS FLOW
+// ═══════════════════════════════════════════
+function rOPTIONS(){
+  // Key sentiment indicators derived from market data
+  const vix = D.equities.indices[4]?.val || 0;
+  const vixLevel = vix<15?{l:'LOW',c:'var(--green)'}:vix<20?{l:'MODERATE',c:'var(--amber)'}:vix<30?{l:'ELEVATED',c:'#ff6f00'}:{l:'EXTREME',c:'var(--red)'};
+
+  // Simulated but realistic options flow data — updated with current market context
+  const flowData = [
+    {sym:'SPY',  exp:'Mar 21',strike:'$560P', size:'42,000', prem:'$8.2M',  side:'PUT',  sentiment:'BEARISH',  note:'Protective hedge vs index'},
+    {sym:'QQQ',  exp:'Mar 28',strike:'$470C', size:'28,500', prem:'$4.1M',  side:'CALL', sentiment:'BULLISH',  note:'Tech sector upside play'},
+    {sym:'NVDA', exp:'Apr 17',strike:'$900C', size:'12,000', prem:'$6.8M',  side:'CALL', sentiment:'BULLISH',  note:'Earnings run-up positioning'},
+    {sym:'AAPL', exp:'Mar 21',strike:'$210P', size:'18,200', prem:'$2.9M',  side:'PUT',  sentiment:'BEARISH',  note:'Near-term downside protection'},
+    {sym:'IWM',  exp:'Apr 4', strike:'$205P', size:'35,000', prem:'$3.4M',  side:'PUT',  sentiment:'BEARISH',  note:'Small-cap risk hedge'},
+    {sym:'GLD',  exp:'May 16',strike:'$220C', size:'9,800',  prem:'$1.8M',  side:'CALL', sentiment:'BULLISH',  note:'Gold breakout bet'},
+    {sym:'TLT',  exp:'Mar 28',strike:'$90C',  size:'22,000', prem:'$1.2M',  side:'CALL', sentiment:'BULLISH',  note:'Rate cut anticipation'},
+    {sym:'XLE',  exp:'Apr 17',strike:'$88P',  size:'15,600', prem:'$1.1M',  side:'PUT',  sentiment:'BEARISH',  note:'Energy sector weakness'},
+    {sym:'META', exp:'Apr 25',strike:'$580C', size:'8,400',  prem:'$5.2M',  side:'CALL', sentiment:'BULLISH',  note:'Post-earnings momentum'},
+    {sym:'SPY',  exp:'Jun 20',strike:'$600C', size:'31,000', prem:'$3.8M',  side:'CALL', sentiment:'BULLISH',  note:'H1 2026 upside target'},
+  ];
+
+  const rows = flowData.map(f=>{
+    const sCol = f.side==='CALL'?'var(--green)':'var(--red)';
+    return `<tr>
+      <td style="color:var(--amber);font-weight:600">${f.sym}</td>
+      <td>${f.exp}</td>
+      <td style="color:${sCol};font-weight:600">${f.strike}</td>
+      <td style="color:${sCol};font-weight:600">${f.side}</td>
+      <td>${f.size}</td>
+      <td style="color:var(--amber)">${f.prem}</td>
+      <td style="color:${sCol};font-size:9px">${f.sentiment}</td>
+      <td style="color:#3a3a3a;font-size:9px">${f.note}</td>
+    </tr>`;
+  }).join('');
+
+  const bullCount = flowData.filter(f=>f.side==='CALL').length;
+  const bearCount = flowData.filter(f=>f.side==='PUT').length;
+  const bullPrem  = flowData.filter(f=>f.side==='CALL').reduce((a,b)=>a+parseFloat(b.prem.replace('$','').replace('M','')),0);
+  const bearPrem  = flowData.filter(f=>f.side==='PUT').reduce((a,b)=>a+parseFloat(b.prem.replace('$','').replace('M','')),0);
+  const pcRatio   = (bearPrem/bullPrem).toFixed(2);
+
+  return`
+    <div class="sl">SENTIMENT INDICATORS</div>
+    <div class="sf" style="margin-bottom:8px">
+      <div class="si"><span class="sil">VIX</span><span class="siv" style="color:${vixLevel.c}">${vix.toFixed(2)} — ${vixLevel.l}</span></div>
+      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:${parseFloat(pcRatio)>1?'var(--red)':'var(--green)'}">${pcRatio}</span></div>
+      <div class="si"><span class="sil">CALL PREM</span><span class="siv up">$${bullPrem.toFixed(1)}M</span></div>
+      <div class="si"><span class="sil">PUT PREM</span><span class="siv dn">$${bearPrem.toFixed(1)}M</span></div>
+      <div class="si"><span class="sil">FLOW BIAS</span><span class="siv" style="color:${bullCount>=bearCount?'var(--green)':'var(--red)'}">${bullCount>=bearCount?'BULLISH':'BEARISH'}</span></div>
+    </div>
+    <div class="sl">UNUSUAL OPTIONS ACTIVITY — LARGE PREMIUM FLOWS</div>
+    <div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">INDICATIVE DATA — EDUCATIONAL PURPOSES</div>
+    <table class="t">
+      <thead><tr><th>SYMBOL</th><th>EXP</th><th>STRIKE</th><th>TYPE</th><th>CONTRACTS</th><th>PREMIUM</th><th>BIAS</th><th>NOTE</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="sl" style="margin-top:8px">TERM STRUCTURE — VIX FUTURES (INDICATIVE)</div>
+    <div class="sf">
+      ${['SPOT','M1','M2','M3','M4','M5','M6'].map((t,i)=>{
+        const v = (vix + i*0.8 + (i>2?i*0.3:0)).toFixed(2);
+        return `<div class="si"><span class="sil">${t}</span><span class="siv">${v}</span></div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER: EARNINGS CALENDAR
+// ═══════════════════════════════════════════
+function rEARN(){
+  const earnings = [
+    // Week of Mar 10
+    {date:'Mar 10',sym:'ORCL', name:'Oracle Corp',        eps_est:'1.48', eps_act:null, rev_est:'14.4B', beat:null, time:'AMC', mktcap:'360B'},
+    {date:'Mar 11',sym:'ADBE', name:'Adobe Inc',          eps_est:'4.97', eps_act:null, rev_est:'5.8B',  beat:null, time:'AMC', mktcap:'195B'},
+    {date:'Mar 12',sym:'ULTA', name:'Ulta Beauty',        eps_est:'7.12', eps_act:null, rev_est:'3.5B',  beat:null, time:'AMC', mktcap:'18B'},
+    {date:'Mar 13',sym:'DKS',  name:'Dick\'s Sporting',   eps_est:'3.60', eps_act:null, rev_est:'3.9B',  beat:null, time:'BMO', mktcap:'19B'},
+    // Week of Mar 17
+    {date:'Mar 18',sym:'GIS',  name:'General Mills',      eps_est:'0.97', eps_act:null, rev_est:'4.8B',  beat:null, time:'BMO', mktcap:'31B'},
+    {date:'Mar 19',sym:'MU',   name:'Micron Technology',  eps_est:'1.43', eps_act:null, rev_est:'8.0B',  beat:null, time:'AMC', mktcap:'104B'},
+    {date:'Mar 20',sym:'NKE',  name:'Nike Inc',           eps_est:'0.29', eps_act:null, rev_est:'11.0B', beat:null, time:'AMC', mktcap:'106B'},
+    {date:'Mar 21',sym:'FDX',  name:'FedEx Corp',         eps_est:'3.96', eps_act:null, rev_est:'22.1B', beat:null, time:'AMC', mktcap:'58B'},
+    {date:'Mar 25',sym:'KB',   name:'KB Home',            eps_est:'1.55', eps_act:null, rev_est:'1.5B',  beat:null, time:'AMC', mktcap:'4B'},
+    {date:'Mar 26',sym:'GME',  name:'GameStop Corp',      eps_est:'0.08', eps_act:null, rev_est:'0.9B',  beat:null, time:'AMC', mktcap:'12B'},
+    {date:'Mar 27',sym:'PAYX', name:'Paychex Inc',        eps_est:'1.36', eps_act:null, rev_est:'1.5B',  beat:null, time:'BMO', mktcap:'48B'},
+    {date:'Apr 11',sym:'JPM',  name:'JPMorgan Chase',     eps_est:'4.61', eps_act:null, rev_est:'43.8B', beat:null, time:'BMO', mktcap:'720B'},
+    {date:'Apr 11',sym:'WFC',  name:'Wells Fargo',        eps_est:'1.23', eps_act:null, rev_est:'20.6B', beat:null, time:'BMO', mktcap:'255B'},
+    {date:'Apr 14',sym:'GS',   name:'Goldman Sachs',      eps_est:'11.44',eps_act:null, rev_est:'14.8B', beat:null, time:'BMO', mktcap:'185B'},
+    {date:'Apr 22',sym:'TSLA', name:'Tesla Inc',          eps_est:'0.48', eps_act:null, rev_est:'24.2B', beat:null, time:'AMC', mktcap:'890B'},
+    {date:'Apr 23',sym:'META', name:'Meta Platforms',     eps_est:'6.72', eps_act:null, rev_est:'41.3B', beat:null, time:'AMC', mktcap:'1.5T'},
+    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',       eps_est:'2.01', eps_act:null, rev_est:'89.4B', beat:null, time:'AMC', mktcap:'2.1T'},
+    {date:'Apr 25',sym:'MSFT', name:'Microsoft Corp',     eps_est:'3.22', eps_act:null, rev_est:'68.8B', beat:null, time:'AMC', mktcap:'3.1T'},
+    {date:'Apr 29',sym:'AAPL', name:'Apple Inc',          eps_est:'1.62', eps_act:null, rev_est:'94.5B', beat:null, time:'AMC', mktcap:'3.4T'},
+    {date:'Apr 30',sym:'AMZN', name:'Amazon.com',         eps_est:'1.36', eps_act:null, rev_est:'187.4B',beat:null, time:'AMC', mktcap:'2.2T'},
+    {date:'May 1', sym:'NVDA', name:'Nvidia Corp',        eps_est:'0.88', eps_act:null, rev_est:'43.2B', beat:null, time:'AMC', mktcap:'2.8T'},
+  ];
+
+  const rows = earnings.map(e=>{
+    const beatCol = e.beat===true?'var(--green)':e.beat===false?'var(--red)':'#2a2a2a';
+    const beatTxt = e.beat===true?'BEAT':e.beat===false?'MISS':e.eps_act?'IN-LINE':'—';
+    const timeCol = e.time==='BMO'?'#3a5a3a':'#3a3a5a';
+    return `<tr>
+      <td style="color:#555;font-size:9px">${e.date}</td>
+      <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
+      <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
+      <td style="background:${timeCol};color:#888;font-size:8px;padding:1px 4px;text-align:center">${e.time}</td>
+      <td style="color:#888">$${e.eps_est}</td>
+      <td style="color:${e.eps_act?'var(--amber)':'#2a2a2a'}">${e.eps_act?'$'+e.eps_act:'—'}</td>
+      <td style="color:${beatCol};font-size:9px">${beatTxt}</td>
+      <td style="color:#2a2a2a;font-size:9px">${e.mktcap}</td>
+    </tr>`;
+  }).join('');
+
+  return`
+    <div class="sf" style="margin-bottom:6px">
+      <div class="si"><span class="sil">THIS WEEK</span><span class="siv">${earnings.filter(e=>e.date.startsWith('Mar 1')).length} reports</span></div>
+      <div class="si"><span class="sil">NEXT WEEK</span><span class="siv">${earnings.filter(e=>e.date.startsWith('Mar 2')).length} reports</span></div>
+      <div class="si"><span class="sil">BIG TECH</span><span class="siv" style="color:var(--amber)">Apr 22–May 1</span></div>
+      <div class="si"><span class="sil">BMO</span><span class="siv" style="color:#3a5a3a">Before Market</span></div>
+      <div class="si"><span class="sil">AMC</span><span class="siv" style="color:#3a3a5a">After Market</span></div>
+    </div>
+    <div class="sl">UPCOMING EARNINGS — CLICK TICKER FOR EQS</div>
+    <table class="t">
+      <thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>RESULT</th><th>MKTCAP</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER: ECONOMIC CALENDAR / RELEASES
+// ═══════════════════════════════════════════
+function rECON(){
+  const fred = D.macro?.fred || {};
+  const releases = [
+    {cat:'INFLATION',  id:'CPIAUCSL',   label:'CPI MoM',           freq:'Monthly',  next:'Apr 10'},
+    {cat:'INFLATION',  id:'CPILFESL',   label:'Core CPI MoM',      freq:'Monthly',  next:'Apr 10'},
+    {cat:'INFLATION',  id:'PCEPILFE',   label:'Core PCE MoM',      freq:'Monthly',  next:'Mar 28'},
+    {cat:'LABOR',      id:'PAYEMS',     label:'Nonfarm Payrolls',   freq:'Monthly',  next:'Apr 4'},
+    {cat:'LABOR',      id:'UNRATE',     label:'Unemployment Rate',  freq:'Monthly',  next:'Apr 4'},
+    {cat:'LABOR',      id:'ICSA',       label:'Initial Claims',     freq:'Weekly',   next:'Mar 13'},
+    {cat:'GROWTH',     id:'GDP',        label:'GDP QoQ Ann.',       freq:'Quarterly',next:'Mar 27'},
+    {cat:'GROWTH',     id:'INDPRO',     label:'Industrial Prod.',   freq:'Monthly',  next:'Mar 14'},
+    {cat:'GROWTH',     id:'RETAILSMNSA',label:'Retail Sales MoM',   freq:'Monthly',  next:'Mar 17'},
+    {cat:'RATES',      id:'FEDFUNDS',   label:'Fed Funds Rate',     freq:'FOMC',     next:'Mar 19'},
+    {cat:'HOUSING',    id:'MORTGAGE30US',label:'30Y Mortgage Rate', freq:'Weekly',   next:'Mar 13'},
+    {cat:'INFLATION',  id:'T10YIE',     label:'10Y Breakeven',      freq:'Daily',    next:'Live'},
+    {cat:'INFLATION',  id:'T5YIE',      label:'5Y Breakeven',       freq:'Daily',    next:'Live'},
+  ];
+
+  const catColors = {INFLATION:'#3a2a00',LABOR:'#0a2a0a',GROWTH:'#0a1a3a',RATES:'#2a0a2a',HOUSING:'#1a2a2a'};
+
+  const rows = releases.map(r=>{
+    const d = fred[r.id];
+    const val = d ? (r.id==='PAYEMS' ? (d.val>0?'+':'')+Math.round(d.val)+'K' : d.val.toFixed(r.id==='UNRATE'||r.id==='MORTGAGE30US'?2:2)+'%') : '—';
+    const prev = d ? (r.id==='PAYEMS' ? (d.prev>0?'+':'')+Math.round(d.prev)+'K' : d.prev.toFixed(2)+'%') : '—';
+    const chg = d ? d.chg : null;
+    const chgCol = chg===null?'#333':chg>0?'var(--green)':'var(--red)';
+    const chgTxt = chg===null?'—':((chg>0?'+':'')+chg.toFixed(2));
+    const date = d?.date || '—';
+    return `<tr>
+      <td><span style="background:${catColors[r.cat]||'#1a1a1a'};color:#888;font-size:8px;padding:1px 5px;letter-spacing:.5px">${r.cat}</span></td>
+      <td style="color:var(--text-dim)">${r.label}</td>
+      <td style="color:var(--amber);font-weight:600">${val}</td>
+      <td style="color:#555">${prev}</td>
+      <td style="color:${chgCol}">${chgTxt}</td>
+      <td style="color:#333;font-size:9px">${date}</td>
+      <td style="color:#555;font-size:9px">${r.freq}</td>
+      <td style="color:var(--amber);font-size:9px">${r.next}</td>
+    </tr>`;
+  }).join('');
+
+  const hasData = Object.keys(fred).length > 0;
+  return`
+    <div class="sf" style="margin-bottom:6px">
+      <div class="si"><span class="sil">DATA SOURCE</span><span class="siv" style="color:${hasData?'var(--green)':'var(--red)'}">${hasData?'FRED LIVE':'FRED PENDING'}</span></div>
+      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">Mar 19, 2026</span></div>
+      <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
+    </div>
+    <div class="sl">KEY ECONOMIC RELEASES — LIVE FRED DATA</div>
+    <table class="t">
+      <thead><tr><th>CATEGORY</th><th>INDICATOR</th><th>LATEST</th><th>PREVIOUS</th><th>CHG</th><th>RELEASE DATE</th><th>FREQ</th><th>NEXT RELEASE</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${!hasData?`<div style="color:#3a2a00;font-size:9px;padding:8px;margin-top:8px;border:1px solid #2a1a00">⟳ FRED DATA LOADING — REFRESH IN 30s IF EMPTY</div>`:''}`;
 }
 
 // ═══════════════════════════════════════════
@@ -1533,7 +1759,7 @@ setInterval(updateClock,1000);updateClock();
 const LIVE_MODE = true;          // true = live API polling; false = static seed data only
 const POLL_INTERVAL_MS = 60000;  // 60-second polling
 const API_KEYS = {
-  FRED:          '',
+  FRED:          '2c953e1a1e30c68daa1c2f778381c586',
   ALPHA_VANTAGE: '',
   FMP:           '',
   EIA:           '',
@@ -1825,6 +2051,48 @@ async function fetchRSSFeed(feedUrl, src){
     return { src, tag: classifyNewsTag(title), hl: title, detail: desc, url: link, pubDate,
              ts: pubDate.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/Denver'})+' '+pubDate.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Denver'}) };
   }).filter(n => n.hl);
+}
+
+// ═══════════════════════════════════════════
+// FRED ECONOMIC DATA FETCH
+// ═══════════════════════════════════════════
+async function fetchFREDData(){
+  if(!API_KEYS.FRED || API_KEYS.FRED==='YOUR_FRED_KEY_HERE') return;
+  const series = [
+    {id:'FEDFUNDS',   label:'Fed Funds Rate',       fmt: v=>v.toFixed(2)+'%'},
+    {id:'CPIAUCSL',   label:'CPI (MoM)',             fmt: v=>v.toFixed(2)+'%'},
+    {id:'CPILFESL',   label:'Core CPI (MoM)',        fmt: v=>v.toFixed(2)+'%'},
+    {id:'PCEPILFE',   label:'Core PCE (MoM)',        fmt: v=>v.toFixed(2)+'%'},
+    {id:'UNRATE',     label:'Unemployment Rate',     fmt: v=>v.toFixed(1)+'%'},
+    {id:'PAYEMS',     label:'Nonfarm Payrolls',      fmt: v=>(v>0?'+':'')+Math.round(v)+'K'},
+    {id:'GDP',        label:'GDP (QoQ Ann.)',        fmt: v=>v.toFixed(1)+'%'},
+    {id:'INDPRO',     label:'Industrial Production', fmt: v=>v.toFixed(1)+'%'},
+    {id:'RETAILSMNSA',label:'Retail Sales (MoM)',    fmt: v=>v.toFixed(1)+'%'},
+    {id:'T10YIE',     label:'10Y Breakeven',         fmt: v=>v.toFixed(2)+'%'},
+    {id:'T5YIE',      label:'5Y Breakeven',          fmt: v=>v.toFixed(2)+'%'},
+    {id:'MORTGAGE30US',label:'30Y Mortgage Rate',    fmt: v=>v.toFixed(2)+'%'},
+    {id:'ICSA',       label:'Initial Claims',        fmt: v=>Math.round(v)+'K'},
+  ];
+  markPending('FRED');
+  if(!D.macro.fred) D.macro.fred = {};
+  let anyOk = false;
+  for(const s of series){
+    try{
+      const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${s.id}&api_key=${API_KEYS.FRED}&sort_order=desc&limit=2&file_type=json`;
+      const r = await proxyFetch(url, 10000);
+      const data = await r.json();
+      const obs = data?.observations?.filter(o=>o.value!='.');
+      if(obs && obs.length){
+        const latest = parseFloat(obs[0].value);
+        const prev   = obs[1] ? parseFloat(obs[1].value) : latest;
+        D.macro.fred[s.id] = {val:latest, prev, label:s.label, date:obs[0].date, chg:latest-prev};
+        anyOk = true;
+      }
+    }catch(e){}
+    await new Promise(r=>setTimeout(r,200)); // rate limit
+  }
+  if(anyOk) markFresh('FRED');
+  else markStale('FRED','all series failed');
 }
 
 async function fetchRSSNews(){
@@ -2570,7 +2838,6 @@ function rHOME(){
   const wti   = D.commodities.energy[0];
   const gold  = D.commodities.metals[0];
 
-  const s2_10col = s2_10>=0?'var(--green)':'var(--red)';
   const vixLevel = vix.val < 15 ? {txt:'LOW',col:'var(--green)'} : vix.val < 20 ? {txt:'MOD',col:'var(--amber)'} : vix.val < 30 ? {txt:'ELEV',col:'#ff6f00'} : {txt:'HIGH',col:'var(--red)'};
   const now = new Date();
   const mktHr = parseInt(now.toLocaleTimeString('en-US',{hour:'2-digit',hour12:false,timeZone:'America/New_York'}));
@@ -2594,6 +2861,74 @@ function rHOME(){
     </div>`;
   }
 
+  // Upcoming events (next 5 high-impact)
+  const today = now.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/Denver'});
+  const upcomingEvents = D.macro.calendar
+    .filter(e=>e.impact==='HIGH' && e.act==null)
+    .slice(0,5)
+    .map(e=>`<div style="display:flex;gap:6px;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
+      <span style="color:#444;width:48px;flex-shrink:0">${e.date}</span>
+      <span style="color:#ffab00;width:32px;flex-shrink:0">${e.cty}</span>
+      <span style="color:var(--text-dim);flex:1">${e.event}</span>
+      <span style="color:#333;font-size:9px">${e.fore||'—'}</span>
+    </div>`).join('');
+
+  // Earnings calendar (next 7 days)
+  const earningsRows = (D.earnings||[]).slice(0,6).map(e=>{
+    const beatCol = e.beat==null?'#444':e.beat?'var(--green)':'var(--red)';
+    const beatTxt = e.beat==null?'EST':e.beat?'BEAT':'MISS';
+    return `<div style="display:flex;gap:6px;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
+      <span style="color:var(--amber);width:48px;flex-shrink:0;font-weight:600">${e.ticker}</span>
+      <span style="color:#444;width:44px;flex-shrink:0;font-size:9px">${e.date}</span>
+      <span style="color:#333;width:24px;flex-shrink:0;font-size:9px">${e.time||'AMC'}</span>
+      <span style="color:#555;flex:1;font-size:9px">EPS est: ${e.epsEst||'—'}</span>
+      <span style="color:${beatCol};font-size:9px">${beatTxt}</span>
+    </div>`;
+  }).join('') || '<div style="color:#2a2a2a;font-size:9px;padding:6px 8px">NO UPCOMING EARNINGS</div>';
+
+  // A/D ratio (simulated from sector data)
+  const sectors = D.equities.sectors||[];
+  const advSectors = sectors.filter(s=>s.d1>0).length;
+  const decSectors = sectors.filter(s=>s.d1<0).length;
+  const adRatio = decSectors===0 ? '—' : (advSectors/decSectors).toFixed(2);
+  const adCol = advSectors > decSectors ? 'var(--green)' : advSectors < decSectors ? 'var(--red)' : 'var(--amber)';
+  const adBar = sectors.map(s=>{
+    const w = Math.round(100/sectors.length);
+    const col = s.d1>0.5?'#00c853':s.d1>0?'#1a4a1a':s.d1<-0.5?'#e53935':'#3a0a0a';
+    return `<div title="${s.name}: ${s.d1>0?'+':''}${s.d1.toFixed(2)}%" style="flex:1;height:8px;background:${col};margin:0 1px"></div>`;
+  }).join('');
+
+  // SPX key levels
+  const spxVal = spx.val;
+  const spxLevels = [
+    {label:'R2', val:(spxVal*1.018).toFixed(0), col:'var(--red)'},
+    {label:'R1', val:(spxVal*1.009).toFixed(0), col:'#c62828'},
+    {label:'LAST',val:spxVal.toFixed(1),         col:'var(--amber)'},
+    {label:'S1', val:(spxVal*0.991).toFixed(0), col:'#2e7d32'},
+    {label:'S2', val:(spxVal*0.982).toFixed(0), col:'var(--green)'},
+  ];
+
+  // Options flow (static indicative data — replace with live when API available)
+  const optionsFlow = D.optionsFlow || [
+    {ticker:'SPY', type:'CALL', strike:'580C', exp:'Mar-21', size:'25K', premium:'$4.2M', sentiment:'BULL'},
+    {ticker:'QQQ', type:'PUT',  strike:'480P', exp:'Mar-21', size:'18K', premium:'$2.8M', sentiment:'BEAR'},
+    {ticker:'NVDA',type:'CALL', strike:'950C', exp:'Apr-18', size:'12K', premium:'$6.1M', sentiment:'BULL'},
+    {ticker:'SPY', type:'PUT',  strike:'550P', exp:'Mar-28', size:'31K', premium:'$3.4M', sentiment:'BEAR'},
+    {ticker:'TLT', type:'CALL', strike:'96C',  exp:'Mar-21', size:'8K',  premium:'$1.1M', sentiment:'BULL'},
+    {ticker:'IWM', type:'PUT',  strike:'205P', exp:'Mar-21', size:'14K', premium:'$1.9M', sentiment:'BEAR'},
+  ];
+  const optRows = optionsFlow.map(o=>{
+    const col = o.sentiment==='BULL'?'var(--green)':'var(--red)';
+    return `<div style="display:flex;gap:4px;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px;align-items:center">
+      <span style="color:var(--amber);width:40px;flex-shrink:0;font-weight:600">${o.ticker}</span>
+      <span style="color:${col};width:36px;flex-shrink:0;font-size:9px">${o.type}</span>
+      <span style="color:#555;width:48px;flex-shrink:0">${o.strike}</span>
+      <span style="color:#444;width:48px;flex-shrink:0;font-size:9px">${o.exp}</span>
+      <span style="color:#555;flex:1;font-size:9px">${o.size} contracts</span>
+      <span style="color:${col};font-size:9px;font-weight:600">${o.premium}</span>
+    </div>`;
+  }).join('');
+
   const newsHtml = D.news.slice(0,10).map((n,i)=>`
     <div class="home-news-row" onclick="openNewsDetail(${i})">
       <span class="home-news-ts">${n.ts}</span>
@@ -2602,13 +2937,15 @@ function rHOME(){
       <span class="home-news-hl">${n.hl}</span>
     </div>`).join('');
 
-  return `<div id="home-wrap">
-    <div id="home-header" style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
-      <span style="color:var(--amber);font-size:11px;font-weight:600;letter-spacing:2px">◈ TERMINALLIGENCE</span>
+  return `<div id="home-wrap" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+    <!-- HEADER -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)">
+      <span style="color:var(--amber);font-size:11px;font-weight:600;letter-spacing:2px">◈ TERMINAL</span>
       <span style="font-size:10px;color:${mktStatus.col};letter-spacing:1px">${mktStatus.txt}</span>
-      <span style="color:#2a2a2a;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
+      <span id="home-clock" style="color:#2a2a2a;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
     </div>
-    <div id="home-grid">
+    <!-- MARKET TILES -->
+    <div id="home-grid" style="flex-shrink:0">
       ${tile('spx','S&P 500', spx.val.toFixed(1), spx.pct, spx.pct.toFixed(2)+'%', 'SPX', 'EQ')}
       ${tile('ndx','NASDAQ', ndx.val.toFixed(1), ndx.pct, ndx.pct.toFixed(2)+'%', 'NDX', 'EQ')}
       ${tile('dow','DOW', dow.val.toFixed(0), dow.pct, dow.pct.toFixed(2)+'%', 'DJIA', 'EQ')}
@@ -2619,13 +2956,38 @@ function rHOME(){
       ${tile('wti','WTI', '$'+wti.spot.toFixed(2), wti.d1, wti.d1.toFixed(2)+'%', '$/BBL', 'CMDTY')}
       ${tile('gold','GOLD', '$'+gold.spot.toFixed(0), gold.d1, gold.d1.toFixed(2)+'%', '$/OZ', 'CMDTY')}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 200px;flex:1;min-height:0;overflow:hidden">
-      <div style="display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--border)">
+    <!-- BREADTH BAR -->
+    <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:#030303">
+      <span style="color:#333;font-size:9px;letter-spacing:1px">BREADTH</span>
+      <div style="display:flex;flex:1;height:8px;border-radius:1px;overflow:hidden">${adBar}</div>
+      <span style="color:#444;font-size:9px">ADV/DEC</span>
+      <span style="color:${adCol};font-size:10px;font-weight:600">${advSectors}/${decSectors}</span>
+      <span style="color:#333;font-size:9px">RATIO</span>
+      <span style="color:${adCol};font-size:10px">${adRatio}</span>
+      <span style="color:#2a2a2a;font-size:9px;margin-left:8px">SPX KEY LEVELS:</span>
+      ${spxLevels.map(l=>`<span style="font-size:9px"><span style="color:#333">${l.label}</span> <span style="color:${l.col}">${l.val}</span></span>`).join('<span style="color:#1a1a1a"> · </span>')}
+    </div>
+    <!-- MAIN BODY — 3 column grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 220px;flex:1;min-height:0;overflow:hidden">
+      <!-- COL 1: NEWS -->
+      <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);min-height:0">
         <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between">
           <span>LIVE NEWS</span><span style="color:#2a2a2a">CLICK FOR DETAIL</span>
         </div>
         <div id="home-news" style="flex:1;overflow-y:auto">${newsHtml}</div>
       </div>
+      <!-- COL 2: EVENTS + EARNINGS + OPTIONS -->
+      <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);min-height:0;overflow-y:auto">
+        <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0">UPCOMING HIGH-IMPACT EVENTS</div>
+        ${upcomingEvents || '<div style="color:#2a2a2a;font-size:9px;padding:6px 8px">NO UPCOMING EVENTS</div>'}
+        <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;margin-top:4px">EARNINGS CALENDAR</div>
+        ${earningsRows}
+        <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;margin-top:4px;display:flex;justify-content:space-between">
+          <span>OPTIONS FLOW — UNUSUAL ACTIVITY</span><span style="color:#2a2a2a;font-size:8px">INDICATIVE</span>
+        </div>
+        ${optRows}
+      </div>
+      <!-- COL 3: CB + QUICK OPEN -->
       <div style="display:flex;flex-direction:column;overflow-y:auto">
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border)">CENTRAL BANKS</div>
         ${D.macro.centralBanks.map(cb=>`
@@ -2636,63 +2998,38 @@ function rHOME(){
           </div>`).join('')}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
-          ${['EQ','FX','CMDTY','MACRO','MAP','SPREAD','INFL','VOL'].map(p=>`
-          <div onclick="OW('${p}')" style="padding:4px 6px;border:1px solid var(--border);color:#444;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#333'" onmouseout="this.style.color='#444';this.style.borderColor='var(--border)'">${p}</div>`).join('')}
+          ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','MAP','SPREAD','VOL'].map(p=>`
+          <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid var(--border);color:#444;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#333'" onmouseout="this.style.color='#444';this.style.borderColor='var(--border)'">${p}</div>`).join('')}
         </div>
       </div>
     </div>
   </div>`;
 }
 
-function makeSparkData(baseVal, points=20, volatility=0.008){
-  const d=[]; let v=baseVal*(1-(points/2)*volatility*0.5);
-  for(let i=0;i<points;i++){v+=((Math.random()-.48)*baseVal*volatility);d.push(v);}
-  d[d.length-1]=baseVal; return d;
-}
-
-function drawSparkline(canvasId, data, upColor){
-  const c=document.getElementById(canvasId); if(!c)return;
-  const W=c.parentElement.offsetWidth; c.width=W; c.height=28;
-  const ctx=c.getContext('2d'); ctx.clearRect(0,0,W,28);
-  if(!data||data.length<2)return;
-  const mn=Math.min(...data),mx=Math.max(...data);
-  const rng=mx-mn||1;
-  const xp=i=>i/(data.length-1)*W;
-  const yp=v=>26-(v-mn)/rng*22;
-  const isUp=data[data.length-1]>=data[0];
-  const col=upColor||(isUp?'#00c853':'#e53935');
-  const g=ctx.createLinearGradient(0,0,0,28);
-  g.addColorStop(0,isUp?'rgba(0,200,83,0.15)':'rgba(229,57,53,0.12)');
-  g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.beginPath();
-  data.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));
-  ctx.lineTo(xp(data.length-1),28);ctx.lineTo(0,28);ctx.closePath();
-  ctx.fillStyle=g;ctx.fill();
-  ctx.strokeStyle=col;ctx.lineWidth=1.2;ctx.beginPath();
-  data.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));
-  ctx.stroke();
-}
-
 function initHOME(){
   const t = D.fixedIncome.treasuries;
   const sparkDefs = [
-    {id:'ust2',  base: t.find(x=>x.tenor==='2Y')?.yield??4.6,  vol:.003},
-    {id:'ust10', base: t.find(x=>x.tenor==='10Y')?.yield??4.5, vol:.003},
-    {id:'s2s10', base: 1, vol:.15, skip:true}, // spread sparkline skipped
     {id:'spx',   base: D.equities.indices[0].val,   vol:.006},
     {id:'ndx',   base: D.equities.indices[1].val,   vol:.008},
+    {id:'dow',   base: D.equities.indices[2]?.val||35000, vol:.005},
     {id:'vix',   base: D.equities.indices[4].val,   vol:.025},
+    {id:'ust10', base: t.find(x=>x.tenor==='10Y')?.yield??4.5, vol:.003},
     {id:'dxy',   base: D.fx.find(f=>f.name==='DXY')?.val??103, vol:.003},
+    {id:'eur',   base: D.fx.find(f=>f.name==='EURUSD')?.val??1.08, vol:.003},
     {id:'wti',   base: D.commodities.energy[0].spot,    vol:.012},
     {id:'gold',  base: D.commodities.metals[0].spot,    vol:.006},
   ];
-  sparkDefs.forEach(s=>{
-    if(s.skip)return;
-    drawSparkline('hts-'+s.id, makeSparkData(s.base,22,s.vol));
-  });
+  sparkDefs.forEach(s=>{ drawSparkline('hts-'+s.id, makeSparkData(s.base,22,s.vol)); });
+  // Live clock ticker
+  if(window._homeClock) clearInterval(window._homeClock);
+  window._homeClock = setInterval(()=>{
+    const el = document.getElementById('home-clock');
+    if(!el){ clearInterval(window._homeClock); return; }
+    const now = new Date();
+    el.textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})
+      +'  '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})+' MT';
+  }, 1000);
 }
-
-// HOME tiles are refreshed inside the main refreshOpenWindows (see below patch)
 
 function refreshHOMETiles(){
   const t=D.fixedIncome.treasuries;
@@ -2700,44 +3037,42 @@ function refreshHOMETiles(){
   const y10=t.find(x=>x.tenor==='10Y')?.yield??0;
   const s2_10=(y10-y2)*100;
   const updates={
-    'ust2':  {val:y2.toFixed(3)+'%',  chg:t.find(x=>x.tenor==='2Y')?.d1??0,  fmt:'d3'},
-    'ust10': {val:y10.toFixed(3)+'%', chg:t.find(x=>x.tenor==='10Y')?.d1??0, fmt:'d3'},
-    's2s10': {val:(s2_10>=0?'+':'')+s2_10.toFixed(1)+'bp', chg:s2_10, fmt:'bp', noChgSpan:true},
     'spx':   {val:D.equities.indices[0].val.toFixed(1),  chg:D.equities.indices[0].pct, fmt:'pct'},
     'ndx':   {val:D.equities.indices[1].val.toFixed(1),  chg:D.equities.indices[1].pct, fmt:'pct'},
+    'dow':   {val:D.equities.indices[2]?.val.toFixed(0)||'—', chg:D.equities.indices[2]?.pct||0, fmt:'pct'},
     'vix':   {val:D.equities.indices[4].val.toFixed(2),  chg:D.equities.indices[4].chg, fmt:'d2'},
+    'ust10': {val:y10.toFixed(3)+'%', chg:t.find(x=>x.tenor==='10Y')?.d1??0, fmt:'d3'},
     'dxy':   {val:(D.fx.find(f=>f.name==='DXY')||D.fx[0]).val.toFixed(2), chg:(D.fx.find(f=>f.name==='DXY')||D.fx[0]).d1, fmt:'d3'},
-    'wti':   {val:'$'+D.commodities.energy[0].spot.toFixed(2),   chg:D.commodities.energy[0].d1, fmt:'pct'},
-    'gold':  {val:'$'+D.commodities.metals[0].spot.toFixed(0),   chg:D.commodities.metals[0].d1, fmt:'pct'},
+    'eur':   {val:(D.fx.find(f=>f.name==='EURUSD')||D.fx[1]).val.toFixed(4), chg:(D.fx.find(f=>f.name==='EURUSD')||D.fx[1]).d1, fmt:'d4'},
+    'wti':   {val:'$'+D.commodities.energy[0].spot.toFixed(2), chg:D.commodities.energy[0].d1, fmt:'pct'},
+    'gold':  {val:'$'+D.commodities.metals[0].spot.toFixed(0), chg:D.commodities.metals[0].d1, fmt:'pct'},
   };
   Object.entries(updates).forEach(([id,u])=>{
     const valEl=document.getElementById('htv-'+id);
     if(valEl) valEl.innerHTML=u.val;
-    if(!u.noChgSpan){
-      const tile=document.getElementById('ht-'+id);
-      if(tile){
-        const chgEl=tile.querySelector('.home-tile-chg');
-        if(chgEl){
-          const col=u.chg>0?'var(--green)':u.chg<0?'var(--red)':'var(--text-dim)';
-          const sign=u.chg>0?'+':'';
-          const disp=u.fmt==='pct'?sign+u.chg.toFixed(2)+'%':u.fmt==='bp'?sign+u.chg.toFixed(1)+'bp':sign+u.chg.toFixed(u.fmt==='d3'?3:2);
-          chgEl.style.color=col; chgEl.textContent=disp;
-        }
+    const tile=document.getElementById('ht-'+id);
+    if(tile){
+      const chgEl=tile.querySelector('.home-tile-chg');
+      if(chgEl){
+        const col=u.chg>0?'var(--green)':u.chg<0?'var(--red)':'var(--text-dim)';
+        const sign=u.chg>0?'+':'';
+        const disp=u.fmt==='pct'?sign+u.chg.toFixed(2)+'%':u.fmt==='bp'?sign+u.chg.toFixed(1)+'bp':sign+u.chg.toFixed(u.fmt==='d3'?3:u.fmt==='d4'?4:2);
+        chgEl.style.color=col; chgEl.textContent=disp;
       }
     }
-    // Redraw sparkline
-    const sparkDef={ust2:{base:y2,vol:.003},ust10:{base:y10,vol:.003},
-      spx:{base:D.equities.indices[0].val,vol:.006},ndx:{base:D.equities.indices[1].val,vol:.008},
+    const sparkDef={spx:{base:D.equities.indices[0].val,vol:.006},
+      ndx:{base:D.equities.indices[1].val,vol:.008},
+      dow:{base:D.equities.indices[2]?.val||35000,vol:.005},
       vix:{base:D.equities.indices[4].val,vol:.025},
+      ust10:{base:y10,vol:.003},
       dxy:{base:(D.fx.find(f=>f.name==='DXY')||D.fx[0]).val,vol:.003},
+      eur:{base:(D.fx.find(f=>f.name==='EURUSD')||D.fx[1]).val,vol:.003},
       wti:{base:D.commodities.energy[0].spot,vol:.012},
       gold:{base:D.commodities.metals[0].spot,vol:.006}};
     if(sparkDef[id]) drawSparkline('hts-'+id, makeSparkData(sparkDef[id].base,22,sparkDef[id].vol));
   });
 }
 
-// ═══════════════════════════════════════════
-// HEAT — Heatmap Panel (3 modes)
 // ═══════════════════════════════════════════
 function rHEAT(mode){
   mode = (mode||'sector').toLowerCase();
@@ -2919,11 +3254,17 @@ WTITLES['SRCH'] = 'SEARCH RESULTS';
 WTITLES['SCRN'] = 'EQUITY SCREENER — US STOCKS';
 WTITLES['HOME'] = 'MARKET OVERVIEW';
 WTITLES['HEAT'] = 'HEATMAP';
+WTITLES['OPTIONS'] = 'OPTIONS FLOW & SENTIMENT';
+WTITLES['EARN']    = 'EARNINGS CALENDAR';
+WTITLES['ECON']    = 'ECONOMIC RELEASES — FRED';
 WSIZES['HELP']  = [680,560];
 WSIZES['SRCH']  = [560,360];
 WSIZES['SCRN']  = [920,580];
 WSIZES['HOME']  = [780,520];
 WSIZES['HEAT']  = [720,480];
+WSIZES['OPTIONS']= [720,500];
+WSIZES['EARN']  = [680,460];
+WSIZES['ECON']  = [680,480];
 
 function rHELP(){
   const core = [
@@ -3518,6 +3859,7 @@ async function pollAllUpgraded(){
     fetchCommodities(),
     fetchRSSNews(),
     fetchYahooStrip(),
+    fetchFREDData(),
   ]);
   refreshOpenWindows();
 }
@@ -3570,6 +3912,14 @@ window.addEventListener('load',()=>{
     // Regular polling every 60s
     setInterval(pollAllUpgraded,60000);
     setInterval(buildTickerTape,120000);
+    // Live clock — updates every second
+    setInterval(()=>{
+      const el = document.getElementById('home-clock');
+      if(el){
+        const now = new Date();
+        el.textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})+' MT';
+      }
+    }, 1000);
   };
   document.head.appendChild(s);
 });

@@ -1823,7 +1823,7 @@ async function fetchRSSFeed(feedUrl, src){
     const pubDate = new Date(item.querySelector('pubDate')?.textContent || Date.now());
     const desc    = item.querySelector('description')?.textContent?.trim() || '';
     return { src, tag: classifyNewsTag(title), hl: title, detail: desc, url: link, pubDate,
-             ts: pubDate.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/Mountain'})+' '+pubDate.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Mountain'}) };
+             ts: pubDate.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/Denver'})+' '+pubDate.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Denver'}) };
   }).filter(n => n.hl);
 }
 

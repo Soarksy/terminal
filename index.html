@@ -1233,9 +1233,9 @@ async function fetchEQS(ticker){
   try{
     // Yahoo Finance: quote + summary detail in parallel
     const [quoteRes, histRes] = await Promise.allSettled([
-      proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1y`, 10000)
+      proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1y`, 10000)
         .then(r=>r.json()),
-      proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=5m&range=1d`, 10000)
+      proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=1d`, 10000)
         .then(r=>r.json()),
     ]);
 
@@ -1512,8 +1512,9 @@ function updateStatusBar(){
 // ═══════════════════════════════════════════
 async function proxyFetch(url, timeoutMs=10000){
   const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
     `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
   ];
   let lastErr;
   for(const proxied of proxies){
@@ -1521,7 +1522,7 @@ async function proxyFetch(url, timeoutMs=10000){
       const r = await fetch(proxied, {signal: AbortSignal.timeout(timeoutMs)});
       if(!r.ok) throw new Error(`HTTP ${r.status}`);
       return r;
-    }catch(e){ lastErr=e; }
+    }catch(e){ lastErr=e; continue; }
   }
   throw lastErr;
 }
@@ -1621,7 +1622,7 @@ const INDEX_SYMS = ['^GSPC','^IXIC','^DJI','^RUT','^VIX'];
 async function fetchEquityIndices(){
   markPending('EQ');
   const results = await Promise.allSettled(INDEX_SYMS.map(async sym => {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d`;
     const r = await proxyFetch(url, 9000);
     const d = await r.json();
     const m = d?.chart?.result?.[0]?.meta;
@@ -1650,7 +1651,7 @@ const CMDTY_SYMS = {'CL=F':'WTI Crude','BZ=F':'Brent Crude','NG=F':'Nat Gas','GC
 async function fetchCommodities(){
   markPending('CMDTY');
   const results = await Promise.allSettled(Object.entries(CMDTY_SYMS).map(async ([sym, name]) => {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d`;
     const r = await proxyFetch(url, 9000);
     const d = await r.json();
     const m = d?.chart?.result?.[0]?.meta;
@@ -1688,8 +1689,8 @@ function classifyNewsTag(title){
 const NEWS_RSS = [
   {url:'https://finance.yahoo.com/rss/topstories',              src:'YAHOO'},
   {url:'https://feeds.a.dj.com/rss/RSSMarketsMain.xml',         src:'WSJ'},
-  {url:'https://www.ft.com/rss/home/uk',                        src:'FT'},
   {url:'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', src:'CNBC'},
+  {url:'https://feeds.nbcnews.com/nbcnews/public/business',      src:'NBC'},
 ];
 
 async function fetchRSSFeed(feedUrl, src){
@@ -3203,7 +3204,7 @@ const YF_SYMBOLS = {
 };
 async function yfFetch(sym){
   try{
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d&includePrePost=false`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d&includePrePost=false`;
     const r = await proxyFetch(url, 9000);
     const d = await r.json();
     const m = d?.chart?.result?.[0]?.meta;
@@ -3216,7 +3217,7 @@ async function yfFetch(sym){
 
 async function yfFetchHistory(sym, range){
   try{
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=${range}&includePrePost=false`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=${range}&includePrePost=false`;
     const r = await proxyFetch(url, 12000);
     const d = await r.json();
     const res = d?.chart?.result?.[0];

@@ -445,7 +445,7 @@ canvas{display:block}
   <button class="scbtn" onclick="OW('VOL')"><span class="k">-</span>VOL</button>
   <button class="scbtn" onclick="OW('EQS')"><span class="k">=</span>EQS</button>
   <button class="scbtn" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)"><span class="k">C</span>CHART</button>
-  <div id="sc-right">H=HOME &nbsp;|&nbsp; F=FULLSCREEN &nbsp;|&nbsp; / = SEARCH &nbsp;|&nbsp; ↑↓ = HISTORY &nbsp;|&nbsp; TAB = AUTOCOMPLETE &nbsp;|&nbsp; ESC = CLEAR &nbsp;|&nbsp; CTRL+A = ARRANGE &nbsp;|&nbsp; ~ = CLOSE ALL &nbsp;|&nbsp; HEAT · SCRN · HELP</div>
+  <div id="sc-right">CTRL+F = FULLSCREEN &nbsp;|&nbsp; CTRL+A = ARRANGE &nbsp;|&nbsp; CTRL+BACKSPACE = CLOSE ALL</div>
 </div>
 
 <!-- STATUS BAR -->
@@ -456,16 +456,6 @@ canvas{display:block}
 
 <!-- WORKSPACE -->
 <div id="workspace">
-  <div id="welcome">
-    <div class="wt">MACRO INTELLIGENCE</div>
-    <div class="ws">CROSS-ASSET WORKSTATION v3.0</div>
-    <div class="wg">
-      <div class="wc">FI</div><div class="wc">EQ</div><div class="wc">FX</div>
-      <div class="wc">CMDTY</div><div class="wc">MAP</div><div class="wc">MACRO</div>
-      <div class="wc">NEWS</div><div class="wc">SPREAD</div><div class="wc">INFL</div>
-      <div class="wc">AUCTION</div><div class="wc">VOL</div><div class="wc">EQS</div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -511,13 +501,16 @@ const D = {
       ]
     },
     auctions:[
-      {sec:'3M T-Bill',issue:'2025-01-14',mat:'2025-04-14',auction:'2025-01-13',yield:5.280,btc:2.84,tail:.2,ind:68.2,dir:18.4,deal:13.4,weak:false},
-      {sec:'6M T-Bill',issue:'2025-01-16',mat:'2025-07-17',auction:'2025-01-13',yield:5.220,btc:2.91,tail:.1,ind:71.4,dir:16.2,deal:12.4,weak:false},
-      {sec:'2Y Note',  issue:'2025-01-31',mat:'2027-01-31',auction:'2025-01-28',yield:4.618,btc:2.52,tail:1.4,ind:62.1,dir:20.8,deal:17.1,weak:false},
-      {sec:'5Y Note',  issue:'2025-01-31',mat:'2030-01-31',auction:'2025-01-29',yield:4.382,btc:2.38,tail:2.1,ind:58.4,dir:19.2,deal:22.4,weak:true},
-      {sec:'7Y Note',  issue:'2025-01-31',mat:'2032-01-31',auction:'2025-01-30',yield:4.422,btc:2.44,tail:1.8,ind:60.2,dir:18.8,deal:21.0,weak:false},
-      {sec:'10Y Note', issue:'2025-02-15',mat:'2035-02-15',auction:'2025-02-12',yield:4.521,btc:2.48,tail:1.6,ind:65.8,dir:17.4,deal:16.8,weak:false},
-      {sec:'30Y Bond', issue:'2025-02-15',mat:'2055-02-15',auction:'2025-02-13',yield:4.882,btc:2.22,tail:3.2,ind:55.4,dir:14.2,deal:30.4,weak:true},
+      {sec:'4W T-Bill', issue:'2026-02-05',mat:'2026-03-05',auction:'2026-02-03',yield:4.280,btc:2.96,tail:.1,ind:66.4,dir:19.8,deal:13.8,weak:false},
+      {sec:'8W T-Bill', issue:'2026-02-05',mat:'2026-04-02',auction:'2026-02-03',yield:4.295,btc:2.88,tail:.1,ind:68.2,dir:18.4,deal:13.4,weak:false},
+      {sec:'13W T-Bill',issue:'2026-02-06',mat:'2026-05-07',auction:'2026-02-03',yield:4.310,btc:3.02,tail:.2,ind:70.1,dir:16.2,deal:13.7,weak:false},
+      {sec:'26W T-Bill',issue:'2026-02-06',mat:'2026-08-06',auction:'2026-02-03',yield:4.298,btc:2.94,tail:.1,ind:71.4,dir:15.8,deal:12.8,weak:false},
+      {sec:'2Y Note',   issue:'2026-02-28',mat:'2028-02-28',auction:'2026-02-25',yield:4.114,btc:2.64,tail:1.1,ind:63.4,dir:21.2,deal:15.4,weak:false},
+      {sec:'5Y Note',   issue:'2026-02-28',mat:'2031-02-28',auction:'2026-02-26',yield:4.248,btc:2.41,tail:1.8,ind:59.8,dir:18.4,deal:21.8,weak:false},
+      {sec:'7Y Note',   issue:'2026-02-28',mat:'2033-02-28',auction:'2026-02-27',yield:4.312,btc:2.38,tail:2.2,ind:58.2,dir:17.8,deal:24.0,weak:true},
+      {sec:'10Y Note',  issue:'2026-02-17',mat:'2036-02-15',auction:'2026-02-11',yield:4.632,btc:2.44,tail:1.9,ind:64.2,dir:16.8,deal:19.0,weak:false},
+      {sec:'20Y Bond',  issue:'2026-02-17',mat:'2046-02-15',auction:'2026-02-12',yield:4.914,btc:2.28,tail:2.8,ind:58.4,dir:13.2,deal:28.4,weak:true},
+      {sec:'30Y Bond',  issue:'2026-02-17',mat:'2056-02-15',auction:'2026-02-13',yield:4.812,btc:2.31,tail:2.4,ind:56.8,dir:14.4,deal:28.8,weak:false},
     ],
     inflation:{
       breakevens:[
@@ -814,7 +807,7 @@ function renderW(cmd,key,extra){
   const b=document.getElementById('wb-'+key);
   if(!b)return;
   switch(cmd){
-    case'FI':     b.innerHTML=rFI();break;
+    case'FI':     b.innerHTML=rFI(); setTimeout(drawYieldCurve,40); break;
     case'EQ':     b.innerHTML=rEQ();setTimeout(()=>drawEQ(),30);break;
     case'FX':     b.innerHTML=rFX();break;
     case'CMDTY':  b.innerHTML=rCMDTY();break;
@@ -869,13 +862,141 @@ function rFI(){
     <td>${fmtC(r.d1,3)}</td><td>${fmtC(r.w1,3)}</td><td>${fmtC(r.m1,3)}</td>
     <td class="neu">${fmt(r.dur,2)}</td><td class="w">${fmt(r.price,2)}</td>
   </tr>`).join('');
-  return`<table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D</th><th>1W</th><th>1M</th><th>DUR</th><th>PRICE</th></tr></thead><tbody>${rows}</tbody></table>
-  <div class="sf">
+  return`
+  <div class="sl">YIELD CURVE — INTERACTIVE</div>
+  <canvas id="yield-curve-canvas" height="160" style="width:100%;cursor:crosshair;margin-bottom:4px"></canvas>
+  <div id="yield-curve-tooltip" style="height:16px;font-size:9px;color:#555;letter-spacing:.5px;margin-bottom:4px;padding:0 2px"></div>
+  <div class="sf" style="margin-bottom:6px">
     <div class="si"><span class="sil">2s10s</span><span class="siv">${fmtCS(s2_10,1)}bp</span></div>
     <div class="si"><span class="sil">3m10y</span><span class="siv">${fmtCS(s3m10,1)}bp</span></div>
     <div class="si"><span class="sil">5s30s</span><span class="siv">${fmtCS(s5_30,1)}bp</span></div>
     <div class="si"><span class="sil">CURVE</span><span class="regime ${regime}">${regime.toUpperCase()}</span></div>
-  </div>`;
+  </div>
+  <div class="sl">TENOR TABLE</div>
+  <table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D</th><th>1W</th><th>1M</th><th>DUR</th><th>PRICE</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function drawYieldCurve(){
+  const canvas = document.getElementById('yield-curve-canvas');
+  if(!canvas) return;
+  const t = D.fixedIncome.treasuries;
+  const W = canvas.parentElement.offsetWidth - 4;
+  canvas.width = W; canvas.height = 160;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,W,160);
+
+  const pts = t.filter(r=>r.yield>0);
+  if(!pts.length) return;
+
+  const yields = pts.map(r=>r.yield);
+  const mn = Math.min(...yields) - 0.1;
+  const mx = Math.max(...yields) + 0.1;
+  const pad = {l:38,r:8,t:10,b:20};
+  const pw = W-pad.l-pad.r, ph = 160-pad.t-pad.b;
+  const xp = i => pad.l + (i/(pts.length-1))*pw;
+  const yp = v => pad.t + (1-(v-mn)/(mx-mn))*ph;
+
+  // Grid lines
+  const gridYs = 4;
+  for(let i=0;i<=gridYs;i++){
+    const v = mn + (mx-mn)*(i/gridYs);
+    const y = yp(v);
+    ctx.strokeStyle='#111'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle='#333'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
+    ctx.fillText(v.toFixed(2)+'%', pad.l-2, y+3);
+  }
+
+  // Determine curve color by regime
+  const y2=t[4]?.yield||0, y10=t[8]?.yield||0;
+  const inverted = y10 < y2;
+  const lineCol = inverted ? '#e53935' : '#00c853';
+
+  // Fill under curve
+  const grad = ctx.createLinearGradient(0,pad.t,0,160-pad.b);
+  grad.addColorStop(0, inverted?'rgba(229,57,53,0.15)':'rgba(0,200,83,0.15)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();
+  pts.forEach((r,i)=> i===0 ? ctx.moveTo(xp(i),yp(r.yield)) : ctx.lineTo(xp(i),yp(r.yield)));
+  ctx.lineTo(xp(pts.length-1),160-pad.b); ctx.lineTo(pad.l,160-pad.b);
+  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+
+  // Line
+  ctx.strokeStyle=lineCol; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  pts.forEach((r,i)=> i===0 ? ctx.moveTo(xp(i),yp(r.yield)) : ctx.lineTo(xp(i),yp(r.yield)));
+  ctx.stroke();
+
+  // Dots + labels
+  pts.forEach((r,i)=>{
+    const x=xp(i), y=yp(r.yield);
+    ctx.fillStyle=lineCol; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2a2a2a'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText(r.tenor, x, 160-pad.b+12);
+  });
+
+  // Store pts+coords for hover
+  canvas._yieldPts = pts.map((r,i)=>({x:xp(i),y:yp(r.yield),r}));
+
+  // Hover interaction
+  canvas.onmousemove = e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx2 = e.clientX - rect.left;
+    const tip = document.getElementById('yield-curve-tooltip');
+    if(!tip||!canvas._yieldPts) return;
+    // Find nearest point
+    let nearest=null, minD=999;
+    canvas._yieldPts.forEach(p=>{
+      const d=Math.abs(p.x-mx2);
+      if(d<minD){minD=d;nearest=p;}
+    });
+    if(nearest && minD < 40){
+      const r=nearest.r;
+      const d1=r.d1>=0?`<span style="color:#00c853">+${r.d1.toFixed(3)}</span>`:`<span style="color:#e53935">${r.d1.toFixed(3)}</span>`;
+      tip.innerHTML=`<span style="color:var(--amber)">${r.tenor}</span> &nbsp;YIELD: <span style="color:#e0e0e0">${r.yield.toFixed(3)}%</span> &nbsp;1D: ${d1} &nbsp;DUR: ${r.dur.toFixed(1)}y`;
+      // Draw crosshair
+      const savedW=canvas.width;
+      ctx.clearRect(0,0,W,160);
+      drawYieldCurveStatic(ctx,pts,W,pad,pw,ph,mn,mx,xp,yp,lineCol,grad);
+      ctx.strokeStyle='#2a2a2a'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(nearest.x,pad.t); ctx.lineTo(nearest.x,160-pad.b); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#ffab00'; ctx.beginPath(); ctx.arc(nearest.x,nearest.y,4,0,Math.PI*2); ctx.fill();
+    } else {
+      tip.innerHTML='';
+    }
+  };
+  canvas.onmouseleave = e => {
+    const tip = document.getElementById('yield-curve-tooltip');
+    if(tip) tip.innerHTML='';
+    ctx.clearRect(0,0,W,160);
+    drawYieldCurveStatic(ctx,pts,W,pad,pw,ph,mn,mx,xp,yp,lineCol,grad);
+  };
+}
+
+function drawYieldCurveStatic(ctx,pts,W,pad,pw,ph,mn,mx,xp,yp,lineCol,grad){
+  const gridYs=4;
+  for(let i=0;i<=gridYs;i++){
+    const v=mn+(mx-mn)*(i/gridYs); const y=yp(v);
+    ctx.strokeStyle='#111'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle='#333'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
+    ctx.fillText(v.toFixed(2)+'%',pad.l-2,y+3);
+  }
+  ctx.beginPath();
+  pts.forEach((r,i)=>i===0?ctx.moveTo(xp(i),yp(r.yield)):ctx.lineTo(xp(i),yp(r.yield)));
+  ctx.lineTo(xp(pts.length-1),160-pad.b); ctx.lineTo(pad.l,160-pad.b);
+  ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  ctx.strokeStyle=lineCol; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  pts.forEach((r,i)=>i===0?ctx.moveTo(xp(i),yp(r.yield)):ctx.lineTo(xp(i),yp(r.yield)));
+  ctx.stroke();
+  pts.forEach((r,i)=>{
+    const x=xp(i),y=yp(r.yield);
+    ctx.fillStyle=lineCol; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#2a2a2a'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText(r.tenor,x,160-pad.b+12);
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1694,7 +1815,7 @@ const NEWS_RSS = [
 ];
 
 async function fetchRSSFeed(feedUrl, src){
-  const r = await proxyFetch(feedUrl, 9000);
+  const r = await proxyFetch(feedUrl, 14000);
   const text = await r.text();
   const xml  = new DOMParser().parseFromString(text, 'text/xml');
   return [...xml.querySelectorAll('item')].slice(0,12).map(item => {
@@ -1758,6 +1879,7 @@ function refreshOpenWindows(){
       renderW(cmd, cmd, null);
       WR[cmd].classList.add('flash');
       setTimeout(()=>WR[cmd].classList.remove('flash'), 500);
+      if(cmd==='FI') setTimeout(drawYieldCurve, 60);
     }
   });
 
@@ -3448,9 +3570,14 @@ window.addEventListener('load',()=>{
       setTimeout(()=>OW('FI'),100);
       setTimeout(()=>OW('NEWS'),200);
       setTimeout(()=>{OW('CHART','SPY');setTimeout(loadChartData,300);},400);
-      setTimeout(()=>runNetworkTest(),800);
     },80);
-    setTimeout(()=>{pollAllUpgraded();buildTickerTape();},1000);
+    // Run DIAG first, then poll after it finishes (avoid proxy contention)
+    setTimeout(async ()=>{
+      await runNetworkTest();
+      await pollAllUpgraded();
+      buildTickerTape();
+    }, 600);
+    // Regular polling every 60s
     setInterval(pollAllUpgraded,60000);
     setInterval(buildTickerTape,120000);
   };

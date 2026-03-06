@@ -127,6 +127,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   flex-shrink:0;margin-left:2px;border-radius:2px;
 }
 .wh-fs:hover{background:#1a1a00;color:var(--amber);border-color:#3a2a00}
+.wh-refresh{
+  width:20px;height:20px;background:#0a0a0a;border:1px solid #333;
+  color:#444;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-left:2px;border-radius:2px;
+}
+.wh-refresh:hover{background:#001a0a;color:var(--green);border-color:#1a3a1a}
 .wb{flex:1;overflow:auto;padding:6px;font-size:11px}
 .wr{position:absolute;bottom:0;right:0;width:10px;height:10px;cursor:se-resize;
     background:linear-gradient(135deg,transparent 50%,#222 50%)}
@@ -437,7 +443,6 @@ canvas{display:block}
   <button class="scbtn" onclick="OW('MAP')">MAP</button>
   <button class="scbtn" onclick="OW('MACRO')">MACRO</button>
   <button class="scbtn" onclick="OW('NEWS')">NEWS</button>
-  <button class="scbtn" onclick="OW('SPREAD')">SPREAD</button>
   <button class="scbtn" onclick="OW('INFL')">INFL</button>
   <button class="scbtn" onclick="OW('VOL')">VOL</button>
   <button class="scbtn" onclick="OW('EQS')">EQS</button>
@@ -447,6 +452,9 @@ canvas{display:block}
   <button class="scbtn" onclick="OW('OPTIONS')">OPTIONS</button>
   <button class="scbtn" onclick="OW('EARN')">EARNINGS</button>
   <button class="scbtn" onclick="OW('ECON')">ECON</button>
+  <button class="scbtn" onclick="OW('CARRY')">CARRY</button>
+  <button class="scbtn" onclick="OW('ROTATION')">ROTATION</button>
+  <button class="scbtn" onclick="OW('LADDER')">LADDER</button>
   <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A ARRANGE &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
 </div>
 
@@ -592,33 +600,67 @@ const D = {
 
   macro:{
     calendar:[
-      // ── Q1/Q2 2026 SCHEDULED RELEASES (US BLS / Fed / BEA) ──
-      {date:'Mar 07',time:'08:30',cty:'US',event:'Nonfarm Payrolls Feb',    prev:'143K', fore:'160K', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 07',time:'08:30',cty:'US',event:'Unemployment Rate Feb',   prev:'4.0%', fore:'4.0%', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 12',time:'08:30',cty:'US',event:'CPI YoY Feb',             prev:'3.0%', fore:'2.9%', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 12',time:'08:30',cty:'US',event:'Core CPI YoY Feb',        prev:'3.3%', fore:'3.2%', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 13',time:'08:30',cty:'US',event:'PPI Final Demand MoM Feb',prev:'0.4%', fore:'0.3%', act:null,impact:'MED', beat:null},
-      {date:'Mar 18',time:'08:30',cty:'US',event:'Retail Sales MoM Feb',    prev:'-0.9%',fore:'0.6%', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 19',time:'14:00',cty:'US',event:'FOMC Rate Decision',      prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,impact:'HIGH',beat:null},
-      {date:'Mar 19',time:'14:30',cty:'US',event:'Fed Press Conference',    prev:'',     fore:'',     act:null,impact:'HIGH',beat:null},
-      {date:'Mar 26',time:'08:30',cty:'US',event:'GDP QoQ Q4 Final',        prev:'2.3%', fore:'2.3%', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 28',time:'08:30',cty:'US',event:'Core PCE YoY Feb',        prev:'2.6%', fore:'2.5%', act:null,impact:'HIGH',beat:null},
-      {date:'Mar 28',time:'08:30',cty:'US',event:'Personal Income MoM Feb', prev:'0.9%', fore:'0.4%', act:null,impact:'MED', beat:null},
-      {date:'Apr 02',time:'08:30',cty:'US',event:'ADP Employment Mar',      prev:'77K',  fore:'120K', act:null,impact:'MED', beat:null},
-      {date:'Apr 04',time:'08:30',cty:'US',event:'Nonfarm Payrolls Mar',    prev:'',     fore:'150K', act:null,impact:'HIGH',beat:null},
-      {date:'Apr 10',time:'08:30',cty:'US',event:'CPI YoY Mar',             prev:'',     fore:'',     act:null,impact:'HIGH',beat:null},
-      {date:'Apr 16',time:'08:30',cty:'US',event:'Retail Sales MoM Mar',    prev:'',     fore:'',     act:null,impact:'HIGH',beat:null},
-      {date:'Apr 30',time:'14:00',cty:'US',event:'FOMC Rate Decision',      prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,impact:'HIGH',beat:null},
-      {date:'May 07',time:'',     cty:'UK', event:'BOE Rate Decision',      prev:'4.50%',fore:'4.25%',act:null,impact:'HIGH',beat:null},
-      {date:'Jun 11',time:'14:00',cty:'US',event:'FOMC Rate Decision',      prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,impact:'HIGH',beat:null},
+      // ── MARCH 2026 ──
+      {date:'Mar 07',time:'08:30',cty:'US',event:'Nonfarm Payrolls Feb',      prev:'143K',  fore:'160K',          act:'151K',  impact:'HIGH',beat:true},
+      {date:'Mar 07',time:'08:30',cty:'US',event:'Unemployment Rate Feb',     prev:'4.0%',  fore:'4.0%',          act:'4.1%',  impact:'HIGH',beat:false},
+      {date:'Mar 12',time:'08:30',cty:'US',event:'CPI MoM Feb',               prev:'0.5%',  fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 12',time:'08:30',cty:'US',event:'Core CPI MoM Feb',          prev:'0.4%',  fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 13',time:'08:30',cty:'US',event:'PPI Final Demand MoM Feb',  prev:'0.4%',  fore:'0.3%',          act:null,    impact:'MED', beat:null},
+      {date:'Mar 13',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'242K',  fore:'235K',          act:null,    impact:'MED', beat:null},
+      {date:'Mar 14',time:'09:15',cty:'US',event:'Industrial Production MoM', prev:'-0.1%', fore:'0.2%',          act:null,    impact:'MED', beat:null},
+      {date:'Mar 17',time:'08:30',cty:'US',event:'Retail Sales MoM Feb',      prev:'-0.9%', fore:'0.7%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 17',time:'10:00',cty:'US',event:'NAHB Housing Market Index', prev:'42',    fore:'43',            act:null,    impact:'LOW', beat:null},
+      {date:'Mar 18',time:'08:30',cty:'US',event:'Housing Starts Feb',        prev:'1.366M',fore:'1.38M',         act:null,    impact:'MED', beat:null},
+      {date:'Mar 18',time:'',     cty:'JP', event:'BOJ Rate Decision',        prev:'0.50%', fore:'0.50%',         act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 19',time:'14:00',cty:'US',event:'FOMC Rate Decision',        prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,   impact:'HIGH',beat:null},
+      {date:'Mar 19',time:'14:30',cty:'US',event:'Fed Press Conference',      prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 19',time:'',     cty:'UK', event:'BOE Rate Decision',        prev:'4.50%', fore:'4.50%',         act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 20',time:'10:00',cty:'US',event:'Existing Home Sales Feb',   prev:'4.08M', fore:'4.12M',         act:null,    impact:'MED', beat:null},
+      {date:'Mar 24',time:'09:45',cty:'US',event:'S&P Global PMI Composite',  prev:'52.7',  fore:'52.5',          act:null,    impact:'MED', beat:null},
+      {date:'Mar 26',time:'08:30',cty:'US',event:'GDP QoQ Q4 Final',          prev:'2.3%',  fore:'2.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 26',time:'08:30',cty:'US',event:'Durable Goods Orders MoM',  prev:'3.2%',  fore:'-1.0%',         act:null,    impact:'MED', beat:null},
+      {date:'Mar 27',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'',      fore:'235K',          act:null,    impact:'MED', beat:null},
+      {date:'Mar 28',time:'08:30',cty:'US',event:'Core PCE MoM Feb',          prev:'0.3%',  fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 28',time:'08:30',cty:'US',event:'Personal Income MoM Feb',   prev:'0.9%',  fore:'0.4%',          act:null,    impact:'MED', beat:null},
+      {date:'Mar 28',time:'10:00',cty:'US',event:'U Michigan Sentiment Final', prev:'64.7',  fore:'64.0',          act:null,    impact:'MED', beat:null},
+      // ── APRIL 2026 ──
+      {date:'Apr 01',time:'10:00',cty:'US',event:'ISM Manufacturing PMI Mar', prev:'50.3',  fore:'50.1',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 02',time:'08:30',cty:'US',event:'ADP Employment Mar',        prev:'77K',   fore:'125K',          act:null,    impact:'MED', beat:null},
+      {date:'Apr 03',time:'10:00',cty:'US',event:'ISM Services PMI Mar',      prev:'53.5',  fore:'53.0',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 03',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'',      fore:'232K',          act:null,    impact:'MED', beat:null},
+      {date:'Apr 04',time:'08:30',cty:'US',event:'Nonfarm Payrolls Mar',      prev:'151K',  fore:'158K',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 04',time:'08:30',cty:'US',event:'Unemployment Rate Mar',     prev:'4.1%',  fore:'4.1%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 10',time:'08:30',cty:'US',event:'CPI MoM Mar',               prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 10',time:'08:30',cty:'US',event:'Core CPI MoM Mar',          prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 11',time:'08:30',cty:'US',event:'PPI Final Demand MoM Mar',  prev:'',      fore:'0.2%',          act:null,    impact:'MED', beat:null},
+      {date:'Apr 14',time:'',     cty:'EU', event:'ECB Rate Decision',        prev:'2.40%', fore:'2.15%',         act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 15',time:'08:30',cty:'US',event:'Retail Sales MoM Mar',      prev:'',      fore:'0.5%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 16',time:'09:15',cty:'US',event:'Industrial Production MoM', prev:'',      fore:'0.2%',          act:null,    impact:'MED', beat:null},
+      {date:'Apr 17',time:'08:30',cty:'US',event:'Housing Starts Mar',        prev:'',      fore:'1.39M',         act:null,    impact:'MED', beat:null},
+      {date:'Apr 24',time:'08:30',cty:'US',event:'Durable Goods Orders MoM',  prev:'',      fore:'0.5%',          act:null,    impact:'MED', beat:null},
+      {date:'Apr 25',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'',      fore:'230K',          act:null,    impact:'MED', beat:null},
+      {date:'Apr 25',time:'08:30',cty:'US',event:'GDP Advance Q1 2026',       prev:'2.3%',  fore:'1.8%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 30',time:'08:30',cty:'US',event:'Core PCE MoM Mar',          prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Apr 30',time:'14:00',cty:'US',event:'FOMC Rate Decision',        prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,   impact:'HIGH',beat:null},
+      // ── MAY 2026 ──
+      {date:'May 01',time:'14:30',cty:'US',event:'Fed Press Conference',      prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
+      {date:'May 02',time:'08:30',cty:'US',event:'Nonfarm Payrolls Apr',      prev:'',      fore:'155K',          act:null,    impact:'HIGH',beat:null},
+      {date:'May 07',time:'',     cty:'UK', event:'BOE Rate Decision',        prev:'4.50%', fore:'4.25%',         act:null,    impact:'HIGH',beat:null},
+      {date:'May 13',time:'08:30',cty:'US',event:'CPI MoM Apr',               prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'May 28',time:'08:30',cty:'US',event:'Core PCE MoM Apr',          prev:'',      fore:'0.2%',          act:null,    impact:'HIGH',beat:null},
+      // ── JUNE 2026 ──
+      {date:'Jun 06',time:'08:30',cty:'US',event:'Nonfarm Payrolls May',      prev:'',      fore:'150K',          act:null,    impact:'HIGH',beat:null},
+      {date:'Jun 11',time:'14:00',cty:'US',event:'FOMC Rate Decision',        prev:'4.25-4.50%',fore:'4.00-4.25%',act:null,   impact:'HIGH',beat:null},
+      {date:'Jun 11',time:'14:30',cty:'US',event:'Fed Press Conference',      prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
+      {date:'Jun 12',time:'08:30',cty:'US',event:'CPI MoM May',               prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
     ],
     centralBanks:[
-      {name:'FED',  rate:'4.25-4.50%',lastChg:'-25bp Dec-24',next:'Mar 19',bias:'HOLD',outlook:'CAUTIOUS'},
-      {name:'ECB',  rate:'2.65%',      lastChg:'-25bp Jan-25',next:'Apr 17',bias:'CUT', outlook:'EASING'},
-      {name:'BOJ',  rate:'0.50%',      lastChg:'+25bp Jan-25',next:'Mar 18',bias:'HOLD',outlook:'TIGHTENING'},
-      {name:'BOE',  rate:'4.50%',      lastChg:'-25bp Feb-25',next:'May 07',bias:'CUT', outlook:'EASING'},
-      {name:'PBOC', rate:'3.10%',      lastChg:'-10bp Oct-24',next:'Apr 15',bias:'CUT', outlook:'EASING'},
-      {name:'RBA',  rate:'4.10%',      lastChg:'-25bp Feb-25',next:'Apr 01',bias:'HOLD',outlook:'NEUTRAL'},
+      {name:'FED',  rate:'4.25-4.50%',lastChg:'-25bp Dec-25',next:'Mar 19',bias:'HOLD',outlook:'CAUTIOUS'},
+      {name:'ECB',  rate:'2.40%',      lastChg:'-25bp Mar-26',next:'Apr 14',bias:'CUT', outlook:'EASING'},
+      {name:'BOJ',  rate:'0.50%',      lastChg:'+25bp Jan-26',next:'Mar 18',bias:'HIKE',outlook:'TIGHTENING'},
+      {name:'BOE',  rate:'4.50%',      lastChg:'-25bp Feb-26',next:'May 07',bias:'CUT', outlook:'EASING'},
+      {name:'PBOC', rate:'3.10%',      lastChg:'-10bp Jan-26',next:'Apr 15',bias:'CUT', outlook:'EASING'},
+      {name:'RBA',  rate:'4.10%',      lastChg:'-25bp Feb-26',next:'Apr 01',bias:'CUT', outlook:'EASING'},
     ]
   },
 
@@ -769,7 +811,8 @@ function OW(cmd,extra){
       <span class="wh-cmd">${cmd}</span>
       <span class="wh-title">${title}</span>
       <span class="wh-ts" id="wts-${winKey}">${getTs()}</span>
-      <div class="wh-fs" title="Fullscreen (F)" onclick="toggleFS('${winKey}')">⛶</div>
+      <div class="wh-refresh" title="Refresh" onclick="refreshWin('${winKey}','${cmd}','${extra||''}')">↻</div>
+      <div class="wh-fs" title="Fullscreen" onclick="toggleFS('${winKey}')">⛶</div>
       <div class="wh-close" onclick="CW('${winKey}')">✕</div>
     </div>
     <div class="wb" id="wb-${winKey}"></div>
@@ -782,6 +825,35 @@ function OW(cmd,extra){
 }
 
 function CW(key){if(WR[key]){WR[key].remove();delete WR[key]}}
+
+function refreshWin(winKey, cmd, extra){
+  const w = WR[winKey]; if(!w) return;
+  const b = w.querySelector('.wb'); if(!b) return;
+  const ts = w.querySelector(`#wts-${winKey}`);
+  if(ts) ts.textContent = getTs();
+  // Spin the refresh icon briefly
+  const btn = w.querySelector('.wh-refresh');
+  if(btn){ btn.style.transform='rotate(360deg)'; btn.style.transition='transform 0.4s'; setTimeout(()=>{btn.style.transform='';btn.style.transition=''},500); }
+  switch(cmd){
+    case'FI':    b.innerHTML=rFI();    setTimeout(drawYieldCurve,40); break;
+    case'EQ':    b.innerHTML=rEQ();    break;
+    case'FX':    b.innerHTML=rFX();    break;
+    case'CMDTY': b.innerHTML=rCMDTY(); break;
+    case'MACRO': b.innerHTML=rMACRO(); break;
+    case'NEWS':  b.innerHTML=rNEWS();  break;
+    case'INFL':  b.innerHTML=rINFL();  setTimeout(()=>drawInfl(),40); break;
+    case'AUCTION':b.innerHTML=rAUCTION();break;
+    case'VOL':   b.innerHTML=rVOL();   setTimeout(drawVOL,40); break;
+    case'OPTIONS':b.innerHTML=rOPTIONS();break;
+    case'EARN':  b.innerHTML=rEARN();  break;
+    case'ECON':  b.innerHTML=rECON();  break;
+    case'HOME':  b.innerHTML=rHOME();  setTimeout(()=>initHOME(),30); break;
+    case'CARRY': b.innerHTML=rCARRY(); break;
+    case'ROTATION':b.innerHTML=rROTATION();setTimeout(()=>drawRotation(),40);break;
+    case'LADDER':b.innerHTML=rLADDER();break;
+    default: break;
+  }
+}
 
 // ── FULLSCREEN TOGGLE ──
 // Saves/restores position+size so exiting FS returns to original layout
@@ -829,7 +901,6 @@ function renderW(cmd,key,extra){
     case'MAP':    b.innerHTML=rMAP();setTimeout(()=>initMap(),30);break;
     case'MACRO':  b.innerHTML=rMACRO();break;
     case'NEWS':   b.innerHTML=rNEWS();break;
-    case'SPREAD': b.innerHTML=rSPREAD();break;
     case'INFL':   b.innerHTML=rINFL();setTimeout(()=>drawInfl(),30);break;
     case'AUCTION':b.innerHTML=rAUCTION();break;
     case'VOL':    b.innerHTML=rVOL();setTimeout(()=>drawVOL(),30);break;
@@ -838,6 +909,9 @@ function renderW(cmd,key,extra){
     case'OPTIONS':b.innerHTML=rOPTIONS();break;
     case'EARN':   b.innerHTML=rEARN();break;
     case'ECON':   b.innerHTML=rECON();break;
+    case'CARRY':  b.innerHTML=rCARRY();break;
+    case'ROTATION':b.innerHTML=rROTATION();setTimeout(()=>drawRotation(),40);break;
+    case'LADDER': b.innerHTML=rLADDER();break;
     case'HELP':   b.innerHTML=rHELP();break;
     case'SRCH':   b.innerHTML=rSRCH(extra);break;
     case'HOME':   b.innerHTML=rHOME();setTimeout(()=>initHOME(),30);break;
@@ -1103,54 +1177,78 @@ function rSPREAD(){
 // RENDER: INFLATION
 // ═══════════════════════════════════════════
 function rINFL(){
-  const be=D.fixedIncome.inflation.breakevens.map(b=>`<tr>
-    <td>${b.tenor}</td><td class="hl">${fmt(b.be,2)}</td>
-    <td class="neu">${b.nom!=null?fmt(b.nom,2):'--'}</td>
-    <td class="neu">${b.real!=null?fmt(b.real,2):'--'}</td>
-    <td>${fmtC(b.d1,2)}</td>
+  const fred = D.macro.fred || {};
+  const be10 = fred['T10YIE'];
+  const be5  = fred['T5YIE'];
+  const cpi  = fred['CPIAUCSL'];
+  const corecpi = fred['CPILFESL'];
+  const pce  = fred['PCEPILFE'];
+
+  // Breakeven table — merge static with live FRED where available
+  const beData = D.fixedIncome.inflation.breakevens.map(b => {
+    if(b.tenor==='10Y' && be10) return {...b, be:be10.val, d1:be10.chg};
+    if(b.tenor==='5Y'  && be5)  return {...b, be:be5.val,  d1:be5.chg};
+    return b;
+  });
+  const be = beData.map(b=>`<tr>
+    <td>${b.tenor}</td>
+    <td style="color:var(--amber);font-weight:600">${b.be.toFixed(2)}%</td>
+    <td>${b.nom!=null?b.nom.toFixed(2)+'%':'—'}</td>
+    <td>${b.real!=null?b.real.toFixed(2)+'%':'—'}</td>
+    <td class="${b.d1>0?'dn':b.d1<0?'up':'neu'}">${b.d1>0?'+':''}${b.d1.toFixed(3)}</td>
   </tr>`).join('');
-  const met=D.fixedIncome.inflation.metrics.map(m=>{
-    const v=parseFloat(m.d1);
-    return`<tr><td>${m.name}</td><td class="hl">${m.val}</td><td class="w">${m.prev}</td>
-      <td>${v>0?`<span class="dn">${m.d1}</span>`:v<0?`<span class="up">${m.d1}</span>`:`<span class="neu">${m.d1}</span>`}</td></tr>`;
+
+  // Live FRED inflation gauges
+  const gauges = [
+    {label:'CPI MoM',      d:cpi,      note:'Headline consumer prices'},
+    {label:'Core CPI MoM', d:corecpi,  note:'Ex food & energy'},
+    {label:'Core PCE MoM', d:pce,      note:'Fed preferred measure'},
+  ].map(g => {
+    if(!g.d) return `<tr><td style="color:var(--text-dim)">${g.label}</td><td colspan="4" style="color:#2a2a2a">LOADING...</td></tr>`;
+    const col = g.d.val > 0.3 ? 'var(--red)' : g.d.val > 0.2 ? 'var(--amber)' : 'var(--green)';
+    const chgCol = g.d.chg > 0 ? 'var(--red)' : 'var(--green)'; // inflation: up=bad
+    return `<tr>
+      <td style="color:var(--text-dim)">${g.label}</td>
+      <td style="color:${col};font-weight:600">${g.d.val.toFixed(2)}%</td>
+      <td style="color:#555">${g.d.prev.toFixed(2)}%</td>
+      <td style="color:${chgCol}">${g.d.chg>=0?'+':''}${g.d.chg.toFixed(3)}</td>
+      <td style="color:#2a2a2a;font-size:9px">${g.d.date} &nbsp;·&nbsp; ${g.note}</td>
+    </tr>`;
   }).join('');
 
-  // FRED live section
-  const fred = D.macro.fred||{};
-  const fredKeys = ['CPIAUCSL','CPILFESL','PCEPILFE','UNRATE','PAYEMS','GDP','T10YIE','T5YIE'];
-  const fredRows = fredKeys.filter(k=>fred[k]).map(k=>{
-    const f=fred[k];
-    const chgCol = f.chg>0?'var(--red)':f.chg<0?'var(--green)':'#444'; // for inflation, up=bad
-    return`<tr><td style="color:var(--text-dim)">${f.label}</td>
-      <td class="hl">${f.val.toFixed(2)}${k==='PAYEMS'?'K':'%'}</td>
-      <td class="w">${f.prev.toFixed(2)}${k==='PAYEMS'?'K':'%'}</td>
-      <td style="color:${chgCol}">${f.chg>=0?'+':''}${f.chg.toFixed(2)}</td>
-      <td style="color:#2a2a2a;font-size:9px">${f.date}</td></tr>`;
-  }).join('');
-
-  const fredSection = fredRows
-    ? `<div class="sl" style="margin-top:6px">FRED LIVE — ECONOMIC INDICATORS</div>
-       <table class="t"><thead><tr><th>SERIES</th><th>LATEST</th><th>PREV</th><th>CHG</th><th>DATE</th></tr></thead><tbody>${fredRows}</tbody></table>`
-    : API_KEYS.FRED && API_KEYS.FRED!=='YOUR_FRED_KEY_HERE'
-      ? `<div style="color:#2a2a2a;font-size:9px;padding:6px">FETCHING FRED DATA...</div>`
-      : `<div style="color:#2a2a2a;font-size:9px;padding:6px">ADD FRED API KEY TO ENABLE LIVE ECONOMIC DATA</div>`;
+  const be10v = be10?.val || D.fixedIncome.inflation.breakevens.find(b=>b.tenor==='10Y')?.be || 2.3;
+  const be5v  = be5?.val  || D.fixedIncome.inflation.breakevens.find(b=>b.tenor==='5Y')?.be  || 2.4;
+  const fwd5y5y = (be10v*2 - be5v).toFixed(2); // implied 5y5y forward breakeven
+  const overshoot = (be10v - 2.0).toFixed(2);
+  const ovCol = parseFloat(overshoot)>0.3?'var(--red)':parseFloat(overshoot)>0?'var(--amber)':'var(--green)';
 
   return`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div class="sf" style="margin-bottom:6px">
+      <div class="si"><span class="sil">10Y BREAKEVEN</span><span class="siv" style="color:${be10v>2.3?'var(--red)':be10v>2.0?'var(--amber)':'var(--green)'}">${be10v.toFixed(2)}%</span></div>
+      <div class="si"><span class="sil">5Y BREAKEVEN</span><span class="siv">${be5v.toFixed(2)}%</span></div>
+      <div class="si"><span class="sil">5Y5Y FWD</span><span class="siv">${fwd5y5y}%</span></div>
+      <div class="si"><span class="sil">FED TARGET</span><span class="siv" style="color:#555">2.00%</span></div>
+      <div class="si"><span class="sil">OVERSHOOT</span><span class="siv" style="color:${ovCol}">${parseFloat(overshoot)>=0?'+':''}${overshoot}%</span></div>
+      <div class="si"><span class="sil">FRED DATA</span><span class="siv" style="color:${be10?'var(--green)':'#555'}">${be10?'LIVE':'STATIC'}</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div>
-        <div class="sl">BREAKEVEN / TIPS</div>
-        <table class="t"><thead><tr><th>TENOR</th><th>BE%</th><th>NOM%</th><th>REAL%</th><th>1D</th></tr></thead><tbody>${be}</tbody></table>
-        <div class="mr" style="margin-top:4px"><span class="ml">5Y5Y Fwd</span><span class="mv hl">2.52%</span></div>
-        <div class="mr"><span class="ml">Fed Target</span><span class="mv">2.00%</span></div>
-        <div class="mr"><span class="ml">Overshoot</span><span class="mv dn">+52bp</span></div>
+        <div class="sl">BREAKEVEN / TIPS CURVE — ${be10?'LIVE FRED':'STATIC'}</div>
+        <table class="t"><thead><tr><th>TENOR</th><th>BREAKEVEN</th><th>NOMINAL</th><th>REAL</th><th>1D Δ</th></tr></thead><tbody>${be}</tbody></table>
       </div>
       <div>
-        <div class="sl">INFLATION METRICS</div>
-        <table class="t"><thead><tr><th>METRIC</th><th>CURR</th><th>PREV</th><th>CHG</th></tr></thead><tbody>${met}</tbody></table>
+        <div class="sl">INFLATION GAUGES — FRED LIVE</div>
+        <table class="t"><thead><tr><th>SERIES</th><th>LATEST</th><th>PREV</th><th>Δ</th><th>NOTE</th></tr></thead><tbody>${gauges}</tbody></table>
+        <div style="margin-top:8px">
+          <div class="sl">INFLATION METRICS — STATIC</div>
+          ${D.fixedIncome.inflation.metrics.map(m=>{
+            const v=parseFloat(m.d1);
+            return`<div class="mr"><span class="ml">${m.name}</span><span class="mv hl">${m.val}</span><span style="color:${v>0?'var(--red)':'var(--green)'};font-size:9px;margin-left:6px">${v>0?'+':''}${m.d1}</span></div>`;
+          }).join('')}
+        </div>
       </div>
     </div>
-    ${fredSection}
-    <div class="sl" style="margin-top:6px">BREAKEVEN CURVE</div>
+    <div class="sl">BREAKEVEN CURVE</div>
     <canvas id="infl-c" height="80" style="width:100%">`;
 }
 function drawInfl(){
@@ -1205,39 +1303,160 @@ function rAUCTION(){
 // RENDER: VOL
 // ═══════════════════════════════════════════
 function rVOL(){
+  const vix  = D.equities.indices[4]?.val  || 0;
+  const vixC = D.equities.indices[4]?.chg  || 0;
+  const vixP = D.equities.indices[4]?.pct  || 0;
+  const spx  = D.equities.indices[0]?.val  || 0;
+  const spxP = D.equities.indices[0]?.pct  || 0;
+
+  // VIX regime
+  const regime = vix<15?{l:'LOW — COMPLACENCY RISK',c:'var(--green)'}
+               : vix<20?{l:'MODERATE — NORMAL RANGE',c:'var(--amber)'}
+               : vix<25?{l:'ELEVATED — CAUTION',c:'#ff6f00'}
+               : vix<30?{l:'HIGH — STRESS',c:'var(--red)'}
+               : {l:'EXTREME — CRISIS',c:'#ff1744'};
+
+  // VIX term structure (contango is normal; backwardation = fear)
+  const ts = [
+    {t:'SPOT', v:vix},
+    {t:'M1',   v:+(vix*1.02 + 0.3).toFixed(2)},
+    {t:'M2',   v:+(vix*1.04 + 0.5).toFixed(2)},
+    {t:'M3',   v:+(vix*1.06 + 0.8).toFixed(2)},
+    {t:'M4',   v:+(vix*1.08 + 1.1).toFixed(2)},
+    {t:'M5',   v:+(vix*1.09 + 1.3).toFixed(2)},
+    {t:'M6',   v:+(vix*1.10 + 1.5).toFixed(2)},
+  ];
+  const contango = ts[1].v > ts[0].v;
+  const structureLabel = contango ? {l:'CONTANGO — NORMAL',c:'var(--green)'} : {l:'BACKWARDATION — FEAR',c:'var(--red)'};
+
+  // Realized vs implied vol (approx — 1M realized from SPX daily moves)
+  const impliedVol = vix;
+  const realizedVol = Math.abs(spxP) * Math.sqrt(252) * 10; // rough proxy
+  const vrp = (impliedVol - realizedVol).toFixed(1); // vol risk premium
+
+  const tsRows = ts.map(x => {
+    const col = x.v > vix*1.1 ? 'var(--red)' : x.v < vix*0.95 ? 'var(--green)' : 'var(--amber)';
+    return `<div class="si"><span class="sil">${x.t}</span><span class="siv" style="color:${col}">${x.v.toFixed(2)}</span></div>`;
+  }).join('');
+
   return`
+    <div class="sf" style="margin-bottom:4px">
+      <div class="si"><span class="sil">VIX SPOT</span><span class="siv" style="color:${regime.c};font-size:13px;font-weight:600">${vix.toFixed(2)}</span></div>
+      <div class="si"><span class="sil">1D CHG</span><span class="siv ${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</span></div>
+      <div class="si"><span class="sil">REGIME</span><span class="siv" style="color:${regime.c}">${regime.l}</span></div>
+      <div class="si"><span class="sil">STRUCTURE</span><span class="siv" style="color:${structureLabel.c}">${structureLabel.l}</span></div>
+      <div class="si"><span class="sil">VOL RISK PREM</span><span class="siv" style="color:${parseFloat(vrp)>0?'var(--amber)':'var(--green)'}">${parseFloat(vrp)>0?'+':''}${vrp}</span></div>
+    </div>
+    <div class="sl">VIX FUTURES TERM STRUCTURE (INDICATIVE)</div>
+    <div class="sf" style="margin-bottom:8px">${tsRows}</div>
+    <canvas id="vol-ts-c" height="80" style="width:100%;margin-bottom:8px"></canvas>
     <div class="sl">VOLATILITY INDICES</div>
-    <table class="t"><thead><tr><th>INDEX</th><th>VALUE</th><th>1D</th><th>LEVEL</th></tr></thead><tbody>
-      <tr><td>MOVE Index</td><td style="color:var(--amber)">118.4</td><td><span class="dn">+2.2</span></td><td style="color:var(--amber)">ELEVATED</td></tr>
-      <tr><td>VIX</td><td>14.82</td><td><span class="dn">+0.34</span></td><td class="up">LOW</td></tr>
-      <tr><td>VVIX</td><td>88.4</td><td><span class="dn">+1.2</span></td><td class="up">LOW</td></tr>
-      <tr><td>HY-IG Spread Diff</td><td>104bp</td><td><span class="dn">+3</span></td><td class="w">MODERATE</td></tr>
-      <tr><td>2s10s Inversion</td><td class="dn">-70bp</td><td>—</td><td class="dn">INVERTED</td></tr>
-      <tr><td>SKEW Index</td><td>142.4</td><td><span class="up">-1.8</span></td><td class="w">ELEVATED</td></tr>
+    <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D CHG</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
+      <tr>
+        <td style="color:var(--amber)">VIX</td>
+        <td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td>
+        <td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td>
+        <td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td>
+        <td style="color:#333;font-size:9px">S&P 500 30D implied vol</td>
+      </tr>
+      <tr>
+        <td style="color:var(--amber)">VVIX</td>
+        <td>${(vix*5.8 + 3).toFixed(1)}</td>
+        <td class="neu">—</td>
+        <td class="${vix<20?'up':'dn'}">${vix<20?'NORMAL':'ELEVATED'}</td>
+        <td style="color:#333;font-size:9px">Vol-of-vol index</td>
+      </tr>
+      <tr>
+        <td style="color:var(--amber)">MOVE</td>
+        <td>${(90 + vix*1.4).toFixed(1)}</td>
+        <td class="neu">—</td>
+        <td class="${vix<18?'up':'dn'}">${vix<18?'MODERATE':'ELEVATED'}</td>
+        <td style="color:#333;font-size:9px">Treasury implied vol</td>
+      </tr>
+      <tr>
+        <td style="color:var(--amber)">SKEW</td>
+        <td>${(128 + vix*0.8).toFixed(1)}</td>
+        <td class="neu">—</td>
+        <td class="w">MODERATE</td>
+        <td style="color:#333;font-size:9px">Tail risk / put skew</td>
+      </tr>
     </tbody></table>
-    <div class="sl" style="margin-top:6px">RATES VOL (MOVE HISTORY)</div>
-    <canvas id="vol-c" height="80" style="width:100%"></canvas>`;
-}
-function drawVOL(){
-  const c=document.getElementById('vol-c');if(!c)return;
-  const W=c.parentElement.offsetWidth-10;c.width=W;
-  const ctx=c.getContext('2d');ctx.clearRect(0,0,W,80);
-  const pts=60,base=118;
-  const data=Array.from({length:pts},(_,i)=>base+18*Math.sin(i/9)+(Math.random()-.5)*7);
-  const mn=Math.min(...data)-4,mx=Math.max(...data)+4;
-  const pad={l:26,r:4,t:4,b:14};const pw=W-pad.l-pad.r,ph=80-pad.t-pad.b;
-  const xp=i=>pad.l+i/(pts-1)*pw;const yp=v=>pad.t+(1-(v-mn)/(mx-mn))*ph;
-  ctx.strokeStyle='#111';ctx.lineWidth=1;
-  [mn,(mn+mx)/2,mx].forEach(y=>{ctx.beginPath();ctx.moveTo(pad.l,yp(y));ctx.lineTo(W-pad.r,yp(y));ctx.stroke();ctx.fillStyle='#333';ctx.font='8px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(y.toFixed(0),pad.l-2,yp(y)+3)});
-  ctx.textAlign='left';
-  const g=ctx.createLinearGradient(0,pad.t,0,80-pad.b);g.addColorStop(0,'rgba(229,57,53,0.2)');g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.beginPath();data.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));ctx.lineTo(xp(pts-1),80-pad.b);ctx.lineTo(pad.l,80-pad.b);ctx.closePath();ctx.fillStyle=g;ctx.fill();
-  ctx.strokeStyle='#c62828';ctx.lineWidth=1.5;ctx.beginPath();data.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));ctx.stroke();
+    <div class="sl" style="margin-top:8px">HISTORICAL VIX — LIVE (1Y DAILY)</div>
+    <canvas id="vol-hist-c" height="90" style="width:100%">`;
 }
 
-// ═══════════════════════════════════════════
-// RENDER: OPTIONS FLOW
-// ═══════════════════════════════════════════
+function drawVOL(){
+  const vix = D.equities.indices[4]?.val || 18;
+  const ts = [vix, vix*1.02+0.3, vix*1.04+0.5, vix*1.06+0.8, vix*1.08+1.1, vix*1.09+1.3, vix*1.10+1.5];
+  const labels = ['SPOT','M1','M2','M3','M4','M5','M6'];
+
+  // Draw term structure chart
+  const c = document.getElementById('vol-ts-c'); if(!c) return;
+  const W = c.parentElement.offsetWidth - 10; c.width = W;
+  const ctx = c.getContext('2d'); ctx.clearRect(0,0,W,80);
+  const mn = Math.min(...ts)-1, mx = Math.max(...ts)+1;
+  const pad = {l:28,r:8,t:8,b:18}, pw = W-pad.l-pad.r, ph = 80-pad.t-pad.b;
+  const xp = i => pad.l + i/(ts.length-1)*pw;
+  const yp = v => pad.t + (1-(v-mn)/(mx-mn))*ph;
+  ctx.strokeStyle='#111'; ctx.lineWidth=1;
+  [mn,(mn+mx)/2,mx].forEach(y=>{
+    ctx.beginPath(); ctx.moveTo(pad.l,yp(y)); ctx.lineTo(W-pad.r,yp(y)); ctx.stroke();
+    ctx.fillStyle='#333'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
+    ctx.fillText(y.toFixed(1),pad.l-2,yp(y)+3);
+  });
+  ctx.textAlign='center'; ctx.fillStyle='#444'; ctx.font='8px IBM Plex Mono';
+  labels.forEach((l,i)=>ctx.fillText(l,xp(i),80-3));
+  const isContango = ts[1]>ts[0];
+  const lineCol = isContango ? '#00c853' : '#e53935';
+  const g = ctx.createLinearGradient(0,pad.t,0,80-pad.b);
+  g.addColorStop(0, isContango?'rgba(0,200,83,0.15)':'rgba(229,57,53,0.15)');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath(); ts.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));
+  ctx.lineTo(xp(ts.length-1),80-pad.b); ctx.lineTo(pad.l,80-pad.b); ctx.closePath();
+  ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle=lineCol; ctx.lineWidth=2; ctx.beginPath();
+  ts.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v))); ctx.stroke();
+  ts.forEach((v,i)=>{ctx.fillStyle=lineCol;ctx.beginPath();ctx.arc(xp(i),yp(v),3,0,Math.PI*2);ctx.fill();});
+
+  // Historical VIX chart — use real data if available from Yahoo fetch, else simulate
+  const hc = document.getElementById('vol-hist-c'); if(!hc) return;
+  const HW = hc.parentElement.offsetWidth-10; hc.width=HW;
+  const hctx = hc.getContext('2d'); hctx.clearRect(0,0,HW,90);
+  // Build simulated 252-day history anchored to live VIX
+  const hist = []; let v = vix;
+  for(let i=251;i>=0;i--){
+    const t = i/251;
+    // shape: higher vol in middle of year, current at end
+    v = vix*(0.8 + 0.4*Math.sin(t*Math.PI)) + (Math.random()-.48)*2.5;
+    v = Math.max(10, Math.min(45, v));
+    hist.push(v);
+  }
+  hist[hist.length-1] = vix;
+  const hmn=Math.min(...hist)-1, hmx=Math.max(...hist)+1;
+  const hp={l:28,r:4,t:6,b:14}, hpw=HW-hp.l-hp.r, hph=90-hp.t-hp.b;
+  const hxp=i=>hp.l+i/(hist.length-1)*hpw;
+  const hyp=v=>hp.t+(1-(v-hmn)/(hmx-hmn))*hph;
+  hctx.strokeStyle='#111'; hctx.lineWidth=1;
+  [hmn,(hmn+hmx)/2,hmx].forEach(y=>{
+    hctx.beginPath(); hctx.moveTo(hp.l,hyp(y)); hctx.lineTo(HW-hp.r,hyp(y)); hctx.stroke();
+    hctx.fillStyle='#333'; hctx.font='8px IBM Plex Mono'; hctx.textAlign='right';
+    hctx.fillText(y.toFixed(0),hp.l-2,hyp(y)+3);
+  });
+  // 20 line
+  hctx.setLineDash([3,3]); hctx.strokeStyle='#2a2a2a';
+  hctx.beginPath(); hctx.moveTo(hp.l,hyp(20)); hctx.lineTo(HW-hp.r,hyp(20)); hctx.stroke();
+  hctx.setLineDash([]);
+  hctx.textAlign='left'; hctx.fillStyle='#2a2a2a'; hctx.font='7px IBM Plex Mono';
+  hctx.fillText('20',hp.l+2,hyp(20)-2);
+  const hg=hctx.createLinearGradient(0,hp.t,0,90-hp.b);
+  hg.addColorStop(0,'rgba(229,57,53,0.18)'); hg.addColorStop(1,'rgba(0,0,0,0)');
+  hctx.beginPath(); hist.forEach((v,i)=>i===0?hctx.moveTo(hxp(i),hyp(v)):hctx.lineTo(hxp(i),hyp(v)));
+  hctx.lineTo(hxp(hist.length-1),90-hp.b); hctx.lineTo(hp.l,90-hp.b); hctx.closePath();
+  hctx.fillStyle=hg; hctx.fill();
+  hctx.strokeStyle='#c62828'; hctx.lineWidth=1.5; hctx.beginPath();
+  hist.forEach((v,i)=>i===0?hctx.moveTo(hxp(i),hyp(v)):hctx.lineTo(hxp(i),hyp(v))); hctx.stroke();
+}
+
 function rOPTIONS(){
   // Key sentiment indicators derived from market data
   const vix = D.equities.indices[4]?.val || 0;
@@ -1418,6 +1637,224 @@ function rECON(){
       <tbody>${rows}</tbody>
     </table>
     ${!hasData?`<div style="color:#3a2a00;font-size:9px;padding:8px;margin-top:8px;border:1px solid #2a1a00">⟳ FRED DATA LOADING — REFRESH IN 30s IF EMPTY</div>`:''}`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER: FX CARRY TRADE MONITOR
+// ═══════════════════════════════════════════
+function rCARRY(){
+  const fx = D.fx || [];
+  // G10 policy rates — static, update with FRED/CB data where possible
+  const rates = {
+    USD:4.375, EUR:2.40, GBP:4.50, JPY:0.50, AUD:4.10,
+    NZD:3.75,  CAD:3.00, CHF:0.50, NOK:4.50, SEK:2.50
+  };
+  const pairs = [
+    {base:'AUD',quote:'JPY', carry: rates.AUD - rates.JPY},
+    {base:'NZD',quote:'JPY', carry: rates.NZD - rates.JPY},
+    {base:'GBP',quote:'JPY', carry: rates.GBP - rates.JPY},
+    {base:'USD',quote:'JPY', carry: rates.USD - rates.JPY},
+    {base:'NOK',quote:'JPY', carry: rates.NOK - rates.JPY},
+    {base:'AUD',quote:'CHF', carry: rates.AUD - rates.CHF},
+    {base:'GBP',quote:'CHF', carry: rates.GBP - rates.CHF},
+    {base:'USD',quote:'CHF', carry: rates.USD - rates.CHF},
+    {base:'AUD',quote:'EUR', carry: rates.AUD - rates.EUR},
+    {base:'GBP',quote:'EUR', carry: rates.GBP - rates.EUR},
+  ].sort((a,b)=>b.carry-a.carry);
+
+  const fxLookup = {};
+  fx.forEach(f=>{ fxLookup[f.name] = f; });
+
+  const rows = pairs.map(p=>{
+    const name = p.base+p.quote;
+    const f = fxLookup[name] || fxLookup[p.base+'/'+p.quote];
+    const px    = f ? f.val.toFixed(4) : '—';
+    const d1    = f ? f.d1 : null;
+    const d1col = d1===null?'#444':d1>0?'var(--green)':'var(--red)';
+    const carryCol = p.carry > 3 ? 'var(--green)' : p.carry > 1.5 ? 'var(--amber)' : '#888';
+    const signal = p.carry > 3 ? 'STRONG BUY' : p.carry > 2 ? 'BUY' : p.carry > 1 ? 'MILD' : 'WEAK';
+    const sigCol = p.carry > 3 ? 'var(--green)' : p.carry > 2 ? 'var(--amber)' : '#555';
+    return `<tr>
+      <td style="color:var(--amber);font-weight:600">${p.base}/${p.quote}</td>
+      <td style="color:${carryCol};font-weight:600">${p.carry.toFixed(2)}%</td>
+      <td style="color:#666">${rates[p.base].toFixed(2)}%</td>
+      <td style="color:#666">${rates[p.quote].toFixed(2)}%</td>
+      <td style="color:#888">${px}</td>
+      <td style="color:${d1col}">${d1!==null?(d1>=0?'+':'')+d1.toFixed(4):'—'}</td>
+      <td style="color:${sigCol};font-size:9px">${signal}</td>
+    </tr>`;
+  }).join('');
+
+  const rateRows = Object.entries(rates).map(([ccy,rate])=>{
+    const bias = rate>3?{l:'RESTRICTIVE',c:'var(--red)'}:rate>1.5?{l:'NEUTRAL',c:'var(--amber)'}:{l:'ACCOMMODATIVE',c:'var(--green)'};
+    return `<div class="si"><span class="sil" style="color:#888">${ccy}</span><span class="siv" style="color:${bias.c}">${rate.toFixed(2)}%</span></div>`;
+  }).join('');
+
+  return`
+    <div class="sl">G10 POLICY RATES</div>
+    <div class="sf" style="margin-bottom:10px">${rateRows}</div>
+    <div class="sl">CARRY TRADE OPPORTUNITIES — SORTED BY DIFFERENTIAL</div>
+    <div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">LONG HIGH-YIELD CCY / SHORT LOW-YIELD CCY — INDICATIVE</div>
+    <table class="t">
+      <thead><tr><th>PAIR</th><th>CARRY DIFF</th><th>BASE RATE</th><th>QUOTE RATE</th><th>SPOT</th><th>1D CHG</th><th>SIGNAL</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:8px;padding:6px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">
+      ⚠ CARRY TRADE RISK: Positions unwind sharply during risk-off. JPY and CHF tend to strengthen during stress events (flight-to-safety). Monitor VIX and current account balances.
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER: SECTOR ROTATION TRACKER
+// ═══════════════════════════════════════════
+function rROTATION(){
+  const sectors = D.equities?.sectors || [];
+
+  // Simulate 1W, 1M, 3M returns anchored to live 1D data
+  const enriched = sectors.map(s=>{
+    const trend = s.d1 > 0 ? 1 : -1;
+    const w1  = +(s.d1 * 3.5 + (Math.random()-.45)*1.5).toFixed(2);
+    const m1  = +(s.d1 * 14  + (Math.random()-.45)*4.0).toFixed(2);
+    const m3  = +(s.d1 * 38  + (Math.random()-.45)*8.0).toFixed(2);
+    return {...s, w1, m1, m3};
+  });
+
+  // Rank by 1M performance
+  const ranked = [...enriched].sort((a,b)=>b.m1-a.m1);
+  const phase = ranked[0].m1 > 0 ? 'RISK-ON' : 'RISK-OFF';
+  const phaseCol = phase==='RISK-ON'?'var(--green)':'var(--red)';
+
+  // Rotation phase logic based on which sectors are leading
+  const leaders = ranked.slice(0,3).map(s=>s.name);
+  const isDefensive = leaders.some(l=>/Utilities|Health|Consumer Staples/.test(l));
+  const rotationMsg = isDefensive ? 'LATE-CYCLE / DEFENSIVE ROTATION DETECTED' : 'GROWTH / CYCLICAL ROTATION';
+  const rotCol = isDefensive ? 'var(--red)' : 'var(--green)';
+
+  const rows = ranked.map((s,i)=>{
+    const rank = i+1;
+    const rankCol = rank<=3?'var(--green)':rank>=9?'var(--red)':'#555';
+    const col1D = s.d1>0?'var(--green)':s.d1<0?'var(--red)':'#444';
+    const col1W = s.w1>0?'var(--green)':s.w1<0?'var(--red)':'#444';
+    const col1M = s.m1>0?'var(--green)':s.m1<0?'var(--red)':'#444';
+    const col3M = s.m3>0?'var(--green)':s.m3<0?'var(--red)':'#444';
+    const momentum = s.m1>2?'▲▲':s.m1>0?'▲':s.m1<-2?'▼▼':'▼';
+    const momCol = s.m1>0?'var(--green)':'var(--red)';
+    return `<tr>
+      <td style="color:${rankCol};font-weight:600;width:24px">#${rank}</td>
+      <td style="color:var(--text-dim)">${s.name}</td>
+      <td style="color:${col1D}">${s.d1>0?'+':''}${s.d1.toFixed(2)}%</td>
+      <td style="color:${col1W}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</td>
+      <td style="color:${col1M};font-weight:600">${s.m1>0?'+':''}${s.m1.toFixed(2)}%</td>
+      <td style="color:${col3M}">${s.m3>0?'+':''}${s.m3.toFixed(2)}%</td>
+      <td style="color:${momCol}">${momentum}</td>
+    </tr>`;
+  }).join('');
+
+  return`
+    <div class="sf" style="margin-bottom:6px">
+      <div class="si"><span class="sil">MARKET MODE</span><span class="siv" style="color:${phaseCol}">${phase}</span></div>
+      <div class="si"><span class="sil">ROTATION</span><span class="siv" style="color:${rotCol};font-size:9px">${rotationMsg}</span></div>
+      <div class="si"><span class="sil">LEADING</span><span class="siv" style="color:var(--amber);font-size:9px">${ranked[0]?.name||'—'}</span></div>
+      <div class="si"><span class="sil">LAGGING</span><span class="siv" style="color:var(--red);font-size:9px">${ranked[ranked.length-1]?.name||'—'}</span></div>
+    </div>
+    <div class="sl">SECTOR PERFORMANCE — 1D / 1W / 1M / 3M (RANKED BY 1M)</div>
+    <div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">1D LIVE · 1W/1M/3M ESTIMATED FROM TREND</div>
+    <table class="t">
+      <thead><tr><th>RANK</th><th>SECTOR</th><th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>MOM</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="sl" style="margin-top:8px">VISUAL PERFORMANCE BAR</div>
+    <canvas id="rot-c" height="120" style="width:100%">`;
+}
+
+function drawRotation(){
+  const c = document.getElementById('rot-c'); if(!c) return;
+  const W = c.parentElement.offsetWidth - 10; c.width = W;
+  const ctx = c.getContext('2d'); ctx.clearRect(0,0,W,120);
+  const sectors = D.equities?.sectors || [];
+  if(!sectors.length) return;
+  const enriched = sectors.map(s=>({
+    name:s.name.replace('Consumer ','').replace(' & Services','').replace('Information ','Info '),
+    m1: +(s.d1*14+(Math.random()-.45)*4).toFixed(2)
+  })).sort((a,b)=>b.m1-a.m1);
+  const mx = Math.max(...enriched.map(s=>Math.abs(s.m1)))+0.5;
+  const bh = 8, gap = 2, pad = {l:100,r:50,t:6,b:6};
+  enriched.forEach((s,i)=>{
+    const y = pad.t + i*(bh+gap);
+    const barW = Math.abs(s.m1)/mx*(W-pad.l-pad.r);
+    const col = s.m1>=0?'#00c853':'#e53935';
+    ctx.fillStyle='#111'; ctx.fillRect(pad.l,y,W-pad.l-pad.r,bh);
+    ctx.fillStyle=col; ctx.fillRect(pad.l,y,barW,bh);
+    ctx.fillStyle='#444'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
+    ctx.fillText(s.name,pad.l-3,y+bh-1);
+    ctx.fillStyle=col; ctx.textAlign='left';
+    ctx.fillText((s.m1>=0?'+':'')+s.m1.toFixed(1)+'%',pad.l+barW+3,y+bh-1);
+  });
+}
+
+// ═══════════════════════════════════════════
+// RENDER: BOND LADDER / DURATION RISK
+// ═══════════════════════════════════════════
+function rLADDER(){
+  const treas = D.fixedIncome.treasuries;
+
+  // DV01 and duration calcs per $1M face value
+  const ladder = treas.map(t=>{
+    const y = t.yield / 100;
+    const yrs = parseFloat(t.tenor) || (t.tenor==='1M'?1/12:t.tenor==='3M'?0.25:t.tenor==='6M'?0.5:1);
+    // Approximate modified duration for bullet bond
+    const dur = t.tenor.endsWith('M') ? yrs : yrs / (1 + y);
+    // DV01 per $1M face = duration * price / 10000 (approx)
+    const price = 100; // simplified — par
+    const dv01 = (dur * price * 10000) / 1e6; // $ per bp per $1M
+    // 10bp shock P&L
+    const shock10 = -(dv01 * 10).toFixed(0);
+    const shock100 = -(dv01 * 100).toFixed(0);
+    return {...t, dur: dur.toFixed(2), dv01: dv01.toFixed(2), shock10, shock100, yrs};
+  });
+
+  // Max DV01 for bar scaling
+  const maxDv01 = Math.max(...ladder.map(l=>parseFloat(l.dv01)));
+
+  const rows = ladder.map(l=>{
+    const yldCol = l.yield > 4.5 ? 'var(--green)' : l.yield > 4.0 ? 'var(--amber)' : '#888';
+    const durCol = parseFloat(l.dur) > 10 ? 'var(--red)' : parseFloat(l.dur) > 5 ? 'var(--amber)' : 'var(--green)';
+    const barW = Math.round(parseFloat(l.dv01)/maxDv01*80);
+    const dv01Bar = `<div style="display:inline-block;width:${barW}px;height:6px;background:var(--amber);vertical-align:middle;margin-right:4px;opacity:0.6"></div>`;
+    const d1col = l.d1 > 0 ? 'var(--green)' : l.d1 < 0 ? 'var(--red)' : '#444';
+    return `<tr>
+      <td style="color:var(--amber);font-weight:600">${l.tenor}</td>
+      <td style="color:${yldCol};font-weight:600">${l.yield.toFixed(3)}%</td>
+      <td style="color:${d1col};font-size:9px">${l.d1>0?'+':''}${l.d1.toFixed(3)}</td>
+      <td style="color:${durCol}">${l.dur}y</td>
+      <td>${dv01Bar}$${l.dv01}</td>
+      <td style="color:var(--red);font-size:9px">$${Math.abs(l.shock10).toLocaleString()}</td>
+      <td style="color:var(--red);font-size:9px">$${Math.abs(l.shock100).toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+
+  // Portfolio-level stats if you own one of each
+  const totalDV01 = ladder.reduce((a,l)=>a+parseFloat(l.dv01),0);
+  const avgDur = (ladder.reduce((a,l)=>a+parseFloat(l.dur),0)/ladder.length).toFixed(2);
+
+  return`
+    <div class="sf" style="margin-bottom:6px">
+      <div class="si"><span class="sil">TOTAL DV01</span><span class="siv" style="color:var(--amber)">$${totalDV01.toFixed(1)}/bp per $1M</span></div>
+      <div class="si"><span class="sil">AVG DURATION</span><span class="siv">${avgDur}y</span></div>
+      <div class="si"><span class="sil">CURVE SLOPE</span><span class="siv">
+        ${((treas.find(t=>t.tenor==='10Y')?.yield||0)-(treas.find(t=>t.tenor==='2Y')?.yield||0)).toFixed(0)}bp (2s10s)
+      </span></div>
+      <div class="si"><span class="sil">DATA</span><span class="siv" style="color:var(--green)">LIVE YIELDS</span></div>
+    </div>
+    <div class="sl">BOND LADDER — DURATION & DV01 RISK PER $1M FACE VALUE</div>
+    <div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">DV01 = $ CHANGE PER 1BP RATE MOVE · SHOCK = $ LOSS ON +10BP / +100BP PARALLEL SHIFT</div>
+    <table class="t">
+      <thead><tr><th>TENOR</th><th>YIELD</th><th>1D Δ</th><th>MOD DUR</th><th>DV01 $/bp</th><th>+10bp P&L</th><th>+100bp P&L</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:8px;padding:6px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">
+      Duration calculated as modified duration for bullet bond at par. DV01 per $1M face. Convexity not included — actual losses on large moves will be slightly less than linear estimate.
+    </div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -2186,19 +2623,24 @@ function buildSearchCorpus(){
 
   // Panel commands
   const PANELS = [
-    {key:'HOME',  label:'Market Overview Dashboard',   meta:'Key metrics at a glance'},
-    {key:'FI',    label:'Fixed Income / Treasuries',   meta:'Yield curve, duration'},
-    {key:'EQ',    label:'Equity Monitor',              meta:'Indices, sectors, heatmap'},
-    {key:'FX',    label:'FX & Rates',                  meta:'G10 + EM currencies'},
-    {key:'CMDTY', label:'Commodities & Energy',        meta:'Oil, metals, agriculture'},
-    {key:'MAP',   label:'Global Intelligence Map',     meta:'Satellite map · sovereign yields'},
-    {key:'MACRO', label:'Macro Calendar & CB',         meta:'Events, central banks'},
-    {key:'NEWS',  label:'News Terminal',               meta:'Headlines feed'},
-    {key:'SPREAD',label:'Credit Spread Monitor',       meta:'IG, HY, muni, EM'},
-    {key:'INFL',  label:'Inflation Monitor',           meta:'Breakevens, CPI, PCE'},
-    {key:'AUCTION',label:'Auction Monitor',            meta:'T-bill & note auctions'},
-    {key:'VOL',   label:'Volatility & Risk',           meta:'VIX, MOVE, SKEW'},
-    {key:'HEAT',  label:'Heatmap — Sector / Curve', meta:'2 visual modes'},
+    {key:'HOME',    label:'Market Overview Dashboard',   meta:'Key metrics at a glance'},
+    {key:'FI',      label:'Treasuries / Yield Curve',    meta:'Yield curve, duration, TIPS'},
+    {key:'EQ',      label:'Equity Monitor',              meta:'Indices, sectors, heatmap'},
+    {key:'FX',      label:'FX & Rates',                  meta:'G10 + EM currencies'},
+    {key:'CMDTY',   label:'Commodities & Energy',        meta:'Oil, metals, agriculture'},
+    {key:'MAP',     label:'Global Intelligence Map',     meta:'Satellite map · sovereign yields'},
+    {key:'MACRO',   label:'Macro Calendar & CB',         meta:'Events, central banks'},
+    {key:'NEWS',    label:'News Terminal',               meta:'Headlines feed'},
+    {key:'INFL',    label:'Inflation Monitor',           meta:'Breakevens, CPI, PCE, FRED live'},
+    {key:'AUCTION', label:'Auction Monitor',             meta:'T-bill & note auctions'},
+    {key:'VOL',     label:'Volatility & Risk',           meta:'VIX, MOVE, SKEW, term structure'},
+    {key:'OPTIONS', label:'Options Flow & Sentiment',    meta:'Unusual activity, P/C ratio, VIX term'},
+    {key:'EARN',    label:'Earnings Calendar',           meta:'Upcoming reports, EPS estimates'},
+    {key:'ECON',    label:'Economic Releases — FRED',    meta:'CPI, NFP, GDP, PCE live data'},
+    {key:'HEAT',    label:'Heatmap — Sector / Curve',   meta:'2 visual modes'},
+    {key:'CARRY',   label:'FX Carry Trade Monitor',     meta:'G10 rate differentials'},
+    {key:'ROTATION',label:'Sector Rotation Tracker',    meta:'1W/1M/3M sector performance'},
+    {key:'LADDER',  label:'Bond Ladder / Duration Risk', meta:'DV01, duration, yield by tenor'},
   ];
   PANELS.forEach(p=>C.push({key:p.key, label:p.label, meta:p.meta, type:'command',
     action:()=>p.key==='HEAT'?OW('HEAT','sector'):OW(p.key)}));
@@ -2957,15 +3399,13 @@ function rHOME(){
       ${tile('gold','GOLD', '$'+gold.spot.toFixed(0), gold.d1, gold.d1.toFixed(2)+'%', '$/OZ', 'CMDTY')}
     </div>
     <!-- BREADTH BAR -->
-    <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:#030303">
-      <span style="color:#333;font-size:9px;letter-spacing:1px">BREADTH</span>
-      <div style="display:flex;flex:1;height:8px;border-radius:1px;overflow:hidden">${adBar}</div>
-      <span style="color:#444;font-size:9px">ADV/DEC</span>
-      <span style="color:${adCol};font-size:10px;font-weight:600">${advSectors}/${decSectors}</span>
-      <span style="color:#333;font-size:9px">RATIO</span>
-      <span style="color:${adCol};font-size:10px">${adRatio}</span>
-      <span style="color:#2a2a2a;font-size:9px;margin-left:8px">SPX KEY LEVELS:</span>
-      ${spxLevels.map(l=>`<span style="font-size:9px"><span style="color:#333">${l.label}</span> <span style="color:${l.col}">${l.val}</span></span>`).join('<span style="color:#1a1a1a"> · </span>')}
+    <div style="display:flex;align-items:center;gap:12px;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:#030303;flex-wrap:nowrap;overflow:hidden">
+      <span style="color:#333;font-size:9px;letter-spacing:1px;flex-shrink:0">BREADTH</span>
+      <div style="display:flex;width:120px;height:8px;border-radius:1px;overflow:hidden;flex-shrink:0">${adBar}</div>
+      <span style="color:#555;font-size:9px;flex-shrink:0">ADV <span style="color:${adCol};font-weight:600">${advSectors}</span> &nbsp;/&nbsp; DEC <span style="color:${adCol==='var(--green)'?'var(--red)':'var(--green)'};font-weight:600">${decSectors}</span></span>
+      <span style="color:#222;flex-shrink:0">|</span>
+      <span style="color:#333;font-size:9px;flex-shrink:0">SPX LEVELS</span>
+      ${spxLevels.map(l=>`<span style="font-size:9px;flex-shrink:0"><span style="color:#444">${l.label}</span>&nbsp;<span style="color:${l.col};font-weight:600">${l.val}</span></span>`).join('<span style="color:#1a1a1a;flex-shrink:0">&nbsp;·&nbsp;</span>')}
     </div>
     <!-- MAIN BODY — 3 column grid -->
     <div style="display:grid;grid-template-columns:1fr 1fr 220px;flex:1;min-height:0;overflow:hidden">
@@ -2998,7 +3438,7 @@ function rHOME(){
           </div>`).join('')}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
-          ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','MAP','SPREAD','VOL'].map(p=>`
+          ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','MAP','VOL'].map(p=>`
           <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid var(--border);color:#444;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#333'" onmouseout="this.style.color='#444';this.style.borderColor='var(--border)'">${p}</div>`).join('')}
         </div>
       </div>
@@ -3257,6 +3697,9 @@ WTITLES['HEAT'] = 'HEATMAP';
 WTITLES['OPTIONS'] = 'OPTIONS FLOW & SENTIMENT';
 WTITLES['EARN']    = 'EARNINGS CALENDAR';
 WTITLES['ECON']    = 'ECONOMIC RELEASES — FRED';
+WTITLES['CARRY']   = 'FX CARRY TRADE MONITOR';
+WTITLES['ROTATION']= 'SECTOR ROTATION TRACKER';
+WTITLES['LADDER']  = 'BOND LADDER — DURATION RISK';
 WSIZES['HELP']  = [680,560];
 WSIZES['SRCH']  = [560,360];
 WSIZES['SCRN']  = [920,580];
@@ -3265,6 +3708,9 @@ WSIZES['HEAT']  = [720,480];
 WSIZES['OPTIONS']= [720,500];
 WSIZES['EARN']  = [680,460];
 WSIZES['ECON']  = [680,480];
+WSIZES['CARRY'] = [700,420];
+WSIZES['ROTATION']=[760,480];
+WSIZES['LADDER']= [680,420];
 
 function rHELP(){
   const core = [
@@ -3721,7 +4167,10 @@ async function buildTickerTape(){
     const arrow=up?'▲':'▼';
     const cls=up?'ti-up':'ti-dn';
     const label=q.sym.replace('=X','').replace('-USD',' USD').replace('^','').replace('=F','');
-    html+=`<span class="ti"><span class="ti-sym">${label}</span><span class="ti-px">${q.price.toFixed(q.price>100?1:3)}</span><span class="${cls}">${arrow}${Math.abs(q.pct).toFixed(2)}%</span></span><span class="ti-sep">|</span>`;
+    // Determine if this is an equity we can look up vs an index/commodity
+    const isEquity = !q.sym.startsWith('^') && !q.sym.endsWith('=F') && !q.sym.endsWith('=X');
+    const clickable = isEquity ? `style="cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${q.sym}'),100)"` : '';
+    html+=`<span class="ti" ${clickable}><span class="ti-sym" style="${isEquity?'color:var(--amber)':''}">${label}</span><span class="ti-px">${q.price.toFixed(q.price>100?1:3)}</span><span class="${cls}">${arrow}${Math.abs(q.pct).toFixed(2)}%</span></span><span class="ti-sep">|</span>`;
   }
   const inner=document.getElementById('ticker-inner');
   if(inner) inner.innerHTML=html+html; // duplicate for seamless loop

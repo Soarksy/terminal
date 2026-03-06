@@ -1401,7 +1401,7 @@ function initMap(){
 // CLOCK + TOP STRIP
 // ═══════════════════════════════════════════
 function updateClock(){
-  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false,timeZone:'America/New_York'})+' ET';
+  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})+' ET';
 }
 setInterval(updateClock,1000);updateClock();
 
@@ -1495,7 +1495,7 @@ function updateStatusBar(){
   const stale = [...FETCH_STATE.staleSources];
   const pending = [...FETCH_STATE.pendingSources];
   const ts = FETCH_STATE.lastRefresh
-    ? new Date(FETCH_STATE.lastRefresh).toLocaleTimeString('en-US',{hour12:false,timeZone:'America/New_York'})
+    ? new Date(FETCH_STATE.lastRefresh).toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})
     : '--:--:--';
 
   let html = `<span style="color:#2e4a2e">LIVE &nbsp;|&nbsp; REFRESHED: ${ts}</span>`;
@@ -1511,10 +1511,19 @@ function updateStatusBar(){
 // CORE FETCH HELPER — allorigins proxy
 // ═══════════════════════════════════════════
 async function proxyFetch(url, timeoutMs=10000){
-  const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  const r = await fetch(proxied, {signal: AbortSignal.timeout(timeoutMs)});
-  if(!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r;
+  const proxies = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  ];
+  let lastErr;
+  for(const proxied of proxies){
+    try{
+      const r = await fetch(proxied, {signal: AbortSignal.timeout(timeoutMs)});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r;
+    }catch(e){ lastErr=e; }
+  }
+  throw lastErr;
 }
 
 // Keep apiFetch stub so existing EQS window code doesn't break
@@ -1677,10 +1686,10 @@ function classifyNewsTag(title){
 }
 
 const NEWS_RSS = [
-  {url:'https://feeds.marketwatch.com/marketwatch/topstories/', src:'MKTWATCH'},
   {url:'https://finance.yahoo.com/rss/topstories',              src:'YAHOO'},
   {url:'https://feeds.a.dj.com/rss/RSSMarketsMain.xml',         src:'WSJ'},
   {url:'https://www.ft.com/rss/home/uk',                        src:'FT'},
+  {url:'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', src:'CNBC'},
 ];
 
 async function fetchRSSFeed(feedUrl, src){
@@ -1695,7 +1704,7 @@ async function fetchRSSFeed(feedUrl, src){
     const pubDate = new Date(item.querySelector('pubDate')?.textContent || Date.now());
     const desc    = item.querySelector('description')?.textContent?.trim() || '';
     return { src, tag: classifyNewsTag(title), hl: title, detail: desc, url: link, pubDate,
-             ts: pubDate.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/New_York'}) };
+             ts: pubDate.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'America/Mountain'})+' '+pubDate.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Mountain'}) };
   }).filter(n => n.hl);
 }
 
@@ -2343,8 +2352,8 @@ async function scrnFetchLive(){
   const spinner = document.getElementById('scrn-spinner');
   const src = document.getElementById('scrn-source');
 
-  if(!API_KEYS.FMP && !API_KEYS.ALPHA_VANTAGE){
-    if(src) src.textContent = '⚠ NO API KEY — ADD FMP OR AV KEY IN API_KEYS CONFIG';
+  if(true){  // live screener enrichment disabled — using static data
+    if(src) src.textContent = 'STATIC SCREENER DATA';
     return;
   }
 
@@ -3242,8 +3251,15 @@ async function fetchYahooStrip(){
 }
 
 async function buildTickerTape(){
-  const results=await Promise.allSettled(YF_SYMBOLS.ticker.map(s=>yfFetch(s)));
-  const valid=results.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
+  // fetch sequentially in small batches to avoid overwhelming the proxy
+  const syms = YF_SYMBOLS.ticker;
+  const valid = [];
+  for(let i=0; i<syms.length; i+=4){
+    const batch = syms.slice(i,i+4);
+    const results = await Promise.allSettled(batch.map(s=>yfFetch(s)));
+    results.forEach(r=>{ if(r.status==='fulfilled'&&r.value) valid.push(r.value); });
+    if(i+4<syms.length) await new Promise(res=>setTimeout(res,500));
+  }
   if(!valid.length) return;
   let html='';
   for(const q of valid){
@@ -3405,7 +3421,8 @@ window.addEventListener('load',()=>{
       {name:'allorigins → Yahoo SPY', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('bad payload'); return 'SPY $'+p;})},
       {name:'open.er-api.com FX',     fn:()=>fetch('https://open.er-api.com/v6/latest/USD',{signal:AbortSignal.timeout(8000)}).then(r=>r.json()).then(d=>{if(d.result!=='success')throw new Error('bad'); return 'EUR='+d.rates.EUR.toFixed(4);})},
       {name:'allorigins → Yahoo ^IRX', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EIRX?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('no data'); return '3M='+p+'%';})},
-      {name:'allorigins → MktWatch RSS',fn:()=>proxyFetch('https://feeds.marketwatch.com/marketwatch/topstories/',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
+      {name:'allorigins → MktWatch RSS',fn:()=>proxyFetch('https://finance.yahoo.com/rss/topstories',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
+      {name:'allorigins → CNBC RSS',    fn:()=>proxyFetch('https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
       {name:'allorigins → Yahoo RSS',  fn:()=>proxyFetch('https://finance.yahoo.com/rss/topstories',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
     ];
     const diagKey='NETTEST';

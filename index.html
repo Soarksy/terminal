@@ -137,6 +137,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .wr{position:absolute;bottom:0;right:0;width:10px;height:10px;cursor:se-resize;
     background:linear-gradient(135deg,transparent 50%,#222 50%)}
 
+
+/* ── PANEL TABS ── */
+.ptabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)}
+.ptab{padding:4px 14px;font-size:10px;color:#444;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.8px;white-space:nowrap}
+.ptab:hover{color:var(--amber)}
+.ptab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.psection{display:none;flex:1;overflow:auto}
+.psection.active{display:block}
+.psection-flex{display:none;flex:1;overflow:auto;flex-direction:column}
+.psection-flex.active{display:flex}
+
 /* ── COMMON TABLE ── */
 .t{width:100%;border-collapse:collapse;font-size:11px}
 .t th{color:#3a3a3a;font-size:10px;font-weight:600;text-align:right;padding:2px 6px;
@@ -440,22 +451,16 @@ canvas{display:block}
   <button class="scbtn" onclick="OW('EQ')">EQ</button>
   <button class="scbtn" onclick="OW('FX')">FX</button>
   <button class="scbtn" onclick="OW('CMDTY')">CMDTY</button>
-  <button class="scbtn" onclick="OW('MAP')">MAP</button>
-  <button class="scbtn" onclick="OW('MACRO')">MACRO</button>
-  <button class="scbtn" onclick="OW('NEWS')">NEWS</button>
-  <button class="scbtn" onclick="OW('INFL')">INFL</button>
-  <button class="scbtn" onclick="OW('VOL')">VOL</button>
-  <button class="scbtn" onclick="OW('EQS')">EQS</button>
   <button class="scbtn" onclick="OW('FI')">TREAS</button>
-  <button class="scbtn" onclick="OW('AUCTION')">AUCTION</button>
+  <button class="scbtn" onclick="OW('INFL')">INFL</button>
+  <button class="scbtn" onclick="OW('MACRO')">MACRO</button>
+  <button class="scbtn" onclick="OW('VOL')">VOL</button>
+  <button class="scbtn" onclick="OW('NEWS')">NEWS</button>
+  <button class="scbtn" onclick="OW('MAP')">MAP</button>
+  <button class="scbtn" onclick="OW('EQS')">EQS</button>
   <button class="scbtn" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)">CHART</button>
-  <button class="scbtn" onclick="OW('OPTIONS')">OPTIONS</button>
-  <button class="scbtn" onclick="OW('EARN')">EARNINGS</button>
-  <button class="scbtn" onclick="OW('ECON')">ECON</button>
-  <button class="scbtn" onclick="OW('CARRY')">CARRY</button>
-  <button class="scbtn" onclick="OW('ROTATION')">ROTATION</button>
-  <button class="scbtn" onclick="OW('LADDER')">LADDER</button>
-  <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A ARRANGE &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
+  <button class="scbtn" onclick="OW('SCRN')">SCRN</button>
+  <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A LAYOUT &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
 </div>
 
 <!-- STATUS BAR -->
@@ -772,6 +777,20 @@ function fmtC(v,d=2){
 function fmtCS(v,d=2){if(v>0)return`+${v.toFixed(d)}`;return v.toFixed(d);}
 const getTs=()=>new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
+// ── Panel tab switcher ──
+function switchTab(groupId, tabId){
+  const group = document.getElementById(groupId);
+  if(!group) return;
+  group.querySelectorAll('.ptab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tabId));
+  group.querySelectorAll('.psection,.psection-flex').forEach(s=>s.classList.toggle('active', s.id===tabId));
+}
+function buildTabs(groupId, tabs){
+  // tabs = [{id, label}]
+  const btns = tabs.map((t,i)=>`<div class="ptab${i===0?' active':''}" data-tab="${t.id}" onclick="switchTab('${groupId}','${t.id}')">${t.label}</div>`).join('');
+  const panes = tabs.map((t,i)=>`<div class="${t.flex?'psection-flex':'psection'}${i===0?' active':''}" id="${t.id}">${t.content}</div>`).join('');
+  return `<div class="ptabs" id="${groupId}">${btns}</div>${panes}`;
+}
+
 // ═══════════════════════════════════════════
 // WINDOW MANAGER
 // ═══════════════════════════════════════════
@@ -946,27 +965,101 @@ function makeResize(el){
 // ═══════════════════════════════════════════
 function rFI(){
   const t=D.fixedIncome.treasuries;
-  const y2=t[4].yield,y5=t[6].yield,y10=t[8].yield,y30=t[10].yield,y3m=t[1].yield;
-  const s2_10=(y10-y2)*100,s3m10=(y10-y3m)*100,s5_30=(y30-y5)*100;
+  const y2=t[4]?.yield||0, y5=t[6]?.yield||0, y10=t[8]?.yield||0, y30=t[10]?.yield||0, y3m=t[1]?.yield||0;
+  const s2_10=(y10-y2)*100, s3m10=(y10-y3m)*100, s5_30=(y30-y5)*100;
   const regime=s2_10<-20?'inverted':s2_10<20?'flat':'normal';
+
+  // ── TAB 1: CURVE ──
+  const curveTab = `
+    <div style="padding:4px 6px">
+      <div class="sl">YIELD CURVE — INTERACTIVE</div>
+      <canvas id="yield-curve-canvas" height="160" style="width:100%;cursor:crosshair;margin-bottom:4px"></canvas>
+      <div id="yield-curve-tooltip" style="height:16px;font-size:9px;color:#555;letter-spacing:.5px;padding:0 2px"></div>
+      <div class="sf" style="margin-top:4px">
+        <div class="si"><span class="sil">2s10s</span><span class="siv">${fmtCS(s2_10,1)}bp</span></div>
+        <div class="si"><span class="sil">3m10y</span><span class="siv">${fmtCS(s3m10,1)}bp</span></div>
+        <div class="si"><span class="sil">5s30s</span><span class="siv">${fmtCS(s5_30,1)}bp</span></div>
+        <div class="si"><span class="sil">CURVE</span><span class="regime ${regime}">${regime.toUpperCase()}</span></div>
+      </div>
+    </div>`;
+
+  // ── TAB 2: TENORS ──
   const rows=t.map(r=>`<tr>
     <td>${r.tenor}</td><td class="hl">${fmt(r.yield,3)}</td>
     <td>${fmtC(r.d1,3)}</td><td>${fmtC(r.w1,3)}</td><td>${fmtC(r.m1,3)}</td>
     <td class="neu">${fmt(r.dur,2)}</td><td class="w">${fmt(r.price,2)}</td>
   </tr>`).join('');
-  return`
-  <div class="sl">YIELD CURVE — INTERACTIVE</div>
-  <canvas id="yield-curve-canvas" height="160" style="width:100%;cursor:crosshair;margin-bottom:4px"></canvas>
-  <div id="yield-curve-tooltip" style="height:16px;font-size:9px;color:#555;letter-spacing:.5px;margin-bottom:4px;padding:0 2px"></div>
-  <div class="sf" style="margin-bottom:6px">
-    <div class="si"><span class="sil">2s10s</span><span class="siv">${fmtCS(s2_10,1)}bp</span></div>
-    <div class="si"><span class="sil">3m10y</span><span class="siv">${fmtCS(s3m10,1)}bp</span></div>
-    <div class="si"><span class="sil">5s30s</span><span class="siv">${fmtCS(s5_30,1)}bp</span></div>
-    <div class="si"><span class="sil">CURVE</span><span class="regime ${regime}">${regime.toUpperCase()}</span></div>
-  </div>
-  <div class="sl">TENOR TABLE</div>
-  <table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D</th><th>1W</th><th>1M</th><th>DUR</th><th>PRICE</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const tenorTab = `
+    <div style="padding:4px 6px">
+      <div class="sl">TREASURY YIELDS — ALL TENORS</div>
+      <table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D</th><th>1W</th><th>1M</th><th>DUR</th><th>PRICE</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+
+  // ── TAB 3: AUCTION ──
+  const arows=D.fixedIncome.auctions.map(a=>`
+    <tr class="${a.weak?'':''}">
+      <td style="${a.weak?'color:var(--red)':''}">${a.sec}</td>
+      <td class="w">${a.mat}</td><td class="w">${a.auction}</td>
+      <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield.toFixed(3)}</td>
+      <td class="${a.btc<2.5?'dn':'up'}">${a.btc.toFixed(2)}</td>
+      <td class="${a.tail>2?'dn':a.tail<1?'up':'w'}">${a.tail.toFixed(1)}</td>
+      <td>${a.ind.toFixed(1)}%</td><td>${a.dir.toFixed(1)}%</td>
+      <td class="${a.deal>25?'dn':'w'}">${a.deal.toFixed(1)}%</td>
+    </tr>`).join('');
+  const auctionTab = `
+    <div style="padding:4px 6px">
+      <div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC)</div>
+      <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${arows}</tbody></table>
+      <div class="sf" style="margin-top:6px">
+        <div class="si"><span class="sil">AVG BTC (2Y)</span><span class="siv">2.64</span></div>
+        <div class="si"><span class="sil">AVG BTC (10Y)</span><span class="siv">2.52</span></div>
+        <div class="si"><span class="sil">AVG BTC (30Y)</span><span class="siv">2.28</span></div>
+      </div>
+    </div>`;
+
+  // ── TAB 4: LADDER ──
+  const maxDv01 = Math.max(...t.map(r=>{
+    const yrs=r.tenor==='1M'?1/12:r.tenor==='3M'?.25:r.tenor==='6M'?.5:parseFloat(r.tenor)||1;
+    return yrs;
+  }));
+  const lrows = t.map(r=>{
+    const yrs=r.tenor==='1M'?1/12:r.tenor==='3M'?.25:r.tenor==='6M'?.5:parseFloat(r.tenor)||1;
+    const y=r.yield/100;
+    const dur = yrs <= 1 ? yrs : yrs/(1+y);
+    const dv01 = (dur*100*10000)/1e6;
+    const s10 = -(dv01*10).toFixed(0);
+    const s100 = -(dv01*100).toFixed(0);
+    const barW = Math.round(dv01/maxDv01*60);
+    const d1col = r.d1>0?'var(--green)':r.d1<0?'var(--red)':'#444';
+    const durCol = dur>10?'var(--red)':dur>5?'var(--amber)':'var(--green)';
+    const dv01Bar = `<div style="display:inline-block;width:${barW}px;height:5px;background:var(--amber);vertical-align:middle;margin-right:4px;opacity:0.5"></div>`;
+    return `<tr>
+      <td style="color:var(--amber);font-weight:600">${r.tenor}</td>
+      <td style="color:var(--green);font-weight:600">${r.yield.toFixed(3)}%</td>
+      <td style="color:${d1col};font-size:9px">${r.d1>0?'+':''}${r.d1.toFixed(3)}</td>
+      <td style="color:${durCol}">${dur.toFixed(2)}y</td>
+      <td>${dv01Bar}$${dv01.toFixed(2)}</td>
+      <td style="color:var(--red);font-size:9px">-$${Math.abs(s10).toLocaleString()}</td>
+      <td style="color:var(--red);font-size:9px">-$${Math.abs(s100).toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+  const ladderTab = `
+    <div style="padding:4px 6px">
+      <div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">DV01 = $/bp PER $1M FACE · SHOCK = LOSS ON +10bp / +100bp PARALLEL SHIFT</div>
+      <table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D Δ</th><th>MOD DUR</th><th>DV01 $/bp</th><th>+10bp P&L</th><th>+100bp P&L</th></tr></thead><tbody>${lrows}</tbody></table>
+      <div style="margin-top:6px;padding:5px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">
+        Duration approximated for bullet bonds at par. Convexity not included — actual losses on large moves will be slightly less than linear.
+      </div>
+    </div>`;
+
+  return buildTabs('fi-tabs',[
+    {id:'fi-curve',   label:'YIELD CURVE', content:curveTab},
+    {id:'fi-tenors',  label:'TENORS',      content:tenorTab},
+    {id:'fi-auction', label:'AUCTION',     content:auctionTab},
+    {id:'fi-ladder',  label:'DURATION',    content:ladderTab},
+  ]);
 }
+
 
 function drawYieldCurve(){
   const canvas = document.getElementById('yield-curve-canvas');
@@ -1109,11 +1202,54 @@ function rEQ(){
       <div class="hm-sub">${s.mcap}T — 1W: ${fmtCS(s.w1,1)}%</div>
     </div>`;
   }).join('');
-  return`
-    <div class="sl">INDEX MONITOR</div>
-    <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${idx}</tbody></table>
-    <div class="sl" style="margin-top:6px">SECTOR HEATMAP — 1D PERFORMANCE</div>
-    <div class="hm-grid">${hm}</div>`;
+
+  // ROTATION tab content
+  const sectors = D.equities.sectors||[];
+  const enriched = sectors.map(s=>({...s, w1:+(s.d1*3.5+(Math.random()-.45)*1.5).toFixed(2), m1:+(s.d1*14+(Math.random()-.45)*4).toFixed(2), m3:+(s.d1*38+(Math.random()-.45)*8).toFixed(2)}));
+  const ranked = [...enriched].sort((a,b)=>b.m1-a.m1);
+  const rotRows = ranked.map((s,i)=>{
+    const rc=i<3?'var(--green)':i>=8?'var(--red)':'#555';
+    return `<tr><td style="color:${rc};font-weight:600">#${i+1}</td><td style="color:var(--text-dim)">${s.name}</td>
+      <td style="color:${s.d1>0?'var(--green)':'var(--red)'}">${s.d1>0?'+':''}${s.d1.toFixed(2)}%</td>
+      <td style="color:${s.w1>0?'var(--green)':'var(--red)'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</td>
+      <td style="color:${s.m1>0?'var(--green)':'var(--red)'};font-weight:600">${s.m1>0?'+':''}${s.m1.toFixed(2)}%</td>
+      <td style="color:${s.m3>0?'var(--green)':'var(--red)'}">${s.m3>0?'+':''}${s.m3.toFixed(2)}%</td>
+    </tr>`;
+  }).join('');
+
+  // EARNINGS tab
+  const earnings=[
+    {date:'Mar 10',sym:'ORCL',name:'Oracle Corp',eps_est:'1.48',time:'AMC',mktcap:'360B'},
+    {date:'Mar 11',sym:'ADBE',name:'Adobe Inc',eps_est:'4.97',time:'AMC',mktcap:'195B'},
+    {date:'Mar 19',sym:'MU',  name:'Micron Technology',eps_est:'1.43',time:'AMC',mktcap:'104B'},
+    {date:'Mar 20',sym:'NKE', name:'Nike Inc',eps_est:'0.29',time:'AMC',mktcap:'106B'},
+    {date:'Mar 21',sym:'FDX', name:'FedEx Corp',eps_est:'3.96',time:'AMC',mktcap:'58B'},
+    {date:'Apr 11',sym:'JPM', name:'JPMorgan Chase',eps_est:'4.61',time:'BMO',mktcap:'720B'},
+    {date:'Apr 14',sym:'GS',  name:'Goldman Sachs',eps_est:'11.44',time:'BMO',mktcap:'185B'},
+    {date:'Apr 22',sym:'TSLA',name:'Tesla Inc',eps_est:'0.48',time:'AMC',mktcap:'890B'},
+    {date:'Apr 23',sym:'META',name:'Meta Platforms',eps_est:'6.72',time:'AMC',mktcap:'1.5T'},
+    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',eps_est:'2.01',time:'AMC',mktcap:'2.1T'},
+    {date:'Apr 25',sym:'MSFT',name:'Microsoft Corp',eps_est:'3.22',time:'AMC',mktcap:'3.1T'},
+    {date:'Apr 29',sym:'AAPL',name:'Apple Inc',eps_est:'1.62',time:'AMC',mktcap:'3.4T'},
+    {date:'Apr 30',sym:'AMZN',name:'Amazon.com',eps_est:'1.36',time:'AMC',mktcap:'2.2T'},
+    {date:'May 1', sym:'NVDA',name:'Nvidia Corp',eps_est:'0.88',time:'AMC',mktcap:'2.8T'},
+  ];
+  const earnRows=earnings.map(e=>`<tr>
+    <td style="color:#555;font-size:9px">${e.date}</td>
+    <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
+    <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
+    <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:8px;padding:1px 4px">${e.time}</td>
+    <td style="color:#888">$${e.eps_est}</td>
+    <td style="color:#333">—</td>
+    <td style="color:#2a2a2a;font-size:9px">${e.mktcap}</td>
+  </tr>`).join('');
+
+  return buildTabs('eq-tabs',[
+    {id:'eq-indices',  label:'INDICES',   content:`<div style="padding:4px 6px"><div class="sl">INDEX MONITOR</div><table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${idx}</tbody></table></div>`},
+    {id:'eq-sectors',  label:'SECTORS',   content:`<div style="padding:4px 6px"><div class="sl">SECTOR HEATMAP — 1D PERFORMANCE</div><div class="hm-grid">${hm}</div></div>`},
+    {id:'eq-rotation', label:'ROTATION',  content:`<div style="padding:4px 6px"><div style="font-size:8px;color:#2a2a2a;margin-bottom:4px">1D LIVE · 1W/1M/3M ESTIMATED FROM TREND</div><table class="t"><thead><tr><th>RANK</th><th>SECTOR</th><th>1D</th><th>1W</th><th>1M</th><th>3M</th></tr></thead><tbody>${rotRows}</tbody></table></div>`},
+    {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>MKTCAP</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
+  ]);
 }
 function drawEQ(){}
 
@@ -1121,13 +1257,12 @@ function drawEQ(){}
 // RENDER: FX
 // ═══════════════════════════════════════════
 function rFX(){
-  function fxSection(title,data){
+  function fxTable(title,data){
     const rows=data.map(r=>{
-      const isSmall=Math.abs(r.val)<10;
-      const dec=r.val>100?2:r.val>10?4:4;
+      const dec=r.val>100?2:4;
       const vol=r.vol==='HIGH'?`<span class="dn">HIGH</span>`:r.vol==='MOD'?`<span style="color:var(--amber)">MOD</span>`:`<span class="neu">${r.vol}</span>`;
       return`<tr><td>${r.name}</td><td class="hl">${r.val.toFixed(dec)}</td>
-        <td>${fmtC(r.d1,r.val>10?3:4)}</td><td>${fmtC(r.w1,r.val>10?3:4)}</td><td>${fmtC(r.m1,r.val>10?3:4)}</td>
+        <td>${fmtC(r.d1,dec)}</td><td>${fmtC(r.w1,dec)}</td><td>${fmtC(r.m1,dec)}</td>
         <td>${vol}</td></tr>`;
     }).join('');
     return`<div class="sl">${title}</div>
@@ -1135,9 +1270,43 @@ function rFX(){
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
   const em=D.fx.filter(f=>f.type==='em');
-  return fxSection('G10 & DXY',g10)+fxSection('EMERGING MARKETS',em);
-}
 
+  // Carry content
+  const rates={USD:4.375,EUR:2.40,GBP:4.50,JPY:0.50,AUD:4.10,NZD:3.75,CAD:3.00,CHF:0.50,NOK:4.50,SEK:2.50};
+  const pairs=[
+    {b:'AUD',q:'JPY'},{b:'NZD',q:'JPY'},{b:'GBP',q:'JPY'},{b:'USD',q:'JPY'},{b:'NOK',q:'JPY'},
+    {b:'AUD',q:'CHF'},{b:'GBP',q:'CHF'},{b:'USD',q:'CHF'},{b:'AUD',q:'EUR'},{b:'GBP',q:'EUR'},
+  ].map(p=>({...p,carry:rates[p.b]-rates[p.q]})).sort((a,b)=>b.carry-a.carry);
+  const fxLookup={};D.fx.forEach(f=>{fxLookup[f.name]=f;});
+  const carryRows=pairs.map(p=>{
+    const f=fxLookup[p.b+p.q];
+    const px=f?f.val.toFixed(4):'—';
+    const carryCol=p.carry>3?'var(--green)':p.carry>1.5?'var(--amber)':'#888';
+    const sig=p.carry>3?'STRONG BUY':p.carry>2?'BUY':p.carry>1?'MILD':'WEAK';
+    const sigCol=p.carry>3?'var(--green)':p.carry>2?'var(--amber)':'#555';
+    return`<tr>
+      <td style="color:var(--amber);font-weight:600">${p.b}/${p.q}</td>
+      <td style="color:${carryCol};font-weight:600">${p.carry.toFixed(2)}%</td>
+      <td style="color:#666">${rates[p.b].toFixed(2)}%</td>
+      <td style="color:#666">${rates[p.q].toFixed(2)}%</td>
+      <td style="color:#888">${px}</td>
+      <td style="color:${sigCol};font-size:9px">${sig}</td>
+    </tr>`;
+  }).join('');
+  const rateBar=Object.entries(rates).map(([c,r])=>`<div class="si"><span class="sil">${c}</span><span class="siv" style="color:${r>3?'var(--red)':r>1.5?'var(--amber)':'var(--green)'}">${r.toFixed(2)}%</span></div>`).join('');
+
+  return buildTabs('fx-tabs',[
+    {id:'fx-g10',   label:'G10 & DXY', content:`<div style="padding:4px 6px">${fxTable('G10 & DXY',g10)}</div>`},
+    {id:'fx-em',    label:'EMERGING',  content:`<div style="padding:4px 6px">${fxTable('EMERGING MARKETS',em)}</div>`},
+    {id:'fx-carry', label:'CARRY',     content:`<div style="padding:4px 6px">
+      <div class="sl">G10 POLICY RATES</div>
+      <div class="sf" style="margin-bottom:8px">${rateBar}</div>
+      <div class="sl">CARRY OPPORTUNITIES — SORTED BY RATE DIFFERENTIAL</div>
+      <table class="t"><thead><tr><th>PAIR</th><th>CARRY</th><th>BASE</th><th>QUOTE</th><th>SPOT</th><th>SIGNAL</th></tr></thead><tbody>${carryRows}</tbody></table>
+      <div style="margin-top:6px;padding:5px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">⚠ JPY &amp; CHF unwind sharply in risk-off. Monitor VIX.</div>
+    </div>`},
+  ]);
+}
 // ═══════════════════════════════════════════
 // RENDER: COMMODITIES
 // ═══════════════════════════════════════════
@@ -1305,157 +1474,46 @@ function rAUCTION(){
 function rVOL(){
   const vix  = D.equities.indices[4]?.val  || 0;
   const vixC = D.equities.indices[4]?.chg  || 0;
-  const vixP = D.equities.indices[4]?.pct  || 0;
-  const spx  = D.equities.indices[0]?.val  || 0;
   const spxP = D.equities.indices[0]?.pct  || 0;
-
-  // VIX regime
   const regime = vix<15?{l:'LOW — COMPLACENCY RISK',c:'var(--green)'}
-               : vix<20?{l:'MODERATE — NORMAL RANGE',c:'var(--amber)'}
+               : vix<20?{l:'MODERATE — NORMAL',c:'var(--amber)'}
                : vix<25?{l:'ELEVATED — CAUTION',c:'#ff6f00'}
                : vix<30?{l:'HIGH — STRESS',c:'var(--red)'}
                : {l:'EXTREME — CRISIS',c:'#ff1744'};
+  const ts=[{t:'SPOT',v:vix},{t:'M1',v:+(vix*1.02+0.3).toFixed(2)},{t:'M2',v:+(vix*1.04+0.5).toFixed(2)},{t:'M3',v:+(vix*1.06+0.8).toFixed(2)},{t:'M4',v:+(vix*1.08+1.1).toFixed(2)},{t:'M5',v:+(vix*1.09+1.3).toFixed(2)},{t:'M6',v:+(vix*1.10+1.5).toFixed(2)}];
+  const contango=ts[1].v>ts[0].v;
+  const structLabel=contango?{l:'CONTANGO — NORMAL',c:'var(--green)'}:{l:'BACKWARDATION — FEAR',c:'var(--red)'};
+  const vrp=(vix - Math.abs(spxP)*Math.sqrt(252)*10).toFixed(1);
 
-  // VIX term structure (contango is normal; backwardation = fear)
-  const ts = [
-    {t:'SPOT', v:vix},
-    {t:'M1',   v:+(vix*1.02 + 0.3).toFixed(2)},
-    {t:'M2',   v:+(vix*1.04 + 0.5).toFixed(2)},
-    {t:'M3',   v:+(vix*1.06 + 0.8).toFixed(2)},
-    {t:'M4',   v:+(vix*1.08 + 1.1).toFixed(2)},
-    {t:'M5',   v:+(vix*1.09 + 1.3).toFixed(2)},
-    {t:'M6',   v:+(vix*1.10 + 1.5).toFixed(2)},
-  ];
-  const contango = ts[1].v > ts[0].v;
-  const structureLabel = contango ? {l:'CONTANGO — NORMAL',c:'var(--green)'} : {l:'BACKWARDATION — FEAR',c:'var(--red)'};
+  const volTab=`
+    <div style="padding:4px 6px">
+      <div class="sf" style="margin-bottom:6px">
+        <div class="si"><span class="sil">VIX SPOT</span><span class="siv" style="color:${regime.c};font-size:13px;font-weight:600">${vix.toFixed(2)}</span></div>
+        <div class="si"><span class="sil">1D CHG</span><span class="siv ${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</span></div>
+        <div class="si"><span class="sil">REGIME</span><span class="siv" style="color:${regime.c}">${regime.l}</span></div>
+        <div class="si"><span class="sil">STRUCTURE</span><span class="siv" style="color:${structLabel.c}">${structLabel.l}</span></div>
+        <div class="si"><span class="sil">VOL RISK PREM</span><span class="siv" style="color:${parseFloat(vrp)>0?'var(--amber)':'var(--green)'}">${parseFloat(vrp)>0?'+':''}${vrp}</span></div>
+      </div>
+      <div class="sl">VIX TERM STRUCTURE</div>
+      <div class="sf" style="margin-bottom:6px">${ts.map(x=>`<div class="si"><span class="sil">${x.t}</span><span class="siv" style="color:${x.v>vix*1.1?'var(--red)':x.v<vix*0.95?'var(--green)':'var(--amber)'}">${x.v.toFixed(2)}</span></div>`).join('')}</div>
+      <canvas id="vol-ts-c" height="70" style="width:100%;margin-bottom:8px"></canvas>
+      <div class="sl">VOL INDICES</div>
+      <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
+        <tr><td style="color:var(--amber)">VIX</td><td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td><td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td><td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td><td style="color:#333;font-size:9px">S&P 500 30D implied</td></tr>
+        <tr><td style="color:var(--amber)">VVIX</td><td>${(vix*5.8+3).toFixed(1)}</td><td class="neu">—</td><td class="${vix<20?'up':'dn'}">${vix<20?'NORMAL':'ELEVATED'}</td><td style="color:#333;font-size:9px">Vol-of-vol</td></tr>
+        <tr><td style="color:var(--amber)">MOVE</td><td>${(90+vix*1.4).toFixed(1)}</td><td class="neu">—</td><td class="${vix<18?'up':'dn'}">${vix<18?'MODERATE':'ELEVATED'}</td><td style="color:#333;font-size:9px">Treasury implied vol</td></tr>
+        <tr><td style="color:var(--amber)">SKEW</td><td>${(128+vix*0.8).toFixed(1)}</td><td class="neu">—</td><td class="w">MODERATE</td><td style="color:#333;font-size:9px">Tail risk / put skew</td></tr>
+      </tbody></table>
+      <div class="sl" style="margin-top:6px">1Y VIX HISTORY</div>
+      <canvas id="vol-hist-c" height="80" style="width:100%">
+    </div>`;
 
-  // Realized vs implied vol (approx — 1M realized from SPX daily moves)
-  const impliedVol = vix;
-  const realizedVol = Math.abs(spxP) * Math.sqrt(252) * 10; // rough proxy
-  const vrp = (impliedVol - realizedVol).toFixed(1); // vol risk premium
-
-  const tsRows = ts.map(x => {
-    const col = x.v > vix*1.1 ? 'var(--red)' : x.v < vix*0.95 ? 'var(--green)' : 'var(--amber)';
-    return `<div class="si"><span class="sil">${x.t}</span><span class="siv" style="color:${col}">${x.v.toFixed(2)}</span></div>`;
-  }).join('');
-
-  return`
-    <div class="sf" style="margin-bottom:4px">
-      <div class="si"><span class="sil">VIX SPOT</span><span class="siv" style="color:${regime.c};font-size:13px;font-weight:600">${vix.toFixed(2)}</span></div>
-      <div class="si"><span class="sil">1D CHG</span><span class="siv ${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</span></div>
-      <div class="si"><span class="sil">REGIME</span><span class="siv" style="color:${regime.c}">${regime.l}</span></div>
-      <div class="si"><span class="sil">STRUCTURE</span><span class="siv" style="color:${structureLabel.c}">${structureLabel.l}</span></div>
-      <div class="si"><span class="sil">VOL RISK PREM</span><span class="siv" style="color:${parseFloat(vrp)>0?'var(--amber)':'var(--green)'}">${parseFloat(vrp)>0?'+':''}${vrp}</span></div>
-    </div>
-    <div class="sl">VIX FUTURES TERM STRUCTURE (INDICATIVE)</div>
-    <div class="sf" style="margin-bottom:8px">${tsRows}</div>
-    <canvas id="vol-ts-c" height="80" style="width:100%;margin-bottom:8px"></canvas>
-    <div class="sl">VOLATILITY INDICES</div>
-    <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D CHG</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
-      <tr>
-        <td style="color:var(--amber)">VIX</td>
-        <td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td>
-        <td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td>
-        <td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td>
-        <td style="color:#333;font-size:9px">S&P 500 30D implied vol</td>
-      </tr>
-      <tr>
-        <td style="color:var(--amber)">VVIX</td>
-        <td>${(vix*5.8 + 3).toFixed(1)}</td>
-        <td class="neu">—</td>
-        <td class="${vix<20?'up':'dn'}">${vix<20?'NORMAL':'ELEVATED'}</td>
-        <td style="color:#333;font-size:9px">Vol-of-vol index</td>
-      </tr>
-      <tr>
-        <td style="color:var(--amber)">MOVE</td>
-        <td>${(90 + vix*1.4).toFixed(1)}</td>
-        <td class="neu">—</td>
-        <td class="${vix<18?'up':'dn'}">${vix<18?'MODERATE':'ELEVATED'}</td>
-        <td style="color:#333;font-size:9px">Treasury implied vol</td>
-      </tr>
-      <tr>
-        <td style="color:var(--amber)">SKEW</td>
-        <td>${(128 + vix*0.8).toFixed(1)}</td>
-        <td class="neu">—</td>
-        <td class="w">MODERATE</td>
-        <td style="color:#333;font-size:9px">Tail risk / put skew</td>
-      </tr>
-    </tbody></table>
-    <div class="sl" style="margin-top:8px">HISTORICAL VIX — LIVE (1Y DAILY)</div>
-    <canvas id="vol-hist-c" height="90" style="width:100%">`;
+  return buildTabs('vol-tabs',[
+    {id:'vol-main',    label:'VIX & INDICES', content:volTab},
+    {id:'vol-options', label:'OPTIONS FLOW',  content:`<div style="padding:4px 6px">${rOPTIONS()}</div>`},
+  ]);
 }
 
-function drawVOL(){
-  const vix = D.equities.indices[4]?.val || 18;
-  const ts = [vix, vix*1.02+0.3, vix*1.04+0.5, vix*1.06+0.8, vix*1.08+1.1, vix*1.09+1.3, vix*1.10+1.5];
-  const labels = ['SPOT','M1','M2','M3','M4','M5','M6'];
-
-  // Draw term structure chart
-  const c = document.getElementById('vol-ts-c'); if(!c) return;
-  const W = c.parentElement.offsetWidth - 10; c.width = W;
-  const ctx = c.getContext('2d'); ctx.clearRect(0,0,W,80);
-  const mn = Math.min(...ts)-1, mx = Math.max(...ts)+1;
-  const pad = {l:28,r:8,t:8,b:18}, pw = W-pad.l-pad.r, ph = 80-pad.t-pad.b;
-  const xp = i => pad.l + i/(ts.length-1)*pw;
-  const yp = v => pad.t + (1-(v-mn)/(mx-mn))*ph;
-  ctx.strokeStyle='#111'; ctx.lineWidth=1;
-  [mn,(mn+mx)/2,mx].forEach(y=>{
-    ctx.beginPath(); ctx.moveTo(pad.l,yp(y)); ctx.lineTo(W-pad.r,yp(y)); ctx.stroke();
-    ctx.fillStyle='#333'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
-    ctx.fillText(y.toFixed(1),pad.l-2,yp(y)+3);
-  });
-  ctx.textAlign='center'; ctx.fillStyle='#444'; ctx.font='8px IBM Plex Mono';
-  labels.forEach((l,i)=>ctx.fillText(l,xp(i),80-3));
-  const isContango = ts[1]>ts[0];
-  const lineCol = isContango ? '#00c853' : '#e53935';
-  const g = ctx.createLinearGradient(0,pad.t,0,80-pad.b);
-  g.addColorStop(0, isContango?'rgba(0,200,83,0.15)':'rgba(229,57,53,0.15)');
-  g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.beginPath(); ts.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v)));
-  ctx.lineTo(xp(ts.length-1),80-pad.b); ctx.lineTo(pad.l,80-pad.b); ctx.closePath();
-  ctx.fillStyle=g; ctx.fill();
-  ctx.strokeStyle=lineCol; ctx.lineWidth=2; ctx.beginPath();
-  ts.forEach((v,i)=>i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v))); ctx.stroke();
-  ts.forEach((v,i)=>{ctx.fillStyle=lineCol;ctx.beginPath();ctx.arc(xp(i),yp(v),3,0,Math.PI*2);ctx.fill();});
-
-  // Historical VIX chart — use real data if available from Yahoo fetch, else simulate
-  const hc = document.getElementById('vol-hist-c'); if(!hc) return;
-  const HW = hc.parentElement.offsetWidth-10; hc.width=HW;
-  const hctx = hc.getContext('2d'); hctx.clearRect(0,0,HW,90);
-  // Build simulated 252-day history anchored to live VIX
-  const hist = []; let v = vix;
-  for(let i=251;i>=0;i--){
-    const t = i/251;
-    // shape: higher vol in middle of year, current at end
-    v = vix*(0.8 + 0.4*Math.sin(t*Math.PI)) + (Math.random()-.48)*2.5;
-    v = Math.max(10, Math.min(45, v));
-    hist.push(v);
-  }
-  hist[hist.length-1] = vix;
-  const hmn=Math.min(...hist)-1, hmx=Math.max(...hist)+1;
-  const hp={l:28,r:4,t:6,b:14}, hpw=HW-hp.l-hp.r, hph=90-hp.t-hp.b;
-  const hxp=i=>hp.l+i/(hist.length-1)*hpw;
-  const hyp=v=>hp.t+(1-(v-hmn)/(hmx-hmn))*hph;
-  hctx.strokeStyle='#111'; hctx.lineWidth=1;
-  [hmn,(hmn+hmx)/2,hmx].forEach(y=>{
-    hctx.beginPath(); hctx.moveTo(hp.l,hyp(y)); hctx.lineTo(HW-hp.r,hyp(y)); hctx.stroke();
-    hctx.fillStyle='#333'; hctx.font='8px IBM Plex Mono'; hctx.textAlign='right';
-    hctx.fillText(y.toFixed(0),hp.l-2,hyp(y)+3);
-  });
-  // 20 line
-  hctx.setLineDash([3,3]); hctx.strokeStyle='#2a2a2a';
-  hctx.beginPath(); hctx.moveTo(hp.l,hyp(20)); hctx.lineTo(HW-hp.r,hyp(20)); hctx.stroke();
-  hctx.setLineDash([]);
-  hctx.textAlign='left'; hctx.fillStyle='#2a2a2a'; hctx.font='7px IBM Plex Mono';
-  hctx.fillText('20',hp.l+2,hyp(20)-2);
-  const hg=hctx.createLinearGradient(0,hp.t,0,90-hp.b);
-  hg.addColorStop(0,'rgba(229,57,53,0.18)'); hg.addColorStop(1,'rgba(0,0,0,0)');
-  hctx.beginPath(); hist.forEach((v,i)=>i===0?hctx.moveTo(hxp(i),hyp(v)):hctx.lineTo(hxp(i),hyp(v)));
-  hctx.lineTo(hxp(hist.length-1),90-hp.b); hctx.lineTo(hp.l,90-hp.b); hctx.closePath();
-  hctx.fillStyle=hg; hctx.fill();
-  hctx.strokeStyle='#c62828'; hctx.lineWidth=1.5; hctx.beginPath();
-  hist.forEach((v,i)=>i===0?hctx.moveTo(hxp(i),hyp(v)):hctx.lineTo(hxp(i),hyp(v))); hctx.stroke();
-}
 
 function rOPTIONS(){
   // Key sentiment indicators derived from market data
@@ -1861,88 +1919,94 @@ function rLADDER(){
 // RENDER: MACRO
 // ═══════════════════════════════════════════
 function rMACRO(){
-  const calRows=D.macro.calendar.map(e=>`
-    <div class="cal-item${e.impact==='HIGH'?' cal-hi':''}">
+  // ── CALENDAR TAB ──
+  const calRows=D.macro.calendar.map(e=>{
+    const actCol = e.act ? (e.beat===true?'var(--green)':e.beat===false?'var(--red)':'var(--amber)') : '#2a2a2a';
+    const impCol = e.impact==='HIGH'?'var(--red)':e.impact==='MED'?'var(--amber)':'#444';
+    return `<div class="cal-item${e.impact==='HIGH'?' cal-hi':''}">
       <div class="w" style="color:#3a3a3a;font-size:9px">${e.date||''}</div>
       <div class="w">${e.time||'--:--'}</div>
-      <div style="color:var(--amber);font-weight:600">${e.cty}</div>
-      <div>${e.event}</div>
-      <div class="w">${e.prev||'—'}</div>
-      <div class="w">${e.fore||'—'}</div>
-      <div class="${e.act==null?'neu':e.beat?'cal-beat':'cal-miss'}">${e.act||'SCHED'}</div>
-    </div>`).join('');
-  const cbCards=D.macro.centralBanks.map(cb=>`
-    <div class="cb-card">
-      <div class="cb-name">${cb.name}</div>
-      <div class="mr"><span class="ml">Rate</span><span class="mv hl">${cb.rate}</span></div>
-      <div class="mr"><span class="ml">Last</span><span class="mv w" style="font-size:9px">${cb.lastChg}</span></div>
-      <div class="mr"><span class="ml">Next Mtg</span><span class="mv">${cb.next}</span></div>
-      <div class="mr"><span class="ml">Bias</span><span class="mv ${cb.bias==='CUT'?'up':cb.bias==='HIKE'?'dn':'neu'}">${cb.bias}</span></div>
-      <div class="mr"><span class="ml">Outlook</span><span class="mv" style="font-size:9px;color:#666">${cb.outlook}</span></div>
-    </div>`).join('');
-  return`
-    <div class="sl">ECONOMIC CALENDAR — TODAY</div>
-    <div class="cal-hdr">
-      <div style="font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border)">TIME</div>
-      <div style="font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border)">CTY</div>
-      <div style="font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border)">EVENT</div>
-      <div style="font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border);text-align:right">PREV</div>
-      <div style="font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border);text-align:right">FORE</div>
-      <div style="font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border);text-align:right">ACTUAL</div>
+      <div style="color:#555;font-size:9px;width:24px">${e.cty}</div>
+      <div style="flex:1;font-size:10px">${e.event}</div>
+      <div style="width:60px;text-align:right;color:#444;font-size:9px">${e.prev||'—'}</div>
+      <div style="width:60px;text-align:right;color:#555;font-size:9px">${e.fore||'—'}</div>
+      <div style="width:60px;text-align:right;color:${actCol};font-weight:600;font-size:10px">${e.act||'—'}</div>
+      <div style="width:32px;text-align:center"><span style="color:${impCol};font-size:8px;font-weight:700">${e.impact}</span></div>
+    </div>`;
+  }).join('');
+
+  const calTab = `<div style="padding:4px 6px">
+    <div style="display:grid;grid-template-columns:48px 44px 26px 1fr 60px 60px 60px 32px;font-size:8px;color:#2a2a2a;padding:2px 0;border-bottom:1px solid #111;margin-bottom:2px">
+      <span>DATE</span><span>TIME</span><span>CTY</span><span>EVENT</span><span style="text-align:right">PREV</span><span style="text-align:right">FORECAST</span><span style="text-align:right">ACTUAL</span><span style="text-align:center">IMP</span>
     </div>
     ${calRows}
-    <div class="sl" style="margin-top:6px">CENTRAL BANK MONITOR</div>
-    <div class="cb-grid">${cbCards}</div>`;
-}
+  </div>`;
 
-// ═══════════════════════════════════════════
-// RENDER: NEWS
-// ═══════════════════════════════════════════
-let newsFilter='all';
-function rNEWS(){
-  const tags=['all','macro','eq','energy','credit','geo'];
-  const filters=tags.map(t=>`<button class="tbtn${t===newsFilter?' active':''}" onclick="setNewsFilter('${t}',this)">${t.toUpperCase()}</button>`).join('');
-  const items=D.news.filter(n=>newsFilter==='all'||n.tag===newsFilter).map((n,i)=>`
-    <div class="news-item" onclick="openNewsDetail(${i})">
-      <div class="news-meta">
-        <span class="news-ts">${n.ts}</span>
-        <span class="news-src">${n.src}</span>
-        <span class="news-tag ${n.tag}">${n.tag.toUpperCase()}</span>
+  // ── CENTRAL BANKS TAB ──
+  const cbCards=D.macro.centralBanks.map(cb=>`
+    <div style="border:1px solid var(--border);padding:8px;background:var(--bg2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="color:var(--amber);font-size:12px;font-weight:700;letter-spacing:1px">${cb.name}</span>
+        <span style="color:var(--amber);font-size:14px;font-weight:600">${cb.rate}</span>
       </div>
-      <div class="news-hl">${n.hl}</div>
+      <div style="display:flex;gap:12px;font-size:9px">
+        <span style="color:#444">LAST: <span style="color:#666">${cb.lastChg}</span></span>
+        <span style="color:#444">NEXT: <span style="color:#666">${cb.next}</span></span>
+        <span style="color:#444">BIAS: <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#555'};font-weight:600">${cb.bias}</span></span>
+        <span style="color:#444">OUTLOOK: <span style="color:#555">${cb.outlook}</span></span>
+      </div>
     </div>`).join('');
-  return`<div class="news-filters">${filters}</div><div id="news-list">${items}</div>`;
-}
-function setNewsFilter(f,btn){
-  newsFilter=f;
-  document.querySelectorAll('#news-list').forEach(el=>{el.parentElement.innerHTML=rNEWS()});
-}
-function openNewsDetail(idx){
-  const n=D.news[idx];
-  const key='NEWSDET_'+idx;
-  if(WR[key])return;
-  const w=document.createElement('div');
-  w.className='win';w.style.cssText=`left:200px;top:100px;z-index:${++zTop};width:420px;min-height:160px;`;
-  const urlHtml = n.url
-    ? `<a href="${n.url}" target="_blank" rel="noopener" style="color:#1a3a5a;font-size:9px;text-decoration:none;display:inline-block;margin-top:8px;border:1px solid #1a2a3a;padding:2px 8px;letter-spacing:1px">READ FULL ARTICLE ↗</a>`
-    : '';
-  w.innerHTML=`<div class="wh"><span class="wh-cmd">NEWS</span><span class="wh-title">${n.src} — ${n.ts}</span><span class="wh-ts">${getTs()}</span><div class="wh-close" onclick="CW('${key}')">✕</div></div>
-    <div class="wb">
-      <div style="margin-bottom:6px"><span class="news-tag ${n.tag}" style="font-size:8px">${n.tag.toUpperCase()}</span></div>
-      <div style="color:var(--text-bright);font-size:11px;margin-bottom:8px;line-height:1.5">${n.hl}</div>
-      <div class="sl"></div>
-      <div style="color:var(--text);font-size:10px;line-height:1.6;margin-top:6px">${n.detail}</div>
-      ${urlHtml}
-    </div><div class="wr"></div>`;
-  document.getElementById('workspace').appendChild(w);
-  WR[key]=w;makeDrag(w);makeResize(w);
-  w.addEventListener('mousedown',()=>{w.style.zIndex=++zTop});
+  const cbTab = `<div style="padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px">${cbCards}</div>`;
+
+  // ── ECON / FRED TAB ──
+  const fred = D.macro?.fred || {};
+  const releases=[
+    {cat:'INFLATION',id:'CPIAUCSL',   label:'CPI MoM',           next:'Apr 10'},
+    {cat:'INFLATION',id:'CPILFESL',   label:'Core CPI MoM',      next:'Apr 10'},
+    {cat:'INFLATION',id:'PCEPILFE',   label:'Core PCE MoM',      next:'Mar 28'},
+    {cat:'LABOR',    id:'PAYEMS',     label:'Nonfarm Payrolls',   next:'Apr 4'},
+    {cat:'LABOR',    id:'UNRATE',     label:'Unemployment Rate',  next:'Apr 4'},
+    {cat:'LABOR',    id:'ICSA',       label:'Initial Claims',     next:'Mar 13'},
+    {cat:'GROWTH',   id:'GDP',        label:'GDP QoQ Ann.',       next:'Mar 27'},
+    {cat:'GROWTH',   id:'INDPRO',     label:'Industrial Prod.',   next:'Mar 14'},
+    {cat:'GROWTH',   id:'RETAILSMNSA',label:'Retail Sales MoM',  next:'Mar 17'},
+    {cat:'RATES',    id:'FEDFUNDS',   label:'Fed Funds Rate',     next:'Mar 19'},
+    {cat:'HOUSING',  id:'MORTGAGE30US',label:'30Y Mortgage Rate', next:'Mar 13'},
+  ];
+  const catColors={INFLATION:'#3a2a00',LABOR:'#0a2a0a',GROWTH:'#0a1a3a',RATES:'#2a0a2a',HOUSING:'#1a2a2a'};
+  const econRows=releases.map(r=>{
+    const d=fred[r.id];
+    const val=d?(r.id==='PAYEMS'?(d.val>0?'+':'')+Math.round(d.val)+'K':d.val.toFixed(2)+'%'):'—';
+    const prev=d?(r.id==='PAYEMS'?(d.prev>0?'+':'')+Math.round(d.prev)+'K':d.prev.toFixed(2)+'%'):'—';
+    const chg=d?d.chg:null;
+    const chgCol=chg===null?'#333':chg>0?'var(--green)':'var(--red)';
+    return`<tr>
+      <td><span style="background:${catColors[r.cat]||'#1a1a1a'};color:#888;font-size:8px;padding:1px 5px">${r.cat}</span></td>
+      <td style="color:var(--text-dim)">${r.label}</td>
+      <td style="color:var(--amber);font-weight:600">${val}</td>
+      <td style="color:#555">${prev}</td>
+      <td style="color:${chgCol}">${chg!==null?(chg>0?'+':'')+chg.toFixed(2):'—'}</td>
+      <td style="color:#333;font-size:9px">${d?.date||'—'}</td>
+      <td style="color:var(--amber);font-size:9px">${r.next}</td>
+    </tr>`;
+  }).join('');
+  const econTab=`<div style="padding:4px 6px">
+    <div class="sf" style="margin-bottom:6px">
+      <div class="si"><span class="sil">FRED DATA</span><span class="siv" style="color:${Object.keys(fred).length>0?'var(--green)':'var(--red)'}">${Object.keys(fred).length>0?'LIVE':'LOADING'}</span></div>
+      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">Mar 19, 2026</span></div>
+      <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
+    </div>
+    <table class="t"><thead><tr><th>CAT</th><th>INDICATOR</th><th>LATEST</th><th>PREV</th><th>CHG</th><th>DATE</th><th>NEXT</th></tr></thead><tbody>${econRows}</tbody></table>
+  </div>`;
+
+  return buildTabs('macro-tabs',[
+    {id:'macro-cal',  label:'CALENDAR',      content:calTab},
+    {id:'macro-cb',   label:'CENTRAL BANKS', content:cbTab},
+    {id:'macro-econ', label:'ECON / FRED',   content:econTab},
+  ]);
 }
 
-// ═══════════════════════════════════════════
-// ═══════════════════════════════════════════
-// RENDER: EQS — Equity Search (live FMP)
-// ═══════════════════════════════════════════
+
 function rEQS(prefill){
   const val = prefill ? prefill.toUpperCase() : '';
   return`
@@ -4063,8 +4127,8 @@ document.addEventListener('keydown',e=>{
   // Never fire shortcuts when user is typing in any input or textarea
   const tag = document.activeElement?.tagName;
   if(tag==='INPUT'||tag==='TEXTAREA') return;
-  // Ctrl+A = arrange
-  if(e.ctrlKey&&e.key==='a'){e.preventDefault();arrange();}
+  // Ctrl+A = arrange popup
+  if(e.ctrlKey&&e.key==='a'){e.preventDefault();showArrangePopup();}
   // Ctrl+F = fullscreen topmost window
   if(e.ctrlKey&&e.key==='f'){
     e.preventDefault();
@@ -4075,18 +4139,140 @@ document.addEventListener('keydown',e=>{
   // Ctrl+Backspace = close all windows
   if(e.ctrlKey&&e.key==='Backspace'){e.preventDefault();Object.keys(WR).forEach(k=>CW(k));}
 });
-function arrange(){
-  const keys=Object.keys(WR);
-  const n=keys.length;if(!n)return;
-  const cols=Math.ceil(Math.sqrt(n));const rows=Math.ceil(n/cols);
-  const W=window.innerWidth,H=window.innerHeight-46;
+
+function showArrangePopup(){
+  // Remove existing popup if open
+  const existing = document.getElementById('arrange-popup');
+  if(existing){ existing.remove(); return; }
+
+  const n = Object.keys(WR).length;
+  const ws = window.innerWidth, hs = window.innerHeight - 46;
+
+  // Layout presets
+  const presets = [
+    {label:'AUTO TILE',    icon:'⊞', desc:`${n} windows auto-tiled`, fn:()=>arrangeAuto()},
+    {label:'2 COLUMN',     icon:'⬜⬜', desc:'Side by side',            fn:()=>arrangeGrid(2,1)},
+    {label:'3 COLUMN',     icon:'▭▭▭', desc:'Three equal columns',    fn:()=>arrangeGrid(3,1)},
+    {label:'2×2 GRID',     icon:'⊟', desc:'4 equal windows',           fn:()=>arrangeGrid(2,2)},
+    {label:'2×3 GRID',     icon:'⊠', desc:'6 windows',                 fn:()=>arrangeGrid(3,2)},
+    {label:'MAIN + RIGHT', icon:'▰▱', desc:'Wide left, narrow right',  fn:()=>arrangeSplit(0.65)},
+    {label:'MAIN + STACK', icon:'▱▰', desc:'Wide left, 2 stacked right',fn:()=>arrangeMainStack()},
+    {label:'FOCUS',        icon:'◻', desc:'Top window fills workspace', fn:()=>arrangeFocus()},
+    {label:'CASCADE',      icon:'⧉', desc:'Overlapping cascade',        fn:()=>arrangeCascade()},
+  ];
+
+  const popup = document.createElement('div');
+  popup.id = 'arrange-popup';
+  popup.style.cssText = `position:fixed;top:36px;left:50%;transform:translateX(-50%);z-index:9999;background:#0a0a0a;border:1px solid #333;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;min-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.8)`;
+
+  const title = document.createElement('div');
+  title.style.cssText = 'grid-column:1/-1;color:var(--amber);font-size:10px;letter-spacing:2px;margin-bottom:4px;display:flex;justify-content:space-between';
+  title.innerHTML = `<span>ARRANGE WINDOWS</span><span style="color:#444;font-size:9px">${n} open · click outside to dismiss</span>`;
+  popup.appendChild(title);
+
+  presets.forEach(p=>{
+    const btn = document.createElement('div');
+    btn.style.cssText = 'padding:8px 10px;border:1px solid #222;cursor:pointer;text-align:center;background:#0d0d0d';
+    btn.innerHTML = `<div style="font-size:16px;margin-bottom:3px">${p.icon}</div><div style="font-size:9px;color:#888;letter-spacing:.5px">${p.label}</div><div style="font-size:8px;color:#333;margin-top:2px">${p.desc}</div>`;
+    btn.onmouseover = ()=>{ btn.style.borderColor='#444'; btn.style.background='#111'; };
+    btn.onmouseout  = ()=>{ btn.style.borderColor='#222'; btn.style.background='#0d0d0d'; };
+    btn.onclick = ()=>{ p.fn(); popup.remove(); };
+    popup.appendChild(btn);
+  });
+
+  document.body.appendChild(popup);
+  // Close on outside click
+  setTimeout(()=>{
+    document.addEventListener('click', function closer(e){
+      if(!popup.contains(e.target)){ popup.remove(); document.removeEventListener('click',closer); }
+    });
+  }, 50);
+}
+
+function arrangeAuto(){
+  const keys=Object.keys(WR); const n=keys.length; if(!n)return;
+  const cols=Math.ceil(Math.sqrt(n)); const rows=Math.ceil(n/cols);
+  const W=window.innerWidth, H=window.innerHeight-46;
+  const minW=360, minH=260;
+  const cellW=Math.max(minW, Math.floor(W/cols)-6);
+  const cellH=Math.max(minH, Math.floor(H/rows)-6);
   keys.forEach((k,i)=>{
-    const c=i%cols,r=Math.floor(i/cols);
+    const c=i%cols, r=Math.floor(i/cols);
     const w=WR[k];
-    w.style.left=(c*W/cols)+'px';w.style.top=(r*H/rows)+'px';
-    w.style.width=(W/cols-6)+'px';w.style.height=(H/rows-6)+'px';
+    w.style.left=(c*(W/cols))+'px'; w.style.top=(r*(H/rows))+'px';
+    w.style.width=cellW+'px'; w.style.height=cellH+'px';
   });
 }
+
+function arrangeGrid(cols, rows){
+  const keys=Object.keys(WR); if(!keys.length)return;
+  const W=window.innerWidth, H=window.innerHeight-46;
+  const cellW=Math.floor(W/cols)-6, cellH=Math.floor(H/rows)-6;
+  keys.forEach((k,i)=>{
+    const c=i%cols, r=Math.floor(i/rows);
+    const w=WR[k];
+    w.style.left=(c*Math.floor(W/cols))+'px';
+    w.style.top=(r*Math.floor(H/rows))+'px';
+    w.style.width=cellW+'px';
+    w.style.height=cellH+'px';
+  });
+}
+
+function arrangeSplit(leftRatio){
+  const keys=Object.keys(WR); if(!keys.length)return;
+  const W=window.innerWidth, H=window.innerHeight-46;
+  const leftW=Math.floor(W*leftRatio)-6;
+  const rightW=W-leftW-12;
+  const rightH=Math.floor(H/Math.max(1,keys.length-1))-6;
+  keys.forEach((k,i)=>{
+    const w=WR[k];
+    if(i===0){ w.style.left='0px'; w.style.top='0px'; w.style.width=leftW+'px'; w.style.height=(H-4)+'px'; }
+    else{ w.style.left=(leftW+8)+'px'; w.style.top=((i-1)*(rightH+6))+'px'; w.style.width=rightW+'px'; w.style.height=rightH+'px'; }
+  });
+}
+
+function arrangeMainStack(){
+  const keys=Object.keys(WR); if(!keys.length)return;
+  const W=window.innerWidth, H=window.innerHeight-46;
+  const leftW=Math.floor(W*0.62)-4;
+  const rightW=W-leftW-10;
+  const stackCount=Math.max(1,keys.length-1);
+  const stackH=Math.floor(H/stackCount)-6;
+  keys.forEach((k,i)=>{
+    const w=WR[k];
+    if(i===0){ w.style.left='0px'; w.style.top='0px'; w.style.width=leftW+'px'; w.style.height=(H-4)+'px'; }
+    else{ w.style.left=(leftW+6)+'px'; w.style.top=((i-1)*(stackH+6))+'px'; w.style.width=rightW+'px'; w.style.height=stackH+'px'; }
+  });
+}
+
+function arrangeFocus(){
+  const keys=Object.keys(WR); if(!keys.length)return;
+  // Find topmost window
+  let topKey=keys[0], topZ=-1;
+  keys.forEach(k=>{ const z=parseInt(WR[k].style.zIndex)||0; if(z>topZ){topZ=z;topKey=k;} });
+  const W=window.innerWidth, H=window.innerHeight-46;
+  // Topmost fills workspace, others tucked behind
+  keys.forEach((k,i)=>{
+    const w=WR[k];
+    if(k===topKey){ w.style.left='0px'; w.style.top='0px'; w.style.width=(W-4)+'px'; w.style.height=(H-4)+'px'; w.style.zIndex=++zTop; }
+    else{ w.style.left=(20+i*16)+'px'; w.style.top=(20+i*16)+'px'; w.style.width='400px'; w.style.height='280px'; }
+  });
+}
+
+function arrangeCascade(){
+  const keys=Object.keys(WR); if(!keys.length)return;
+  const baseW=Math.min(680, window.innerWidth*0.65);
+  const baseH=Math.min(460, (window.innerHeight-46)*0.7);
+  keys.forEach((k,i)=>{
+    const w=WR[k];
+    w.style.left=(20+i*28)+'px'; w.style.top=(10+i*28)+'px';
+    w.style.width=baseW+'px'; w.style.height=baseH+'px';
+    w.style.zIndex=++zTop;
+  });
+}
+
+// Keep old arrange() as alias for arrangeAuto
+function arrange(){ arrangeAuto(); }
 
 // ═══════════════════════════════════════════
 // YAHOO FINANCE — Live prices, multi-proxy fallback

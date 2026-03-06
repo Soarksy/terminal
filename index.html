@@ -11,7 +11,7 @@
 :root{
   --bg:#000;--bg1:#0a0a0a;--bg2:#0f0f0f;--bg3:#141414;--bg4:#1a1a1a;
   --border:#1e1e1e;--border2:#262626;--border3:#2e2e2e;
-  --text:#b8b8b8;--text-dim:#4a4a4a;--text-mid:#888;--text-bright:#e0e0e0;
+  --text:#cccccc;--text-dim:#707070;--text-mid:#a0a0a0;--text-bright:#f0f0f0;
   --green:#00c853;--red:#e53935;--amber:#ffab00;--blue:#1565c0;--cyan:#00acc1;
   --purple:#7b1fa2;--orange:#e65100;
   --font:'IBM Plex Mono',monospace;
@@ -56,24 +56,65 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #topright{display:flex;align-items:center;gap:10px}
 #mktstrip{display:flex;gap:8px}
 .strip-item{display:flex;gap:4px;font-size:11px;white-space:nowrap}
-.strip-name{color:var(--text-dim)}
+.strip-name{color:#888}
 .strip-val{color:var(--text-bright)}
-#clock{color:var(--text-dim);font-size:11px;white-space:nowrap}
+#clock{color:#a0a0a0;font-size:11px;white-space:nowrap}
 #livebadge{color:var(--green);font-size:10px;border:1px solid #1a3a1a;padding:1px 5px;background:#0a1a0a}
 
 /* ── SHORTCUT BAR ── */
 #shortcuts{
-  height:30px;background:var(--bg1);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 8px;gap:1px;z-index:1999;
+  height:32px;background:#060606;border-bottom:1px solid #1a1a1a;
+  display:flex;align-items:stretch;padding:0 6px 0 0;gap:0;z-index:1999;overflow:hidden;
 }
-.scbtn{
-  background:transparent;border:none;border-right:1px solid var(--border);
-  color:var(--text-dim);font-family:var(--font);font-size:12px;
-  padding:0 14px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
+/* HOME — amber/gold, separated by a gap */
+.scbtn-home{
+  background:transparent;border:none;border-right:2px solid #2a2000;
+  color:#b07800;font-family:var(--font);font-size:12px;font-weight:700;
+  padding:0 16px 0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:1px;
+  margin-right:8px;border-right-width:0;
+  position:relative;
 }
+.scbtn-home::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:#2a2000;}
+.scbtn-home:hover{color:var(--amber);background:#0f0a00}
+/* Market data group — blue tint */
+.scbtn-market{
+  background:transparent;border:none;
+  color:#5a7a9a;font-family:var(--font);font-size:11px;
+  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
+  border-bottom:2px solid transparent;
+}
+.scbtn-market:hover{color:#88bbdd;background:#050a0f;border-bottom-color:#1a3a5a}
+/* Fixed income / rates — green tint */
+.scbtn-rates{
+  background:transparent;border:none;
+  color:#3a7a5a;font-family:var(--font);font-size:11px;
+  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
+  border-bottom:2px solid transparent;
+}
+.scbtn-rates:hover{color:#55bb88;background:#050f0a;border-bottom-color:#1a4a2a}
+/* Macro / news group — muted orange */
+.scbtn-macro{
+  background:transparent;border:none;
+  color:#7a5a2a;font-family:var(--font);font-size:11px;
+  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
+  border-bottom:2px solid transparent;
+}
+.scbtn-macro:hover{color:#cc9944;background:#0f0a05;border-bottom-color:#4a3010}
+/* Tools group — muted cyan */
+.scbtn-tool{
+  background:transparent;border:none;
+  color:#2a6a7a;font-family:var(--font);font-size:11px;
+  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
+  border-bottom:2px solid transparent;
+}
+.scbtn-tool:hover{color:#44aacc;background:#05090f;border-bottom-color:#1a4a5a}
+/* divider between groups */
+.sc-div{width:1px;background:#1a1a1a;margin:6px 4px;flex-shrink:0}
+/* legacy .scbtn fallback */
+.scbtn{background:transparent;border:none;color:var(--text-dim);font-family:var(--font);font-size:11px;padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;}
 .scbtn:hover{color:var(--amber);background:var(--bg2)}
 .scbtn .k{display:none}
-#sc-right{margin-left:auto;color:#2a2a2a;font-size:10px;white-space:nowrap;flex-shrink:0}
+#sc-right{margin-left:auto;color:#252525;font-size:9px;white-space:nowrap;flex-shrink:0;padding:0 8px;align-self:center}
 
 /* ── WORKSPACE ── */
 #workspace{
@@ -141,7 +182,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 .ptabs-container{display:flex;flex-direction:column;height:100%}
 .ptabs{display:flex;gap:0;border-bottom:2px solid #1a1a1a;flex-shrink:0;background:#050505}
-.ptab{padding:5px 16px;font-size:10px;color:#3a3a3a;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.8px;white-space:nowrap;margin-bottom:-2px;transition:color .1s}
+.ptab{padding:5px 16px;font-size:10px;color:#686868;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.8px;white-space:nowrap;margin-bottom:-2px;transition:color .1s}
 .ptab:hover{color:var(--amber);background:#0a0a0a}
 .ptab.active{color:var(--amber);border-bottom-color:var(--amber);background:#080808}
 .ptabs-body{flex:1;overflow:auto;min-height:0}
@@ -153,7 +194,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .t th{color:#3a3a3a;font-size:10px;font-weight:600;text-align:right;padding:2px 6px;
       border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:0.5px}
 .t th:first-child{text-align:left}
-.t td{font-size:11px;padding:3px 6px;border-bottom:1px solid #0d0d0d;text-align:right;white-space:nowrap}
+.t td{font-size:11px;padding:3px 6px;border-bottom:1px solid #0d0d0d;text-align:right;white-space:nowrap;color:#c8c8c8}
 .t td:first-child{text-align:left;color:var(--text-bright)}
 .t tr:hover td{background:var(--bg2)}
 .t .up{color:var(--green)}
@@ -175,7 +216,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* Spreads footer */
 .sf{display:flex;gap:14px;padding:3px 0;font-size:11px;border-top:1px solid var(--border);margin-top:3px;flex-wrap:wrap}
 .si{display:flex;gap:5px}
-.sil{color:var(--text-dim)}
+.sil{color:#909090}
 .siv{color:var(--amber);font-weight:600}
 
 /* Regime badge */
@@ -203,15 +244,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .news-item{padding:5px 0;border-bottom:1px solid #0d0d0d;cursor:pointer}
 .news-item:hover .news-hl{color:var(--text-bright)}
 .news-meta{display:flex;gap:6px;margin-bottom:1px}
-.news-ts{color:#2e2e2e;font-size:9px}
-.news-src{color:var(--text-dim);font-size:9px}
+.news-ts{color:#666;font-size:9px}
+.news-src{color:#888;font-size:9px}
 .news-tag{font-size:9px;padding:0 4px;border:1px solid;font-weight:600;letter-spacing:0.5px}
 .news-tag.macro{color:#00acc1;border-color:#00232a}
 .news-tag.eq{color:#00c853;border-color:#003318}
 .news-tag.energy{color:#ff8f00;border-color:#3a1f00}
 .news-tag.credit{color:#aa00ff;border-color:#1e0033}
 .news-tag.geo{color:#e53935;border-color:#3a0000}
-.news-hl{font-size:11px;color:var(--text);line-height:1.35}
+.news-hl{font-size:11px;color:#d0d0d0;line-height:1.35}
 .news-filters{display:flex;gap:3px;margin-bottom:4px;flex-wrap:wrap}
 
 /* Map */
@@ -219,7 +260,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* Calendar */
 .cal-item{display:grid;grid-template-columns:55px 28px 1fr 60px 60px 60px;gap:0;border-bottom:1px solid #0d0d0d}
-.cal-item>div{padding:2px 4px;font-size:10px}
+.cal-item>div{padding:2px 4px;font-size:10px;color:#b8b8b8}
 .cal-hdr>div{font-size:8px;color:#3a3a3a;padding:2px 4px;border-bottom:1px solid var(--border);font-weight:600;letter-spacing:0.5px}
 .cal-hdr{display:grid;grid-template-columns:55px 28px 1fr 60px 60px 60px}
 .cal-miss{color:var(--red)}
@@ -235,7 +276,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* DES company */
 .des-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .des-stat{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #0a0a0a;font-size:10px}
-.des-label{color:var(--text-dim)}
+.des-label{color:#909090}
 .des-val{color:var(--text-bright)}
 
 /* Vol indicator */
@@ -447,19 +488,23 @@ canvas{display:block}
 
 <!-- SHORTCUT BAR -->
 <div id="shortcuts">
-  <button class="scbtn" onclick="OW('HOME')">HOME</button>
-  <button class="scbtn" onclick="OW('EQ')">EQ</button>
-  <button class="scbtn" onclick="OW('FX')">FX</button>
-  <button class="scbtn" onclick="OW('CMDTY')">CMDTY</button>
-  <button class="scbtn" onclick="OW('FI')">TREAS</button>
-  <button class="scbtn" onclick="OW('INFL')">INFL</button>
-  <button class="scbtn" onclick="OW('MACRO')">MACRO</button>
-  <button class="scbtn" onclick="OW('VOL')">VOL</button>
-  <button class="scbtn" onclick="OW('NEWS')">NEWS</button>
-  <button class="scbtn" onclick="OW('MAP')">MAP</button>
-  <button class="scbtn" onclick="OW('EQS')">EQS</button>
-  <button class="scbtn" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)">CHART</button>
-  <button class="scbtn" onclick="OW('SCRN')">SCRN</button>
+  <button class="scbtn-home" onclick="OW('HOME')" title="Market Overview">HOME</button>
+  <div class="sc-div"></div>
+  <button class="scbtn-market" onclick="OW('EQ')" title="Equities">EQ</button>
+  <button class="scbtn-market" onclick="OW('FX')" title="FX & Rates">FX</button>
+  <button class="scbtn-market" onclick="OW('CMDTY')" title="Commodities">CMDTY</button>
+  <div class="sc-div"></div>
+  <button class="scbtn-rates" onclick="OW('FI')" title="Treasuries">TREAS</button>
+  <button class="scbtn-rates" onclick="OW('INFL')" title="Inflation">INFL</button>
+  <button class="scbtn-rates" onclick="OW('VOL')" title="Volatility">VOL</button>
+  <div class="sc-div"></div>
+  <button class="scbtn-macro" onclick="OW('MACRO')" title="Macro Calendar">MACRO</button>
+  <button class="scbtn-macro" onclick="OW('NEWS')" title="News">NEWS</button>
+  <button class="scbtn-macro" onclick="OW('MAP')" title="Global Map">MAP</button>
+  <div class="sc-div"></div>
+  <button class="scbtn-tool" onclick="OW('EQS')" title="Equity Search">EQS</button>
+  <button class="scbtn-tool" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)" title="Chart">CHART</button>
+  <button class="scbtn-tool" onclick="OW('SCRN')" title="Screener">SCRN</button>
   <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A LAYOUT &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
 </div>
 
@@ -801,7 +846,16 @@ function buildTabs(groupId, tabs){
 // ═══════════════════════════════════════════
 let zTop=100;
 const WR={};
-let posX=Math.max(40,Math.floor((window.innerWidth-600)/2)),posY=Math.max(40,Math.floor((window.innerHeight-400)/4));
+let _spawnCount=0;
+function getSpawnPos(sz){
+  // Always spawn near center, with a small readable cascade offset
+  const W=window.innerWidth, H=window.innerHeight-70;
+  const sw=sz[0]||540, sh=sz[1]||360;
+  const cx=Math.floor((W-sw)/2), cy=Math.floor((H-sh)/2);
+  const offset=(_spawnCount%6)*24; // gentle cascade, resets after 6
+  _spawnCount++;
+  return {x:Math.max(10,cx+offset), y:Math.max(10,cy+offset)};
+}
 
 const WTITLES={
   FI:'TREASURY MONITOR',EQ:'EQUITY MONITOR',FX:'FX & RATES',CMDTY:'COMMODITIES & ENERGY',
@@ -824,10 +878,9 @@ function OW(cmd,extra){
   if(WR[winKey]){WR[winKey].style.zIndex=++zTop;return}
   const w=document.createElement('div');
   w.className='win';
-  w.style.cssText=`left:${posX}px;top:${posY}px;z-index:${++zTop};`;
-  posX=Math.min(posX+28,window.innerWidth-560);
-  posY=Math.min(posY+28,window.innerHeight-360);
   const sz=WSIZES[cmd]||[540,360];
+  const sp=getSpawnPos(sz);
+  w.style.cssText=`left:${sp.x}px;top:${sp.y}px;z-index:${++zTop};`;
   w.style.width=sz[0]+'px';w.style.height=sz[1]+'px';
   const title=WTITLES[cmd]||cmd;
   w.innerHTML=`
@@ -2316,127 +2369,96 @@ async function fetchEQS(ticker){
 }
 
 async function fetchEDGARCIK(ticker){
+  // Step 1: get CIK from SEC's official ticker map (CORS-open, no proxy)
+  const cikStr = await getTickerCIK(ticker);
+  if(!cikStr) return null;
+  // Step 2: fetch company submission data to get canonical name + info
   try{
-    const r = await fetch(`https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&dateRange=custom&startdt=2020-01-01&forms=10-K`,{signal:AbortSignal.timeout(5000)});
-    if(!r.ok) throw new Error('no response');
+    const padded = String(cikStr).padStart(10,'0');
+    const r = await fetch(`https://data.sec.gov/submissions/CIK${padded}.json`,{signal:AbortSignal.timeout(6000)});
+    if(!r.ok) throw new Error('bad');
     const d = await r.json();
-    const hit = d?.hits?.hits?.[0];
-    return hit?._source?.entity_id || null;
-  }catch{
-    try{
-      // Fallback: EDGAR company search
-      const r2 = await fetch(`https://efts.sec.gov/LATEST/search-index?q=%22${ticker}%22&forms=10-K`,{signal:AbortSignal.timeout(5000)});
-      const d2 = await r2.json();
-      return d2?.hits?.hits?.[0]?._source?.entity_id || null;
-    }catch{ return null; }
-  }
+    return {cik: d.cik, name: d.name, tickers: d.tickers, exchanges: d.exchanges};
+  }catch(e){ return {cik: parseInt(cikStr), name: null, tickers:[ticker], exchanges:[]}; }
 }
 
-function buildFilingsTab(ticker, cik, currency, companyName){
-  const edgarBase = 'https://www.sec.gov';
-  const searchUrl = `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=10-K,10-Q,8-K,DEF+14A&dateRange=custom&startdt=2022-01-01`;
-  const edgarSearchUrl = `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&company=${encodeURIComponent(ticker)}&type=10-K&dateb=&owner=include&count=40&search_text=`;
-  const edgarCikUrl = cik ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cik}&type=&dateb=&owner=include&count=40` : null;
-  const fullTextUrl = `https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&dateRange=custom&startdt=2023-01-01`;
+async function getTickerCIK(ticker){
+  // SEC company_tickers.json maps every listed ticker to CIK — CORS-open
+  try{
+    const r = await fetch('https://www.sec.gov/files/company_tickers.json',{signal:AbortSignal.timeout(7000)});
+    if(!r.ok) throw new Error('bad');
+    const d = await r.json();
+    // format: {"0":{"cik_str":320193,"ticker":"AAPL","title":"Apple Inc."}, ...}
+    const entry = Object.values(d).find(e=>e.ticker.toUpperCase()===ticker.toUpperCase());
+    return entry ? entry.cik_str : null;
+  }catch(e){ return null; }
+}
 
-  // Common filing types explained
-  const filingTypes = [
-    {form:'10-K',   freq:'Annual',    desc:'Annual report — full financials, MD&A, risk factors, audited statements'},
-    {form:'10-Q',   freq:'Quarterly', desc:'Quarterly financials — unaudited, 3 filed per year (Q1/Q2/Q3)'},
-    {form:'8-K',    freq:'Event',     desc:'Material event disclosures — earnings, M&A, management changes'},
-    {form:'DEF 14A',freq:'Annual',    desc:'Proxy statement — executive compensation, board composition, shareholder votes'},
-    {form:'S-1',    freq:'One-time',  desc:'IPO registration statement — for new public offerings'},
-    {form:'SC 13G', freq:'As needed', desc:'Beneficial ownership report — >5% stake disclosures by institutions'},
-    {form:'4',      freq:'As needed', desc:'Insider transactions — officer/director buy/sell filings within 2 days'},
-    {form:'13F',    freq:'Quarterly', desc:'Institutional holdings — filed by >$100M AUM managers'},
+function buildFilingsTab(ticker, edgarInfo, currency, companyName){
+  const cik = edgarInfo?.cik;
+  const secName = edgarInfo?.name || companyName || ticker;
+  const cikPadded = cik ? String(cik).padStart(10,'0') : null;
+
+  // All URLs use the correct EDGAR browse-edgar interface (HTML pages, not API)
+  // CIK=TICKER works directly in browse-edgar for most US equities
+  const byTicker  = (type) => `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(ticker)}&type=${encodeURIComponent(type)}&dateb=&owner=include&count=40`;
+  const byCIK     = (type) => cikPadded ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cikPadded}&type=${encodeURIComponent(type)}&dateb=&owner=include&count=40` : byTicker(type);
+  const companyPage = cikPadded
+    ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cikPadded}&type=&dateb=&owner=include&count=40`
+    : `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(ticker)}&type=&dateb=&owner=include&count=40`;
+
+  const cards = [
+    {label:'ALL FILINGS',       color:'var(--amber)', bg:'#0a0a0a', border:'#222',   icon:'📁', url:companyPage,       desc:`${secName} · Full filing history on EDGAR`},
+    {label:'10-K ANNUAL',       color:'var(--green)', bg:'#050d05', border:'#1a2a1a',icon:'📊', url:byCIK('10-K'),     desc:'Annual reports · Audited financials · MD&A · Risk factors'},
+    {label:'10-Q QUARTERLY',    color:'#6080ff',      bg:'#05050d', border:'#1a1a2a',icon:'📋', url:byCIK('10-Q'),     desc:'Quarterly reports · Unaudited · 3 per year'},
+    {label:'8-K CURRENT',       color:'var(--red)',   bg:'#0d0505', border:'#2a1a1a',icon:'🔔', url:byCIK('8-K'),      desc:'Material events · Earnings releases · M&A · Leadership'},
+    {label:'FORM 4 INSIDERS',   color:'var(--amber)', bg:'#0d0d05', border:'#2a2a1a',icon:'👤', url:byCIK('4'),        desc:'Officer & director transactions · Filed within 2 business days'},
+    {label:'DEF 14A PROXY',     color:'#888',         bg:'#0a0a0a', border:'#222',   icon:'🗳️', url:byCIK('DEF 14A'), desc:'Proxy statement · Exec compensation · Board elections'},
   ];
 
-  const ftRows = filingTypes.map(f=>`<tr>
+  const cardHtml = cards.map(c=>`
+    <a href="${c.url}" target="_blank" rel="noopener" style="display:block;padding:8px 10px;border:1px solid ${c.border};background:${c.bg};text-decoration:none;transition:border-color .15s"
+       onmouseover="this.style.borderColor='${c.color}'" onmouseout="this.style.borderColor='${c.border}'">
+      <div style="color:${c.color};font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:2px">${c.icon} ${c.label} ↗</div>
+      <div style="color:#2a2a2a;font-size:9px;line-height:1.4">${c.desc}</div>
+    </a>`).join('');
+
+  // Filing type reference table
+  const ftypes = [
+    {form:'10-K',    freq:'Annual',    desc:'Full year audited financials, MD&A, risk factors, audit opinion'},
+    {form:'10-Q',    freq:'Quarterly', desc:'Unaudited quarterly financials; Q1, Q2, Q3 only'},
+    {form:'8-K',     freq:'Event',     desc:'Any material event: earnings, acquisitions, CEO change, etc.'},
+    {form:'DEF 14A', freq:'Annual',    desc:'Proxy: exec pay, director bios, shareholder vote items'},
+    {form:'4',       freq:'2-day rule',desc:'Insider buy/sell; must file within 2 business days of trade'},
+    {form:'13F',     freq:'Quarterly', desc:'Institutional holdings >$100M AUM; due 45 days after quarter'},
+    {form:'S-1',     freq:'IPO only',  desc:'Registration statement for new public offerings'},
+    {form:'SC 13G',  freq:'>5% stake', desc:'Passive beneficial ownership disclosure by institutions'},
+  ];
+  const ftRows = ftypes.map(f=>`<tr>
     <td style="color:var(--amber);font-weight:600;white-space:nowrap">${f.form}</td>
-    <td style="color:#555;font-size:9px">${f.freq}</td>
+    <td style="color:#444;font-size:9px;white-space:nowrap">${f.freq}</td>
     <td style="color:var(--text-dim);font-size:9px">${f.desc}</td>
-    <td><a href="https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=${encodeURIComponent(f.form)}&dateRange=custom&startdt=2020-01-01" target="_blank" style="color:var(--amber);font-size:8px;text-decoration:none">SEARCH ↗</a></td>
+    <td style="text-align:center"><a href="${byCIK(f.form)}" target="_blank" rel="noopener" style="color:var(--amber);font-size:8px;letter-spacing:.3px;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--amber)'">VIEW ↗</a></td>
   </tr>`).join('');
 
   return `<div style="padding:6px">
-    <div class="sl">SEC EDGAR — ${ticker.toUpperCase()} FILING LINKS</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-      <a href="https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=10-K,10-Q,8-K&dateRange=custom&startdt=2022-01-01" target="_blank" style="display:block;padding:8px;border:1px solid #222;background:#0a0a0a;text-decoration:none">
-        <div style="color:var(--amber);font-size:11px;font-weight:600;margin-bottom:2px">📄 ALL FILINGS ↗</div>
-        <div style="color:#333;font-size:9px">10-K · 10-Q · 8-K · Proxy · 2022–present</div>
-      </a>
-      ${cik ? `<a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cik}&type=&dateb=&owner=include&count=40" target="_blank" style="display:block;padding:8px;border:1px solid #222;background:#0a0a0a;text-decoration:none">
-        <div style="color:var(--amber);font-size:11px;font-weight:600;margin-bottom:2px">🏢 COMPANY PAGE ↗</div>
-        <div style="color:#333;font-size:9px">CIK: ${cik} · Full filing history</div>
-      </a>` : `<a href="${edgarSearchUrl}" target="_blank" style="display:block;padding:8px;border:1px solid #222;background:#0a0a0a;text-decoration:none">
-        <div style="color:var(--amber);font-size:11px;font-weight:600;margin-bottom:2px">🔍 EDGAR SEARCH ↗</div>
-        <div style="color:#333;font-size:9px">Search ${ticker} in EDGAR database</div>
-      </a>`}
-      <a href="https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=10-K&dateRange=custom&startdt=2018-01-01" target="_blank" style="display:block;padding:8px;border:1px solid #1a2a1a;background:#050d05;text-decoration:none">
-        <div style="color:var(--green);font-size:11px;font-weight:600;margin-bottom:2px">📊 10-K ANNUAL REPORTS ↗</div>
-        <div style="color:#333;font-size:9px">Annual filings · 2018–present</div>
-      </a>
-      <a href="https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=10-Q&dateRange=custom&startdt=2023-01-01" target="_blank" style="display:block;padding:8px;border:1px solid #1a1a2a;background:#05050d;text-decoration:none">
-        <div style="color:#6080ff;font-size:11px;font-weight:600;margin-bottom:2px">📋 10-Q QUARTERLIES ↗</div>
-        <div style="color:#333;font-size:9px">Quarterly reports · 2023–present</div>
-      </a>
-      <a href="https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=8-K&dateRange=custom&startdt=2024-01-01" target="_blank" style="display:block;padding:8px;border:1px solid #2a1a1a;background:#0d0505;text-decoration:none">
-        <div style="color:var(--red);font-size:11px;font-weight:600;margin-bottom:2px">🔔 8-K MATERIAL EVENTS ↗</div>
-        <div style="color:#333;font-size:9px">Current reports · 2024–present</div>
-      </a>
-      <a href="https://efts.sec.gov/LATEST/search-index?q=%22${encodeURIComponent(ticker)}%22&forms=4&dateRange=custom&startdt=2024-01-01" target="_blank" style="display:block;padding:8px;border:1px solid #2a2a1a;background:#0d0d05;text-decoration:none">
-        <div style="color:var(--amber);font-size:11px;font-weight:600;margin-bottom:2px">👤 FORM 4 INSIDER TRADES ↗</div>
-        <div style="color:#333;font-size:9px">Officer/director transactions · 2024–present</div>
-      </a>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div class="sl" style="margin:0">SEC EDGAR — ${ticker.toUpperCase()}</div>
+      ${cik ? `<span style="color:#2a2a2a;font-size:9px">CIK: ${String(cik).padStart(10,'0')}</span>` : '<span style="color:#1a1a1a;font-size:9px">CIK NOT RESOLVED — USING TICKER SEARCH</span>'}
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px">${cardHtml}</div>
     <div class="sl">FILING TYPE REFERENCE</div>
-    <table class="t"><thead><tr><th>FORM</th><th>FREQ</th><th>DESCRIPTION</th><th>LINK</th></tr></thead><tbody>${ftRows}</tbody></table>
-    <div style="margin-top:8px;padding:5px;border:1px solid #111;font-size:9px;color:#2a2a2a">
-      SEC EDGAR is the official U.S. Securities and Exchange Commission filing database. All links open in a new tab. Financial data above sourced from Yahoo Finance quoteSummary API.
+    <table class="t" style="margin-bottom:8px">
+      <thead><tr><th>FORM</th><th>FREQ</th><th>DESCRIPTION</th><th>LINK</th></tr></thead>
+      <tbody>${ftRows}</tbody>
+    </table>
+    <div style="padding:5px;border:1px solid #0f0f0f;font-size:9px;color:#1e1e1e;line-height:1.6">
+      All links open SEC EDGAR directly in a new tab. EDGAR is the official U.S. SEC filing database — free and public.
+      ${cik ? '' : ' Ticker-based search used (CIK lookup failed) — if company not found, try searching <a href="https://www.sec.gov/cgi-bin/browse-edgar?company='+encodeURIComponent(ticker)+'&CIK=&type=10-K&dateb=&owner=include&count=40&search_text=&action=getcompany" target="_blank" style="color:var(--amber)">by company name ↗</a>.'}
     </div>
   </div>`;
 }
 
-
-function drawEQSCanvas(canvasId, data, isUp){
-  const canvas = document.getElementById(canvasId);
-  if(!canvas || !data.length) return;
-  const W = canvas.parentElement.offsetWidth - 4;
-  const H = canvas.height;
-  canvas.width = W;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-  const mn = Math.min(...data), mx = Math.max(...data);
-  const range = mx - mn || mn*0.001;
-  const pad = {l:36,r:4,t:4,b:14};
-  const pw = W-pad.l-pad.r, ph = H-pad.t-pad.b;
-  const xp = i => pad.l + i/(data.length-1)*pw;
-  const yp = v => pad.t + (1-(v-mn)/range)*ph;
-  const lineCol = isUp ? '#00c853' : '#e53935';
-  // grid
-  ctx.strokeStyle='#0f0f0f'; ctx.lineWidth=1;
-  [mn,(mn+mx)/2,mx].forEach(v=>{
-    ctx.beginPath(); ctx.moveTo(pad.l,yp(v)); ctx.lineTo(W-pad.r,yp(v)); ctx.stroke();
-    ctx.fillStyle='#2a2a2a'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
-    ctx.fillText('$'+v.toFixed(v>100?0:2), pad.l-2, yp(v)+3);
-  });
-  // fill
-  const g = ctx.createLinearGradient(0,pad.t,0,H-pad.b);
-  g.addColorStop(0, isUp?'rgba(0,200,83,0.18)':'rgba(229,57,53,0.18)');
-  g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.beginPath();
-  data.forEach((v,i)=> i===0 ? ctx.moveTo(xp(i),yp(v)) : ctx.lineTo(xp(i),yp(v)));
-  ctx.lineTo(xp(data.length-1),H-pad.b); ctx.lineTo(pad.l,H-pad.b);
-  ctx.closePath(); ctx.fillStyle=g; ctx.fill();
-  // line
-  ctx.strokeStyle=lineCol; ctx.lineWidth=1.5;
-  ctx.beginPath();
-  data.forEach((v,i)=> i===0 ? ctx.moveTo(xp(i),yp(v)) : ctx.lineTo(xp(i),yp(v)));
-  ctx.stroke();
-  // dot
-  ctx.fillStyle=lineCol; ctx.beginPath();
-  ctx.arc(xp(data.length-1), yp(data[data.length-1]), 3, 0, Math.PI*2); ctx.fill();
-}
 
 // Legacy stub — no longer used but kept so nothing breaks
 async function drawEQSSparkline(ticker, quote){}
@@ -2836,6 +2858,85 @@ async function fetchFREDData(){
   }
   if(anyOk) markFresh('FRED');
   else markStale('FRED','all series failed');
+}
+
+// ═══════════════════════════════════════════
+// RENDER: NEWS PANEL
+// ═══════════════════════════════════════════
+function rNEWS(){
+  const news = D.news || [];
+  const tags = ['ALL','MACRO','EQ','ENERGY','CREDIT','GEO'];
+  const filterBar = tags.map(t=>`<button class="tbtn${t==='ALL'?' active':''}" style="font-size:9px;padding:2px 8px" onclick="newsFilter('${t.toLowerCase()}',this)">${t}</button>`).join('');
+
+  if(!news.length){
+    return `<div style="padding:8px">
+      <div class="news-filters">${filterBar}</div>
+      <div style="color:#2a2a2a;font-size:10px;padding:16px 0;text-align:center">
+        LOADING NEWS FEEDS…<br><span style="font-size:9px;color:#1a1a1a">Sources: Yahoo Finance · WSJ · CNBC · NBC</span>
+      </div>
+    </div>`;
+  }
+
+  const items = news.map((n,i)=>`
+    <div class="news-item" id="ni-${i}" onclick="openNewsDetail(${i})" style="padding:6px 8px;border-bottom:1px solid #0a0a0a;cursor:pointer" onmouseover="this.style.background='#070707'" onmouseout="this.style.background=''">
+      <div class="news-meta">
+        <span class="news-ts">${n.ts}</span>
+        <span class="news-src">${n.src}</span>
+        <span class="news-tag ${n.tag}">${n.tag.toUpperCase()}</span>
+      </div>
+      <div class="news-hl">${n.hl}</div>
+    </div>`).join('');
+
+  return `<div style="display:flex;flex-direction:column;height:100%">
+    <div style="padding:4px 6px;border-bottom:1px solid #111;flex-shrink:0;background:#050505">
+      <div class="news-filters" style="margin:0">${filterBar}</div>
+    </div>
+    <div id="news-list" style="flex:1;overflow-y:auto">${items}</div>
+    <div id="news-detail" style="display:none;flex:1;overflow-y:auto;padding:10px;border-top:1px solid #111">
+      <button onclick="newsCloseDetail()" style="background:#0a0a0a;border:1px solid #222;color:#888;font-family:var(--font);font-size:9px;padding:2px 8px;cursor:pointer;margin-bottom:8px;letter-spacing:.5px">← BACK</button>
+      <div id="news-detail-body"></div>
+    </div>
+  </div>`;
+}
+
+function newsFilter(tag, btn){
+  document.querySelectorAll('#wb-NEWS .tbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const list = document.getElementById('news-list'); if(!list) return;
+  list.querySelectorAll('.news-item').forEach(el=>{
+    const idx = parseInt(el.id.replace('ni-',''));
+    const n = (D.news||[])[idx];
+    if(!n) return;
+    el.style.display = (tag==='all' || n.tag===tag) ? '' : 'none';
+  });
+}
+
+function openNewsDetail(i){
+  const n = (D.news||[])[i]; if(!n) return;
+  const list   = document.getElementById('news-list');
+  const detail = document.getElementById('news-detail');
+  const body   = document.getElementById('news-detail-body');
+  if(!list||!detail||!body) return;
+  list.style.display   = 'none';
+  detail.style.display = 'block';
+  const tag = `<span class="news-tag ${n.tag}" style="vertical-align:middle">${n.tag.toUpperCase()}</span>`;
+  const linkHtml = n.url ? `<a href="${n.url}" target="_blank" rel="noopener" style="color:var(--amber);font-size:9px;text-decoration:none;letter-spacing:.5px">READ FULL ARTICLE ↗</a>` : '';
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+      ${tag}
+      <span class="news-src" style="font-size:10px">${n.src}</span>
+      <span class="news-ts" style="font-size:9px">${n.ts}</span>
+      <span style="margin-left:auto">${linkHtml}</span>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-bright);line-height:1.4;margin-bottom:10px">${n.hl}</div>
+    <div style="font-size:10px;color:var(--text-dim);line-height:1.7;border-top:1px solid #111;padding-top:8px">${n.detail||'<span style="color:#2a2a2a">No summary available. Click the link above to read the full article.</span>'}</div>`;
+}
+
+function newsCloseDetail(){
+  const list   = document.getElementById('news-list');
+  const detail = document.getElementById('news-detail');
+  if(list)   list.style.display   = '';
+  if(detail) detail.style.display = 'none';
 }
 
 async function fetchRSSNews(){

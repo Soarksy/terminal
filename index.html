@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MACRO INTELLIGENCE TERMINAL</title>
+<title>TERMINAL TERMINAL</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
@@ -73,7 +73,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 .scbtn:hover{color:var(--amber);background:var(--bg2)}
 .scbtn .k{display:none}
-#sc-right{margin-left:auto;color:#2a2a2a;font-size:10px}
+#sc-right{margin-left:auto;color:#2a2a2a;font-size:10px;white-space:nowrap;flex-shrink:0}
 
 /* ── WORKSPACE ── */
 #workspace{
@@ -108,31 +108,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   border-radius:0;
 }
 .wh{
-  height:24px;background:var(--bg2);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 6px;cursor:move;user-select:none;
+  height:28px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 8px;cursor:move;user-select:none;
   gap:6px;flex-shrink:0;
 }
 .wh-cmd{color:var(--amber);font-size:10px;font-weight:600;letter-spacing:1px}
 .wh-title{color:var(--text-dim);font-size:10px}
 .wh-ts{color:#2e2e2e;font-size:9px;margin-left:auto}
 .wh-close{
-  width:15px;height:15px;background:var(--bg3);border:1px solid #222;
-  color:#333;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;margin-left:2px;
+  width:20px;height:20px;background:#1a0a0a;border:1px solid #442222;
+  color:#884444;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-left:4px;border-radius:2px;
 }
 .wh-close:hover{background:var(--red);color:#fff;border-color:var(--red)}
 .wh-fs{
-  width:15px;height:15px;background:var(--bg3);border:1px solid #222;
-  color:#333;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;margin-left:2px;
+  width:20px;height:20px;background:#0a0a0a;border:1px solid #333;
+  color:#555;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-left:2px;border-radius:2px;
 }
 .wh-fs:hover{background:#1a1a00;color:var(--amber);border-color:#3a2a00}
-.wb{flex:1;overflow:auto;padding:6px}
+.wb{flex:1;overflow:auto;padding:6px;font-size:11px}
 .wr{position:absolute;bottom:0;right:0;width:10px;height:10px;cursor:se-resize;
     background:linear-gradient(135deg,transparent 50%,#222 50%)}
 
 /* ── COMMON TABLE ── */
-.t{width:100%;border-collapse:collapse}
+.t{width:100%;border-collapse:collapse;font-size:11px}
 .t th{color:#3a3a3a;font-size:10px;font-weight:600;text-align:right;padding:2px 6px;
       border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:0.5px}
 .t th:first-child{text-align:left}
@@ -405,10 +405,10 @@ canvas{display:block}
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div id="logo">◈ MACRO INTEL</div>
+  <div id="logo">◈ TERMINAL</div>
   <div id="cmdwrap">
     <span id="cmdprompt">&gt;&gt;</span>
-    <input id="cmdbar" type="text" placeholder="SEARCH: AAPL · UST10Y · CPI · EURUSD · MAP · HELP · 10-K MSFT  ( / to focus )" autocomplete="off" spellcheck="false">
+    <input id="cmdbar" type="text" placeholder=">> SEARCH" autocomplete="off" spellcheck="false">
     <div id="search-type-badge"></div>
   </div>
   <div id="topright">
@@ -431,7 +431,6 @@ canvas{display:block}
 <!-- SHORTCUT BAR -->
 <div id="shortcuts">
   <button class="scbtn" onclick="OW('HOME')">HOME</button>
-  <button class="scbtn" onclick="OW('FI')">FI</button>
   <button class="scbtn" onclick="OW('EQ')">EQ</button>
   <button class="scbtn" onclick="OW('FX')">FX</button>
   <button class="scbtn" onclick="OW('CMDTY')">CMDTY</button>
@@ -440,11 +439,12 @@ canvas{display:block}
   <button class="scbtn" onclick="OW('NEWS')">NEWS</button>
   <button class="scbtn" onclick="OW('SPREAD')">SPREAD</button>
   <button class="scbtn" onclick="OW('INFL')">INFL</button>
-  <button class="scbtn" onclick="OW('AUCTION')">AUCTION</button>
   <button class="scbtn" onclick="OW('VOL')">VOL</button>
   <button class="scbtn" onclick="OW('EQS')">EQS</button>
+  <button class="scbtn" onclick="OW('FI')">TREAS</button>
+  <button class="scbtn" onclick="OW('AUCTION')">AUCTION</button>
   <button class="scbtn" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)">CHART</button>
-  <div id="sc-right">CTRL+F = FULLSCREEN &nbsp;|&nbsp; CTRL+A = ARRANGE &nbsp;|&nbsp; CTRL+BACKSPACE = CLOSE ALL</div>
+  <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A ARRANGE &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
 </div>
 
 <!-- STATUS BAR -->
@@ -719,7 +719,7 @@ const getTs=()=>new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digi
 // ═══════════════════════════════════════════
 let zTop=100;
 const WR={};
-let posX=20,posY=14;
+let posX=Math.max(40,Math.floor((window.innerWidth-600)/2)),posY=Math.max(40,Math.floor((window.innerHeight-400)/4));
 
 const WTITLES={
   FI:'TREASURY MONITOR',EQ:'EQUITY MONITOR',FX:'FX & RATES',CMDTY:'COMMODITIES & ENERGY',
@@ -743,8 +743,8 @@ function OW(cmd,extra){
   const w=document.createElement('div');
   w.className='win';
   w.style.cssText=`left:${posX}px;top:${posY}px;z-index:${++zTop};`;
-  posX=(posX+22)%(window.innerWidth-500);
-  posY=(posY+22)%(window.innerHeight-300);
+  posX=Math.min(posX+28,window.innerWidth-560);
+  posY=Math.min(posY+28,window.innerHeight-360);
   const sz=WSIZES[cmd]||[540,360];
   w.style.width=sz[0]+'px';w.style.height=sz[1]+'px';
   const title=WTITLES[cmd]||cmd;
@@ -2563,15 +2563,25 @@ function rHOME(){
   const s2_10 = (y10 - y2)*100;
   const spx   = D.equities.indices[0];
   const ndx   = D.equities.indices[1];
+  const dow   = D.equities.indices[2];
   const vix   = D.equities.indices[4];
   const dxy   = D.fx.find(f=>f.name==='DXY')||D.fx[0];
+  const eur   = D.fx.find(f=>f.name==='EURUSD')||D.fx[1];
   const wti   = D.commodities.energy[0];
   const gold  = D.commodities.metals[0];
 
-  const s2_10col  = s2_10>=0?'var(--green)':'var(--red)';
+  const s2_10col = s2_10>=0?'var(--green)':'var(--red)';
+  const vixLevel = vix.val < 15 ? {txt:'LOW',col:'var(--green)'} : vix.val < 20 ? {txt:'MOD',col:'var(--amber)'} : vix.val < 30 ? {txt:'ELEV',col:'#ff6f00'} : {txt:'HIGH',col:'var(--red)'};
+  const now = new Date();
+  const mktHr = parseInt(now.toLocaleTimeString('en-US',{hour:'2-digit',hour12:false,timeZone:'America/New_York'}));
+  const mktMin = parseInt(now.toLocaleTimeString('en-US',{minute:'2-digit',hour12:false,timeZone:'America/New_York'}));
+  const mktOpen = (mktHr > 9 || (mktHr===9 && mktMin>=30)) && mktHr < 16;
+  const dayOfWeek = now.toLocaleDateString('en-US',{weekday:'short',timeZone:'America/New_York'});
+  const isWeekend = dayOfWeek==='Sat'||dayOfWeek==='Sun';
+  const mktStatus = isWeekend ? {txt:'CLOSED — WEEKEND', col:'#444'} : mktOpen ? {txt:'● MARKET OPEN', col:'var(--green)'} : {txt:'○ MARKET CLOSED', col:'#555'};
 
-  function tile(id,label,val,valFmt,chg,chgFmt,meta,cmd,extra){
-    const chgCol = chg>0?'var(--green)':chg<0?'var(--red)':'var(--text-dim)';
+  function tile(id,label,valFmt,chg,chgFmt,meta,cmd,extra){
+    const chgCol = chg>0?'var(--green)':chg<0?'var(--red)':'#444';
     const chgSign = chg>0?'+':'';
     return `<div class="home-tile" onclick="OW('${cmd}'${extra?`,'${extra}'`:''})" id="ht-${id}">
       <span class="home-tile-label">${label}</span>
@@ -2584,7 +2594,7 @@ function rHOME(){
     </div>`;
   }
 
-  const newsHtml = D.news.slice(0,8).map((n,i)=>`
+  const newsHtml = D.news.slice(0,10).map((n,i)=>`
     <div class="home-news-row" onclick="openNewsDetail(${i})">
       <span class="home-news-ts">${n.ts}</span>
       <span class="home-news-src">${n.src}</span>
@@ -2593,64 +2603,47 @@ function rHOME(){
     </div>`).join('');
 
   return `<div id="home-wrap">
-    <div id="home-header">
-      <span style="color:var(--amber);font-size:8px;letter-spacing:2px">MARKET OVERVIEW &nbsp;·&nbsp;</span>
-      <span style="color:#2a2a2a;font-size:8px">${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</span>
+    <div id="home-header" style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <span style="color:var(--amber);font-size:11px;font-weight:600;letter-spacing:2px">◈ TERMINALLIGENCE</span>
+      <span style="font-size:10px;color:${mktStatus.col};letter-spacing:1px">${mktStatus.txt}</span>
+      <span style="color:#2a2a2a;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
     </div>
     <div id="home-grid">
-      ${tile('ust2','UST 2Y', y2, y2.toFixed(3)+'%',
-             t.find(x=>x.tenor==='2Y')?.d1??0, (t.find(x=>x.tenor==='2Y')?.d1??0).toFixed(3),
-             'YIELD', 'FI')}
-      ${tile('ust10','UST 10Y', y10, y10.toFixed(3)+'%',
-             t.find(x=>x.tenor==='10Y')?.d1??0, (t.find(x=>x.tenor==='10Y')?.d1??0).toFixed(3),
-             'YIELD', 'FI')}
-      ${tile('s2s10','2s10s', s2_10,
-             `<span style="color:${s2_10col}">${s2_10>=0?'+':''}${s2_10.toFixed(1)}bp</span>`,
-             0, '', s2_10<-20?'INVERTED':s2_10<20?'FLAT':'NORMAL', 'FI')}
-      ${tile('spx','SPX', spx.val, spx.val.toFixed(1),
-             spx.pct, spx.pct.toFixed(2)+'%', 'S&P 500', 'EQ')}
-      ${tile('ndx','NASDAQ', ndx.val, ndx.val.toFixed(1),
-             ndx.pct, ndx.pct.toFixed(2)+'%', 'COMP', 'EQ')}
-      ${tile('vix','VIX', vix.val, vix.val.toFixed(2),
-             vix.chg, vix.chg.toFixed(2), 'VOLATILITY', 'VOL')}
-      ${tile('dxy','DXY', dxy.val, dxy.val.toFixed(2),
-             dxy.d1, dxy.d1.toFixed(3), 'DOLLAR INDEX', 'FX')}
-      ${tile('wti','WTI', wti.spot, '$'+wti.spot.toFixed(2),
-             wti.d1, wti.d1.toFixed(2)+'%', '$/BBL', 'CMDTY')}
-      ${tile('gold','GOLD', gold.spot, '$'+gold.spot.toFixed(0),
-             gold.d1, gold.d1.toFixed(2)+'%', '$/OZ', 'CMDTY')}
+      ${tile('spx','S&P 500', spx.val.toFixed(1), spx.pct, spx.pct.toFixed(2)+'%', 'SPX', 'EQ')}
+      ${tile('ndx','NASDAQ', ndx.val.toFixed(1), ndx.pct, ndx.pct.toFixed(2)+'%', 'NDX', 'EQ')}
+      ${tile('dow','DOW', dow.val.toFixed(0), dow.pct, dow.pct.toFixed(2)+'%', 'DJIA', 'EQ')}
+      ${tile('vix','VIX', `<span style="color:${vixLevel.col}">${vix.val.toFixed(2)}</span>`, vix.chg, vix.chg.toFixed(2), vixLevel.txt, 'VOL')}
+      ${tile('ust10','UST 10Y', y10.toFixed(3)+'%', t.find(x=>x.tenor==='10Y')?.d1??0, ((t.find(x=>x.tenor==='10Y')?.d1??0)).toFixed(3), '2s10s '+(s2_10>=0?'+':'')+s2_10.toFixed(0)+'bp', 'FI')}
+      ${tile('dxy','DXY', dxy.val.toFixed(2), dxy.d1, dxy.d1.toFixed(3), 'DOLLAR INDEX', 'FX')}
+      ${tile('eur','EUR/USD', eur.val.toFixed(4), eur.d1, eur.d1.toFixed(4), 'G10 FX', 'FX')}
+      ${tile('wti','WTI', '$'+wti.spot.toFixed(2), wti.d1, wti.d1.toFixed(2)+'%', '$/BBL', 'CMDTY')}
+      ${tile('gold','GOLD', '$'+gold.spot.toFixed(0), gold.d1, gold.d1.toFixed(2)+'%', '$/OZ', 'CMDTY')}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 220px;flex:1;min-height:0;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 200px;flex:1;min-height:0;overflow:hidden">
       <div style="display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--border)">
-        <div style="padding:4px 8px;font-size:8px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0">
-          NEWS FEED
-          <span style="color:#2a2a2a;float:right;font-size:8px">CLICK → DETAIL</span>
+        <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between">
+          <span>LIVE NEWS</span><span style="color:#2a2a2a">CLICK FOR DETAIL</span>
         </div>
-        <div id="home-news">${newsHtml}</div>
+        <div id="home-news" style="flex:1;overflow-y:auto">${newsHtml}</div>
       </div>
-      <div style="display:flex;flex-direction:column;min-height:0;overflow-y:auto">
-        <div style="padding:4px 8px;font-size:8px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0">CENTRAL BANKS</div>
+      <div style="display:flex;flex-direction:column;overflow-y:auto">
+        <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border)">CENTRAL BANKS</div>
         ${D.macro.centralBanks.map(cb=>`
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
             <span style="color:var(--text-dim)">${cb.name}</span>
             <span style="color:var(--amber);font-weight:600">${cb.rate}</span>
             <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#444'};font-size:9px">${cb.bias}</span>
           </div>`).join('')}
-        <div style="margin-top:auto;border-top:1px solid var(--border);padding:4px 8px;font-size:8px;color:#2a2a2a">
-          <span style="cursor:pointer;color:#333" onclick="OW('HEAT','sector')">HEAT</span>
-          &nbsp;·&nbsp;
-          <span style="cursor:pointer;color:#333" onclick="OW('MAP')">MAP</span>
-          &nbsp;·&nbsp;
-          <span style="cursor:pointer;color:#333" onclick="OW('MACRO')">MACRO</span>
-          &nbsp;·&nbsp;
-          <span style="cursor:pointer;color:#333" onclick="OW('SCRN')">SCRN</span>
+        <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
+          ${['EQ','FX','CMDTY','MACRO','MAP','SPREAD','INFL','VOL'].map(p=>`
+          <div onclick="OW('${p}')" style="padding:4px 6px;border:1px solid var(--border);color:#444;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#333'" onmouseout="this.style.color='#444';this.style.borderColor='var(--border)'">${p}</div>`).join('')}
         </div>
       </div>
     </div>
   </div>`;
 }
 
-// Sparkline data generator (simulated history — replaced by real data when LIVE)
 function makeSparkData(baseVal, points=20, volatility=0.008){
   const d=[]; let v=baseVal*(1-(points/2)*volatility*0.5);
   for(let i=0;i<points;i++){v+=((Math.random()-.48)*baseVal*volatility);d.push(v);}
@@ -2980,7 +2973,7 @@ function rHELP(){
 
   return `
     <div style="padding:2px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px">
-      <div style="font-size:18px;font-weight:600;color:var(--amber);letter-spacing:4px">MACRO INTELLIGENCE</div>
+      <div style="font-size:18px;font-weight:600;color:var(--amber);letter-spacing:4px">TERMINAL</div>
       <div style="font-size:9px;color:#2a2a2a;letter-spacing:2px;margin-top:3px">COMMAND DIRECTORY · v3.3 · TYPE ANY COMMAND OR SYMBOL IN THE SEARCH BAR</div>
     </div>
 
@@ -3568,12 +3561,6 @@ window.addEventListener('load',()=>{
   const s=document.createElement('script');
   s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
   s.onload=()=>{
-    setTimeout(()=>{
-      OW('HOME');
-      setTimeout(()=>OW('FI'),100);
-      setTimeout(()=>OW('NEWS'),200);
-      setTimeout(()=>{OW('CHART','SPY');setTimeout(loadChartData,300);},400);
-    },80);
     // Run DIAG first, then poll after it finishes (avoid proxy contention)
     setTimeout(async ()=>{
       await runNetworkTest();

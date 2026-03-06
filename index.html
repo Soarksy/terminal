@@ -597,22 +597,33 @@ const D = {
 
   macro:{
     calendar:[
-      {time:'08:30',cty:'US',event:'Initial Jobless Claims',prev:'207K',fore:'210K',act:'214K',impact:'HIGH',beat:false},
-      {time:'08:30',cty:'US',event:'Core PCE MoM',          prev:'0.2%',fore:'0.2%',act:'0.2%',impact:'HIGH',beat:true},
-      {time:'09:45',cty:'US',event:'PMI Composite',         prev:'50.9',fore:'51.2',act:null,   impact:'MED', beat:null},
-      {time:'10:00',cty:'US',event:'ISM Non-Mfg',           prev:'52.1',fore:'52.3',act:null,   impact:'MED', beat:null},
-      {time:'10:00',cty:'US',event:'Factory Orders MoM',    prev:'-2.9%',fore:'+0.4%',act:null, impact:'LOW', beat:null},
-      {time:'13:00',cty:'DE',event:'CPI YoY Flash',         prev:'3.7%', fore:'3.4%',act:null,  impact:'HIGH',beat:null},
-      {time:'19:00',cty:'JP',event:'BOJ Policy Decision',   prev:'-0.10%',fore:'-0.10%',act:null,impact:'HIGH',beat:null},
-      {time:'--:--',cty:'UK',event:'RICS House Price',      prev:'-48',  fore:'-45', act:'-42', impact:'LOW', beat:true},
+      // ── Q1/Q2 2026 SCHEDULED RELEASES (US BLS / Fed / BEA) ──
+      {date:'Mar 07',time:'08:30',cty:'US',event:'Nonfarm Payrolls Feb',    prev:'143K', fore:'160K', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 07',time:'08:30',cty:'US',event:'Unemployment Rate Feb',   prev:'4.0%', fore:'4.0%', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 12',time:'08:30',cty:'US',event:'CPI YoY Feb',             prev:'3.0%', fore:'2.9%', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 12',time:'08:30',cty:'US',event:'Core CPI YoY Feb',        prev:'3.3%', fore:'3.2%', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 13',time:'08:30',cty:'US',event:'PPI Final Demand MoM Feb',prev:'0.4%', fore:'0.3%', act:null,impact:'MED', beat:null},
+      {date:'Mar 18',time:'08:30',cty:'US',event:'Retail Sales MoM Feb',    prev:'-0.9%',fore:'0.6%', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 19',time:'14:00',cty:'US',event:'FOMC Rate Decision',      prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,impact:'HIGH',beat:null},
+      {date:'Mar 19',time:'14:30',cty:'US',event:'Fed Press Conference',    prev:'',     fore:'',     act:null,impact:'HIGH',beat:null},
+      {date:'Mar 26',time:'08:30',cty:'US',event:'GDP QoQ Q4 Final',        prev:'2.3%', fore:'2.3%', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 28',time:'08:30',cty:'US',event:'Core PCE YoY Feb',        prev:'2.6%', fore:'2.5%', act:null,impact:'HIGH',beat:null},
+      {date:'Mar 28',time:'08:30',cty:'US',event:'Personal Income MoM Feb', prev:'0.9%', fore:'0.4%', act:null,impact:'MED', beat:null},
+      {date:'Apr 02',time:'08:30',cty:'US',event:'ADP Employment Mar',      prev:'77K',  fore:'120K', act:null,impact:'MED', beat:null},
+      {date:'Apr 04',time:'08:30',cty:'US',event:'Nonfarm Payrolls Mar',    prev:'',     fore:'150K', act:null,impact:'HIGH',beat:null},
+      {date:'Apr 10',time:'08:30',cty:'US',event:'CPI YoY Mar',             prev:'',     fore:'',     act:null,impact:'HIGH',beat:null},
+      {date:'Apr 16',time:'08:30',cty:'US',event:'Retail Sales MoM Mar',    prev:'',     fore:'',     act:null,impact:'HIGH',beat:null},
+      {date:'Apr 30',time:'14:00',cty:'US',event:'FOMC Rate Decision',      prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,impact:'HIGH',beat:null},
+      {date:'May 07',time:'',     cty:'UK', event:'BOE Rate Decision',      prev:'4.50%',fore:'4.25%',act:null,impact:'HIGH',beat:null},
+      {date:'Jun 11',time:'14:00',cty:'US',event:'FOMC Rate Decision',      prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,impact:'HIGH',beat:null},
     ],
     centralBanks:[
-      {name:'FED',  rate:'5.25-5.50%',lastChg:'+25bp Jul-23',next:'Jan 31',bias:'HOLD',outlook:'EASING'},
-      {name:'ECB',  rate:'4.50%',      lastChg:'+25bp Sep-23',next:'Jan 25',bias:'HOLD',outlook:'EASING'},
-      {name:'BOJ',  rate:'-0.10%',     lastChg:'no change',   next:'Jan 22',bias:'HOLD',outlook:'TIGHTENING'},
-      {name:'BOE',  rate:'5.25%',      lastChg:'+25bp Aug-23',next:'Feb 01',bias:'HOLD',outlook:'EASING'},
-      {name:'PBOC', rate:'3.45%',      lastChg:'-10bp Aug-23',next:'Feb 05',bias:'CUT', outlook:'EASING'},
-      {name:'RBA',  rate:'4.35%',      lastChg:'+25bp Nov-23',next:'Feb 06',bias:'HOLD',outlook:'NEUTRAL'},
+      {name:'FED',  rate:'4.25-4.50%',lastChg:'-25bp Dec-24',next:'Mar 19',bias:'HOLD',outlook:'CAUTIOUS'},
+      {name:'ECB',  rate:'2.65%',      lastChg:'-25bp Jan-25',next:'Apr 17',bias:'CUT', outlook:'EASING'},
+      {name:'BOJ',  rate:'0.50%',      lastChg:'+25bp Jan-25',next:'Mar 18',bias:'HOLD',outlook:'TIGHTENING'},
+      {name:'BOE',  rate:'4.50%',      lastChg:'-25bp Feb-25',next:'May 07',bias:'CUT', outlook:'EASING'},
+      {name:'PBOC', rate:'3.10%',      lastChg:'-10bp Oct-24',next:'Apr 15',bias:'CUT', outlook:'EASING'},
+      {name:'RBA',  rate:'4.10%',      lastChg:'-25bp Feb-25',next:'Apr 01',bias:'HOLD',outlook:'NEUTRAL'},
     ]
   },
 
@@ -694,7 +705,7 @@ const D = {
     lastRefresh:  null,
     lastAttempt:  null,
     version:      '3.3',
-    sources:      {FRED:'idle', EIA:'idle', AV:'idle', FMP:'idle', NEWS:'idle'},
+    sources:      {TREAS:'idle', FX:'idle', EQ:'idle', CMDTY:'idle', NEWS:'idle'},
   }
 };
 
@@ -1069,12 +1080,13 @@ function drawVOL(){
 function rMACRO(){
   const calRows=D.macro.calendar.map(e=>`
     <div class="cal-item${e.impact==='HIGH'?' cal-hi':''}">
-      <div class="w">${e.time}</div>
+      <div class="w" style="color:#3a3a3a;font-size:9px">${e.date||''}</div>
+      <div class="w">${e.time||'--:--'}</div>
       <div style="color:var(--amber);font-weight:600">${e.cty}</div>
       <div>${e.event}</div>
-      <div class="w">${e.prev}</div>
+      <div class="w">${e.prev||'—'}</div>
       <div class="w">${e.fore||'—'}</div>
-      <div class="${e.act==null?'neu':e.beat?'cal-beat':'cal-miss'}">${e.act||'PENDING'}</div>
+      <div class="${e.act==null?'neu':e.beat?'cal-beat':'cal-miss'}">${e.act||'SCHED'}</div>
     </div>`).join('');
   const cbCards=D.macro.centralBanks.map(cb=>`
     <div class="cb-card">
@@ -1165,37 +1177,35 @@ function rEQS(prefill){
     <div id="eqs-suggest" style="margin-bottom:4px;display:none;max-height:80px;overflow-y:auto;border:1px solid var(--border);background:var(--bg2)"></div>
     <div id="eqs-body" style="flex:1;overflow-y:auto">
       <div style="color:#1e1e1e;font-size:10px;padding:10px 0;text-align:center">
-        ENTER TICKER OR COMPANY NAME — LIVE DATA VIA FMP
+        ENTER NYSE/NASDAQ TICKER — LIVE DATA VIA YAHOO FINANCE
       </div>
     </div>`;
 }
 
-// Autocomplete: use FMP symbol search
+// ── EQS AUTOCOMPLETE — Yahoo Finance search (no key needed) ──
 let _eqsAcTimer = null;
 function eqsAutocomplete(val){
-  clearTimeout(_eqsAcTimer);
   const box = document.getElementById('eqs-suggest');
   if(!box) return;
-  if(!val || val.length < 2){ box.style.display='none'; return; }
+  clearTimeout(_eqsAcTimer);
+  if(!val || val.length < 1){ box.style.display='none'; return; }
   _eqsAcTimer = setTimeout(async ()=>{
-    if(!API_KEYS.FMP){ box.style.display='none'; return; }
     try{
-      const data = await apiFetch(
-        `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(val)}&limit=8&exchange=NASDAQ,NYSE&apikey=${API_KEYS.FMP}`,
-        'FMP', 5000
-      );
-      if(!data || !data.length){ box.style.display='none'; return; }
-      box.innerHTML = data.map(r=>`
-        <div onclick="eqsSelectSuggest('${r.symbol}')"
-          style="padding:3px 8px;cursor:pointer;font-size:10px;border-bottom:1px solid #0d0d0d;display:flex;gap:8px;align-items:center"
-          onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
-          <span style="color:var(--amber);width:60px;flex-shrink:0;font-weight:600">${r.symbol}</span>
-          <span style="color:var(--text)">${r.name}</span>
-          <span style="color:var(--text-dim);margin-left:auto;font-size:9px">${r.exchangeShortName||''}</span>
+      const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(val)}&lang=en-US&region=US&quotesCount=6&newsCount=0`;
+      const r = await proxyFetch(url, 5000);
+      const d = await r.json();
+      const quotes = (d.quotes||[]).filter(q=>q.symbol&&q.shortname);
+      if(!quotes.length){ box.style.display='none'; return; }
+      box.innerHTML = quotes.map(q=>`
+        <div onclick="eqsSelectSuggest('${q.symbol}')" style="padding:4px 8px;cursor:pointer;border-bottom:1px solid var(--border);font-size:10px"
+          onmouseover="this.style.background='#111'" onmouseout="this.style.background='transparent'">
+          <span style="color:var(--amber)">${q.symbol}</span>
+          <span style="color:var(--text-dim);margin-left:6px">${(q.shortname||'').substring(0,40)}</span>
+          <span style="color:#333;margin-left:4px;font-size:9px">${q.exchange||''}</span>
         </div>`).join('');
       box.style.display='block';
     }catch(e){ box.style.display='none'; }
-  }, 280);
+  }, 250);
 }
 
 function eqsSelectSuggest(sym){
@@ -1216,218 +1226,132 @@ function eqsSearch(){
   fetchEQS(v);
 }
 
-// Main data fetcher — batches all FMP calls, then renders
 async function fetchEQS(ticker){
   const body = document.getElementById('eqs-body');
   if(!body) return;
-
-  if(!API_KEYS.FMP){
-    body.innerHTML = `<div style="color:var(--red);padding:8px;font-size:10px">FMP API KEY REQUIRED — set API_KEYS.FMP</div>`;
-    return;
-  }
-
-  body.innerHTML = `<div style="color:var(--text-dim);padding:10px;font-size:10px;text-align:center">
-    <span style="color:var(--amber)">⟳</span> FETCHING ${ticker}…</div>`;
-
+  body.innerHTML = `<div style="color:var(--text-dim);padding:10px;font-size:10px;text-align:center"><span style="color:var(--amber)">⟳</span> FETCHING ${ticker}…</div>`;
   try{
-    // Batch: quote + profile + income statement in parallel
-    const [quoteRes, profileRes, incomeRes, ratiosRes] = await Promise.allSettled([
-      apiFetch(`https://financialmodelingprep.com/api/v3/quote/${ticker}?apikey=${API_KEYS.FMP}`, 'FMP', 8000),
-      apiFetch(`https://financialmodelingprep.com/api/v3/profile/${ticker}?apikey=${API_KEYS.FMP}`, 'FMP', 8000),
-      apiFetch(`https://financialmodelingprep.com/api/v3/income-statement/${ticker}?period=annual&limit=3&apikey=${API_KEYS.FMP}`, 'FMP', 8000),
-      apiFetch(`https://financialmodelingprep.com/api/v3/ratios-ttm/${ticker}?apikey=${API_KEYS.FMP}`, 'FMP', 8000),
+    // Yahoo Finance: quote + summary detail in parallel
+    const [quoteRes, histRes] = await Promise.allSettled([
+      proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1y`, 10000)
+        .then(r=>r.json()),
+      proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=5m&range=1d`, 10000)
+        .then(r=>r.json()),
     ]);
 
-    const quote   = quoteRes.status==='fulfilled'   && quoteRes.value?.[0]   || null;
-    const profile = profileRes.status==='fulfilled' && profileRes.value?.[0] || null;
-    const income  = incomeRes.status==='fulfilled'  && incomeRes.value        || [];
-    const ratios  = ratiosRes.status==='fulfilled'  && ratiosRes.value?.[0]  || null;
-
-    if(!quote && !profile){
-      body.innerHTML = `<div style="color:var(--red);padding:8px;font-size:10px">NO DATA RETURNED FOR <span style="color:var(--amber)">${ticker}</span><br><span style="color:#333;font-size:9px;margin-top:4px;display:block">Check ticker symbol — must be a valid NYSE/NASDAQ listing</span></div>`;
+    const quoteData = quoteRes.status==='fulfilled' ? quoteRes.value : null;
+    const meta = quoteData?.chart?.result?.[0]?.meta;
+    if(!meta || !meta.regularMarketPrice){
+      body.innerHTML = `<div style="color:var(--red);padding:8px;font-size:10px">NO DATA FOR <span style="color:var(--amber)">${ticker}</span><br><span style="color:#333;font-size:9px">Check ticker — use NYSE/NASDAQ symbols (e.g. AAPL, MSFT, TSLA)</span></div>`;
       return;
     }
 
-    body.innerHTML = buildEQSPanel(ticker, quote, profile, income, ratios);
+    const px      = meta.regularMarketPrice;
+    const prev    = meta.chartPreviousClose || px;
+    const chg     = px - prev;
+    const chgPct  = (chg/prev)*100;
+    const chgUp   = chg >= 0;
+    const week52h = meta.fiftyTwoWeekHigh || '—';
+    const week52l = meta.fiftyTwoWeekLow  || '—';
+    const name    = meta.longName || meta.shortName || ticker;
+    const exchange= meta.exchangeName || '';
+    const currency= meta.currency || 'USD';
 
-    // Draw sparkline after DOM settles
-    setTimeout(()=>drawEQSSparkline(ticker, quote), 40);
+    // Historical closes for 1Y chart
+    const yearData = quoteData?.chart?.result?.[0];
+    const closes   = yearData?.indicators?.quote?.[0]?.close || [];
+    const timestamps = yearData?.timestamp || [];
+
+    // Intraday data
+    const intradayData = histRes.status==='fulfilled' ? histRes.value?.chart?.result?.[0] : null;
+    const intradayCloses = intradayData?.indicators?.quote?.[0]?.close || [];
+
+    body.innerHTML = `
+      <div style="padding:4px 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+          <span style="color:var(--amber);font-size:20px;font-weight:600">${currency} ${px.toFixed(2)}</span>
+          <span class="${chgUp?'up':'dn'}" style="font-size:12px">${chgUp?'+':''}${chg.toFixed(2)} (${chgUp?'+':''}${chgPct.toFixed(2)}%)</span>
+          <span style="color:var(--text-dim);font-size:9px">${exchange}</span>
+          <span style="color:var(--text-mid);font-size:10px;margin-left:auto">${ticker} · ${name}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+        <div>
+          <div class="sl">MARKET DATA</div>
+          <div class="des-stat"><span class="des-label">Last Price</span><span class="des-val">${currency} ${px.toFixed(2)}</span></div>
+          <div class="des-stat"><span class="des-label">Chg 1D</span><span class="des-val ${chgUp?'up':'dn'}">${chgUp?'+':''}${chg.toFixed(2)}</span></div>
+          <div class="des-stat"><span class="des-label">% Chg 1D</span><span class="des-val ${chgUp?'up':'dn'}">${chgUp?'+':''}${chgPct.toFixed(2)}%</span></div>
+          <div class="des-stat"><span class="des-label">52W High</span><span class="des-val up">${typeof week52h==='number'?'$'+week52h.toFixed(2):week52h}</span></div>
+          <div class="des-stat"><span class="des-label">52W Low</span><span class="des-val dn">${typeof week52l==='number'?'$'+week52l.toFixed(2):week52l}</span></div>
+        </div>
+        <div>
+          <div class="sl">EXCHANGE INFO</div>
+          <div class="des-stat"><span class="des-label">Symbol</span><span class="des-val" style="color:var(--amber)">${ticker}</span></div>
+          <div class="des-stat"><span class="des-label">Exchange</span><span class="des-val">${exchange}</span></div>
+          <div class="des-stat"><span class="des-label">Currency</span><span class="des-val">${currency}</span></div>
+          <div class="des-stat"><span class="des-label">Mkt State</span><span class="des-val">${meta.marketState||'—'}</span></div>
+          <div class="des-stat"><span class="des-label">Source</span><span class="des-val" style="color:#2a2a2a;font-size:9px">YAHOO FINANCE</span></div>
+        </div>
+      </div>
+      <div class="sl">INTRADAY (5-MIN)</div>
+      <canvas id="eqs-spark-${ticker}" height="60" style="width:100%;margin-bottom:8px"></canvas>
+      <div class="sl">1-YEAR PRICE HISTORY</div>
+      <canvas id="eqs-year-${ticker}" height="80" style="width:100%"></canvas>
+    `;
+
+    setTimeout(()=>{
+      drawEQSCanvas('eqs-spark-'+ticker, intradayCloses.filter(Boolean), chgUp);
+      drawEQSCanvas('eqs-year-'+ticker,  closes.filter(Boolean), chgUp);
+    }, 40);
 
   }catch(err){
     body.innerHTML = `<div style="color:var(--red);padding:8px;font-size:10px">ERROR: ${err.message}</div>`;
   }
 }
 
-function buildEQSPanel(ticker, q, p, incomeArr, ratios){
-  const px      = q?.price ?? 0;
-  const chg     = q?.change ?? 0;
-  const chgPct  = q?.changesPercentage ?? 0;
-  const name    = p?.companyName || q?.name || ticker;
-  const sector  = p?.sector || '—';
-  const industry= p?.industry || '—';
-  const exchange= p?.exchangeShortName || '';
-  const mcap    = fmtLargeNum(q?.marketCap);
-  const pe      = q?.pe != null ? q.pe.toFixed(1) : '—';
-  const eps     = q?.eps != null ? '$'+q.eps.toFixed(2) : '—';
-  const week52h = q?.yearHigh != null ? '$'+q.yearHigh.toFixed(2) : '—';
-  const week52l = q?.yearLow  != null ? '$'+q.yearLow.toFixed(2)  : '—';
-  const avgVol  = q?.avgVolume ? fmtLargeNum(q.avgVolume) : '—';
-  const beta    = p?.beta != null ? p.beta.toFixed(2) : '—';
-  const divYield= p?.lastDiv && px ? (p.lastDiv/px*100).toFixed(2)+'%' : '—';
-  const ev      = fmtLargeNum(p?.dcfDiff != null ? null : p?.mktCap); // use mcap as proxy if EV not direct
-  const website = p?.website || '';
-  const desc    = p?.description ? p.description.substring(0,260)+(p.description.length>260?'…':'') : '';
-
-  // Income statement — up to 3 years
-  const incRows = incomeArr.slice(0,3).map(yr=>{
-    const rev  = fmtLargeNum(yr.revenue);
-    const ni   = fmtLargeNum(yr.netIncome);
-    const gm   = yr.grossProfit && yr.revenue ? (yr.grossProfit/yr.revenue*100).toFixed(1)+'%' : '—';
-    const om   = yr.operatingIncome && yr.revenue ? (yr.operatingIncome/yr.revenue*100).toFixed(1)+'%' : '—';
-    const nim  = yr.netIncome && yr.revenue ? (yr.netIncome/yr.revenue*100).toFixed(1)+'%' : '—';
-    const ebitda = fmtLargeNum(yr.ebitda);
-    const niCol = yr.netIncome >= 0 ? 'var(--green)' : 'var(--red)';
-    return`<tr>
-      <td style="color:var(--text-dim)">${(yr.calendarYear||yr.date||'').substring(0,4)}</td>
-      <td>${rev}</td>
-      <td style="color:${niCol}">${ni}</td>
-      <td>${gm}</td>
-      <td>${om}</td>
-      <td>${nim}</td>
-      <td class="w">${ebitda}</td>
-    </tr>`;
-  }).join('');
-
-  // Ratios (TTM)
-  const roe   = ratios?.returnOnEquityTTM != null ? (ratios.returnOnEquityTTM*100).toFixed(1)+'%' : '—';
-  const roa   = ratios?.returnOnAssetsTTM != null ? (ratios.returnOnAssetsTTM*100).toFixed(1)+'%' : '—';
-  const deRatio = ratios?.debtEquityRatioTTM != null ? ratios.debtEquityRatioTTM.toFixed(2) : '—';
-  const fcfYield= ratios?.freeCashFlowYieldTTM != null ? (ratios.freeCashFlowYieldTTM*100).toFixed(2)+'%' : '—';
-  const fwdPe = ratios?.forwardPETTM != null ? ratios.forwardPETTM.toFixed(1) : '—';
-  const evEbitda= ratios?.enterpriseValueMultipleTTM != null ? ratios.enterpriseValueMultipleTTM.toFixed(1)+'x' : '—';
-
-  const chgUp = chg >= 0;
-  return`
-    <!-- HEADER -->
-    <div style="padding:4px 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">
-      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
-        <span style="color:var(--amber);font-size:20px;font-weight:600">$${px.toFixed(2)}</span>
-        <span class="${chgUp?'up':'dn'}" style="font-size:12px">${chgUp?'+':''}${chg.toFixed(2)} (${chgUp?'+':''}${chgPct.toFixed(2)}%)</span>
-        <span style="color:var(--text-dim);font-size:9px">${exchange}</span>
-        <span style="color:var(--text-mid);font-size:10px;margin-left:auto">${ticker} · ${name}</span>
-      </div>
-      ${desc ? `<div style="color:#3a3a3a;font-size:9px;margin-top:5px;line-height:1.5">${desc}</div>` : ''}
-      ${website ? `<a href="${website}" target="_blank" rel="noopener" style="color:#1a3a5a;font-size:8px;text-decoration:none">↗ ${website}</a>` : ''}
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
-      <!-- VALUATION -->
-      <div>
-        <div class="sl">VALUATION</div>
-        <div class="des-stat"><span class="des-label">Sector</span><span class="des-val">${sector}</span></div>
-        <div class="des-stat"><span class="des-label">Industry</span><span class="des-val" style="font-size:9px">${industry}</span></div>
-        <div class="des-stat"><span class="des-label">Market Cap</span><span class="des-val">${mcap}</span></div>
-        <div class="des-stat"><span class="des-label">P/E (TTM)</span><span class="des-val">${pe}</span></div>
-        <div class="des-stat"><span class="des-label">P/E (Fwd)</span><span class="des-val">${fwdPe}</span></div>
-        <div class="des-stat"><span class="des-label">EV/EBITDA</span><span class="des-val">${evEbitda}</span></div>
-        <div class="des-stat"><span class="des-label">EPS (TTM)</span><span class="des-val">${eps}</span></div>
-        <div class="des-stat"><span class="des-label">Div Yield</span><span class="des-val">${divYield}</span></div>
-      </div>
-      <!-- TRADING / RISK -->
-      <div>
-        <div class="sl">MARKET DATA</div>
-        <div class="des-stat"><span class="des-label">52W High</span><span class="des-val up">${week52h}</span></div>
-        <div class="des-stat"><span class="des-label">52W Low</span><span class="des-val dn">${week52l}</span></div>
-        <div class="des-stat"><span class="des-label">Avg Volume</span><span class="des-val">${avgVol}</span></div>
-        <div class="des-stat"><span class="des-label">Beta</span><span class="des-val">${beta}</span></div>
-        <div class="sl" style="margin-top:6px">RETURNS & EFFICIENCY</div>
-        <div class="des-stat"><span class="des-label">ROE (TTM)</span><span class="des-val">${roe}</span></div>
-        <div class="des-stat"><span class="des-label">ROA (TTM)</span><span class="des-val">${roa}</span></div>
-        <div class="des-stat"><span class="des-label">D/E Ratio</span><span class="des-val">${deRatio}</span></div>
-        <div class="des-stat"><span class="des-label">FCF Yield</span><span class="des-val">${fcfYield}</span></div>
-      </div>
-    </div>
-
-    <!-- SPARKLINE -->
-    <div class="sl">INTRADAY PRICE</div>
-    <canvas id="eqs-spark-${ticker}" height="60" style="width:100%;margin-bottom:6px"></canvas>
-
-    <!-- INCOME STATEMENT -->
-    <div class="sl">INCOME STATEMENT — ANNUAL (LAST 3 YEARS)</div>
-    ${incRows ? `
-    <table class="t" style="margin-bottom:4px">
-      <thead><tr>
-        <th style="text-align:left">YEAR</th><th>REVENUE</th><th>NET INCOME</th>
-        <th>GROSS MGN</th><th>OP MGN</th><th>NET MGN</th><th>EBITDA</th>
-      </tr></thead>
-      <tbody>${incRows}</tbody>
-    </table>` : `<div style="color:#2a2a2a;font-size:9px;padding:4px">NO INCOME DATA</div>`}`;
-}
-
-// Sparkline — fetches intraday 5-min chart from FMP
-async function drawEQSSparkline(ticker, quote){
-  const canvas = document.getElementById('eqs-spark-'+ticker);
-  if(!canvas) return;
+function drawEQSCanvas(canvasId, data, isUp){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas || !data.length) return;
   const W = canvas.parentElement.offsetWidth - 4;
-  canvas.width = W; canvas.height = 60;
+  const H = canvas.height;
+  canvas.width = W;
   const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,60);
-
-  let data = [];
-  try{
-    const res = await apiFetch(
-      `https://financialmodelingprep.com/api/v3/historical-chart/5min/${ticker}?apikey=${API_KEYS.FMP}`,
-      'FMP', 6000
-    );
-    // FMP returns most-recent first — take last 78 points (6.5hr trading day)
-    if(res && res.length) data = res.slice(0,78).reverse().map(d=>d.close);
-  }catch(e){}
-
-  // Fallback: flat line at current price if no intraday data
-  if(!data.length && quote?.price){
-    data = Array(20).fill(quote.price);
-  }
-  if(!data.length) return;
-
+  ctx.clearRect(0,0,W,H);
   const mn = Math.min(...data), mx = Math.max(...data);
-  const range = mx - mn || mn * 0.001;
+  const range = mx - mn || mn*0.001;
   const pad = {l:36,r:4,t:4,b:14};
-  const pw = W-pad.l-pad.r, ph = 60-pad.t-pad.b;
+  const pw = W-pad.l-pad.r, ph = H-pad.t-pad.b;
   const xp = i => pad.l + i/(data.length-1)*pw;
   const yp = v => pad.t + (1-(v-mn)/range)*ph;
-
-  // Grid lines
+  const lineCol = isUp ? '#00c853' : '#e53935';
+  // grid
   ctx.strokeStyle='#0f0f0f'; ctx.lineWidth=1;
   [mn,(mn+mx)/2,mx].forEach(v=>{
     ctx.beginPath(); ctx.moveTo(pad.l,yp(v)); ctx.lineTo(W-pad.r,yp(v)); ctx.stroke();
     ctx.fillStyle='#2a2a2a'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='right';
-    ctx.fillText('$'+v.toFixed(2), pad.l-2, yp(v)+3);
+    ctx.fillText('$'+v.toFixed(v>100?0:2), pad.l-2, yp(v)+3);
   });
-  ctx.textAlign='left';
-
-  const isUp = data[data.length-1] >= data[0];
-  const lineCol = isUp ? '#00c853' : '#e53935';
-
-  // Fill
-  const g = ctx.createLinearGradient(0,pad.t,0,60-pad.b);
+  // fill
+  const g = ctx.createLinearGradient(0,pad.t,0,H-pad.b);
   g.addColorStop(0, isUp?'rgba(0,200,83,0.18)':'rgba(229,57,53,0.18)');
   g.addColorStop(1,'rgba(0,0,0,0)');
   ctx.beginPath();
   data.forEach((v,i)=> i===0 ? ctx.moveTo(xp(i),yp(v)) : ctx.lineTo(xp(i),yp(v)));
-  ctx.lineTo(xp(data.length-1),60-pad.b); ctx.lineTo(pad.l,60-pad.b);
+  ctx.lineTo(xp(data.length-1),H-pad.b); ctx.lineTo(pad.l,H-pad.b);
   ctx.closePath(); ctx.fillStyle=g; ctx.fill();
-
-  // Line
+  // line
   ctx.strokeStyle=lineCol; ctx.lineWidth=1.5;
   ctx.beginPath();
   data.forEach((v,i)=> i===0 ? ctx.moveTo(xp(i),yp(v)) : ctx.lineTo(xp(i),yp(v)));
   ctx.stroke();
-
-  // Last price dot
-  const last = data[data.length-1];
+  // dot
   ctx.fillStyle=lineCol; ctx.beginPath();
-  ctx.arc(xp(data.length-1), yp(last), 3, 0, Math.PI*2); ctx.fill();
+  ctx.arc(xp(data.length-1), yp(data[data.length-1]), 3, 0, Math.PI*2); ctx.fill();
 }
+
+// Legacy stub — no longer used but kept so nothing breaks
+async function drawEQSSparkline(ticker, quote){}
+
 
 let leafletMap = null;
 
@@ -2215,7 +2139,7 @@ function rSCRN(){
         </div>
         <div style="display:flex;gap:4px">
           <button class="scrn-btn run" id="scrn-run-btn" onclick="scrnRun()">▶ RUN SCREEN</button>
-          <button class="scrn-btn" id="scrn-live-btn" onclick="scrnFetchLive()" title="Refresh live prices via FMP/AV">⟳ LIVE</button>
+          <button class="scrn-btn" id="scrn-live-btn" onclick="scrnFetchLive()" title="Refresh live prices">⟳ LIVE</button>
         </div>
       </div>
     </div>
@@ -2964,7 +2888,7 @@ function rHELP(){
           </tr>`).join('')}
         </tbody></table>
         <div style="margin-top:8px;font-size:9px;color:#222;line-height:1.8">
-          SOURCES: FRED · EIA · FMP · ALPHA VANTAGE · NEWSAPI<br>
+          SOURCES: YAHOO FINANCE · OPEN.ER-API · MARKETWATCH RSS · YAHOO RSS<br>
           MODE: LIVE — ADD API_KEYS TO ENABLE LIVE DATA FEEDS<br>
           UNIVERSE: 85 US STOCKS + UNLIMITED VIA FMP · 20 SOVEREIGNS
         </div>
@@ -3260,6 +3184,20 @@ function arrange(){
 // ═══════════════════════════════════════════
 // Proxies tried in order until one works
 // yfFetch + yfFetchHistory — use proxyFetch (allorigins) defined above
+const YF_SYMBOLS = {
+  strip: [
+    {sym:'^GSPC',    id:'s-spx', fmt:v=>v.toFixed(1)},
+    {sym:'^IRX',     id:'s-ust', fmt:v=>v.toFixed(2)},
+    {sym:'DX-Y.NYB', id:'s-dxy', fmt:v=>v.toFixed(1)},
+    {sym:'CL=F',     id:'s-wti', fmt:v=>v.toFixed(1)},
+    {sym:'GC=F',     id:'s-gld', fmt:v=>v.toFixed(0)},
+    {sym:'^VIX',     id:'s-vix', fmt:v=>v.toFixed(1)},
+  ],
+  ticker: ['^GSPC','^IXIC','^DJI','^RUT','^VIX','^IRX',
+           'AAPL','MSFT','NVDA','TSLA','META','AMZN','GOOGL',
+           'GC=F','CL=F','SI=F','BTC-USD','ETH-USD',
+           'EURUSD=X','USDJPY=X','GBPUSD=X'],
+};
 async function yfFetch(sym){
   try{
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d&includePrePost=false`;

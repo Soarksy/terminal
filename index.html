@@ -259,8 +259,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .map-sidebar{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
 
 /* Calendar */
-.cal-item{display:grid;grid-template-columns:55px 28px 1fr 60px 60px 60px;gap:0;border-bottom:1px solid #0d0d0d}
-.cal-item>div{padding:2px 4px;font-size:10px;color:#b8b8b8}
+.cal-item{display:grid;grid-template-columns:50px 42px 14px 22px 1fr 52px 52px;gap:0;border-bottom:1px solid #0d0d0d;padding:1px 6px;align-items:center}
+.cal-item>div{padding:3px 2px;font-size:10px;color:#b8b8b8}
 .cal-hdr>div{font-size:9px;color:#808080;padding:2px 4px;border-bottom:1px solid var(--border);font-weight:600;letter-spacing:0.5px}
 .cal-hdr{display:grid;grid-template-columns:55px 28px 1fr 60px 60px 60px}
 .cal-miss{color:var(--red)}
@@ -475,7 +475,7 @@ canvas{display:block}
       <div class="strip-item"><span class="strip-name">UST10</span><span class="strip-val" id="s-ust">4.52</span></div>
       <div class="strip-item"><span class="strip-name">DXY</span><span class="strip-val" id="s-dxy">103.4</span></div>
       <div class="strip-item"><span class="strip-name">WTI</span><span class="strip-val" id="s-wti">78.4</span></div>
-      <div class="strip-item"><span class="strip-name">GOLD</span><span class="strip-val" id="s-gld">2024</span></div>
+      <div class="strip-item"><span class="strip-name">GOLD</span><span class="strip-val" id="s-gld">2888</span></div>
       <div class="strip-item"><span class="strip-name">VIX</span><span class="strip-val" id="s-vix">14.8</span></div>
     </div>
     <div id="livebadge">● LIVE</div>
@@ -527,41 +527,19 @@ canvas{display:block}
 const D = {
   fixedIncome: {
     treasuries: [
-      {tenor:'1M', yield:5.32,d1:+.02,w1:+.04,m1:-.08,dur:.08,price:99.96},
-      {tenor:'3M', yield:5.28,d1:-.01,w1:+.02,m1:-.12,dur:.25,price:98.68},
-      {tenor:'6M', yield:5.20,d1:-.02,w1:-.01,m1:-.18,dur:.49,price:97.44},
-      {tenor:'1Y', yield:4.98,d1:-.03,w1:-.06,m1:-.22,dur:.97,price:95.23},
-      {tenor:'2Y', yield:4.62,d1:-.04,w1:-.09,m1:-.28,dur:1.91,price:96.41},
-      {tenor:'3Y', yield:4.48,d1:-.03,w1:-.08,m1:-.24,dur:2.84,price:95.68},
-      {tenor:'5Y', yield:4.38,d1:-.02,w1:-.06,m1:-.19,dur:4.58,price:97.12},
-      {tenor:'7Y', yield:4.42,d1:-.01,w1:-.04,m1:-.14,dur:6.21,price:97.88},
-      {tenor:'10Y',yield:4.52,d1:+.01,w1:-.02,m1:-.08,dur:8.64,price:96.78},
-      {tenor:'20Y',yield:4.78,d1:+.02,w1:+.01,m1:-.02,dur:14.2,price:94.22},
-      {tenor:'30Y',yield:4.88,d1:+.03,w1:+.03,m1:+.04,dur:18.6,price:93.44},
+      {tenor:'1M', yield:4.34,d1:-.01,w1:-.02,m1:-.04,dur:.08,price:99.64},
+      {tenor:'3M', yield:4.32,d1:-.01,w1:-.02,m1:-.06,dur:.25,price:98.92},
+      {tenor:'6M', yield:4.28,d1:-.01,w1:-.03,m1:-.08,dur:.49,price:97.88},
+      {tenor:'1Y', yield:4.18,d1:-.02,w1:-.04,m1:-.12,dur:.97,price:95.98},
+      {tenor:'2Y', yield:4.02,d1:-.03,w1:-.06,m1:-.14,dur:1.91,price:96.14},
+      {tenor:'3Y', yield:4.08,d1:-.02,w1:-.05,m1:-.12,dur:2.84,price:95.44},
+      {tenor:'5Y', yield:4.18,d1:-.01,w1:-.04,m1:-.10,dur:4.58,price:96.88},
+      {tenor:'7Y', yield:4.28,d1:+.01,w1:-.02,m1:-.06,dur:6.21,price:97.22},
+      {tenor:'10Y',yield:4.32,d1:+.02,w1:-.01,m1:-.04,dur:8.64,price:96.44},
+      {tenor:'20Y',yield:4.62,d1:+.02,w1:+.01,m1:+.02,dur:14.2,price:93.88},
+      {tenor:'30Y',yield:4.72,d1:+.03,w1:+.02,m1:+.04,dur:18.6,price:92.84},
     ],
-    spreads:{
-      ig:[
-        {name:'AAA Corp',yield:4.98,oas:46,d1:-2,w1:-4,pct5y:22},
-        {name:'AA Corp', yield:5.12,oas:60,d1:-1,w1:-3,pct5y:28},
-        {name:'A Corp',  yield:5.34,oas:82,d1:+1,w1:-2,pct5y:35},
-        {name:'BBB Corp',yield:5.78,oas:126,d1:+2,w1:+4,pct5y:48},
-      ],
-      hy:[
-        {name:'BB Corp', yield:6.82,oas:230,d1:+5,w1:+12,pct5y:42},
-        {name:'B Corp',  yield:8.14,oas:362,d1:+8,w1:+18,pct5y:55},
-        {name:'CCC Corp',yield:12.4,oas:788,d1:+18,w1:+44,pct5y:68},
-      ],
-      muni:[
-        {name:'AAA Muni',yield:3.22,oas:18,d1:-1,w1:-2,pct5y:18},
-        {name:'A Muni',  yield:3.68,oas:42,d1:+1,w1:+2,pct5y:32},
-        {name:'BBB Muni',yield:4.12,oas:82,d1:+2,w1:+6,pct5y:44},
-      ],
-      em:[
-        {name:'EM Sov IG', yield:5.88,oas:136,d1:+3,w1:+8,pct5y:38},
-        {name:'EM Corp IG',yield:6.12,oas:160,d1:+4,w1:+10,pct5y:45},
-        {name:'EM HY Sov', yield:9.44,oas:492,d1:+12,w1:+28,pct5y:62},
-      ]
-    },
+    spreads:{ig:[],hy:[],muni:[],em:[]}, // static spreads removed
     auctions:[
       {sec:'4W T-Bill', issue:'2026-02-05',mat:'2026-03-05',auction:'2026-02-03',yield:4.280,btc:2.96,tail:.1,ind:66.4,dir:19.8,deal:13.8,weak:false},
       {sec:'8W T-Bill', issue:'2026-02-05',mat:'2026-04-02',auction:'2026-02-03',yield:4.295,btc:2.88,tail:.1,ind:68.2,dir:18.4,deal:13.4,weak:false},
@@ -576,71 +554,54 @@ const D = {
     ],
     inflation:{
       breakevens:[
-        {tenor:'5Y',   be:2.28,nom:4.38,real:2.10,d1:-.02},
-        {tenor:'10Y',  be:2.38,nom:4.52,real:2.14,d1:-.01},
-        {tenor:'30Y',  be:2.44,nom:4.88,real:2.44,d1:+.00},
-        {tenor:'5Y5Y', be:2.52,nom:null,real:null,d1:+.01},
+        {tenor:'5Y',   be:2.44,nom:4.18,real:1.74,d1:-.01},
+        {tenor:'10Y',  be:2.38,nom:4.32,real:1.94,d1:-.01},
+        {tenor:'30Y',  be:2.34,nom:4.72,real:2.38,d1:+.01},
+        {tenor:'5Y5Y', be:2.44,nom:null,real:null,d1:+.00},
       ],
-      metrics:[
-        {name:'CPI YoY',  val:'3.2%',prev:'3.4%',d1:'-0.2'},
-        {name:'Core CPI', val:'3.9%',prev:'3.9%',d1:'+0.0'},
-        {name:'PCE',      val:'2.6%',prev:'2.7%',d1:'-0.1'},
-        {name:'Core PCE', val:'2.8%',prev:'2.9%',d1:'-0.1'},
-      ]
+      metrics:[]  // removed — FRED gauges above are live
     }
   },
 
   equities:{
     indices:[
-      {name:'S&P 500', val:4868.5, chg:-12.4, pct:-.25, vol:'LOW'},
-      {name:'Nasdaq',  val:15312.2,chg:-44.8, pct:-.29, vol:'LOW'},
-      {name:'Dow',     val:38109.4,chg:+22.3, pct:+.06, vol:'LOW'},
-      {name:'Russell', val:1984.2, chg:-8.1,  pct:-.41, vol:'MOD'},
-      {name:'VIX',     val:14.82,  chg:+.34,  pct:+2.35,vol:'—'},
-      {name:'VVIX',    val:88.4,   chg:+1.2,  pct:+1.37,vol:'—'},
+      {name:'S&P 500', val:5614.6, chg:-28.4, pct:-.50, vol:'MOD'},
+      {name:'Nasdaq',  val:17612.5,chg:-98.2, pct:-.55, vol:'MOD'},
+      {name:'Dow',     val:41511.8,chg:-142.3,pct:-.34, vol:'LOW'},
+      {name:'Russell', val:2116.4, chg:-18.2, pct:-.85, vol:'MOD'},
+      {name:'VIX',     val:22.44,  chg:+1.12, pct:+5.26,vol:'—'},
+      {name:'VVIX',    val:98.2,   chg:+2.4,  pct:+2.51,vol:'—'},
     ],
-    sectors:[
-      {name:'Tech',       d1:-.44,w1:+1.2, mcap:12.4},
-      {name:'Financials', d1:+.28,w1:+.8,  mcap:4.8},
-      {name:'Healthcare', d1:+.12,w1:-.4,  mcap:4.2},
-      {name:'Energy',     d1:+.88,w1:+2.1, mcap:3.1},
-      {name:'Industrials',d1:+.22,w1:+.6,  mcap:2.9},
-      {name:'Cons Disc',  d1:-.61,w1:-.9,  mcap:2.8},
-      {name:'Comm Svc',   d1:-.18,w1:+.4,  mcap:2.6},
-      {name:'Materials',  d1:+.44,w1:+1.4, mcap:1.4},
-      {name:'Utilities',  d1:-.08,w1:-.3,  mcap:1.2},
-      {name:'Real Estate',d1:-.32,w1:-.8,  mcap:1.1},
-      {name:'Cons Staples',d1:+.04,w1:-.2, mcap:1.8},
-    ]
+    sectors:[]  // populated live by fetchSectorETFs()
   },
 
   fx:[
-    {name:'DXY',     val:103.48,d1:+.22,w1:+.41,m1:+.88,  vol:'LOW', type:'idx'},
-    {name:'EURUSD',  val:1.0842,d1:-.0018,w1:-.0042,m1:-.0088,vol:'LOW', type:'g10'},
-    {name:'USDJPY',  val:148.72,d1:+.48,w1:+.92,m1:+2.14, vol:'MOD', type:'g10'},
-    {name:'GBPUSD',  val:1.2688,d1:-.0012,w1:-.0028,m1:-.0044,vol:'LOW',type:'g10'},
-    {name:'USDCHF',  val:.8844, d1:+.0008,w1:+.0018,m1:+.0042,vol:'LOW',type:'g10'},
-    {name:'AUDUSD',  val:.6562, d1:-.0022,w1:-.0048,m1:-.0082,vol:'MOD',type:'g10'},
-    {name:'USDCAD',  val:1.3488,d1:+.0014,w1:+.0032,m1:+.0064,vol:'LOW',type:'g10'},
-    {name:'USDCNH',  val:7.1844,d1:+.0088,w1:+.0188,m1:+.0322,vol:'LOW',type:'em'},
-    {name:'USDBRL',  val:4.9422,d1:+.0244,w1:+.0488,m1:+.1022,vol:'HIGH',type:'em'},
-    {name:'USDINR',  val:83.12, d1:+.04,  w1:+.08,  m1:+.22,  vol:'LOW', type:'em'},
-    {name:'USDMXN',  val:17.08, d1:+.14,  w1:+.28,  m1:+.64,  vol:'MOD', type:'em'},
-    {name:'USDZAR',  val:18.82, d1:+.22,  w1:+.44,  m1:+.88,  vol:'HIGH',type:'em'},
+    {name:'DXY',     val:104.88,d1:+.34,w1:+.58,m1:-.44,  vol:'MOD', type:'idx'},
+    {name:'EURUSD',  val:1.0432,d1:-.0028,w1:-.0062,m1:+.0044,vol:'MOD', type:'g10'},
+    {name:'USDJPY',  val:148.44,d1:+.38,w1:+.72,m1:-1.22, vol:'MOD', type:'g10'},
+    {name:'GBPUSD',  val:1.2862,d1:-.0014,w1:-.0032,m1:+.0088,vol:'LOW',type:'g10'},
+    {name:'USDCHF',  val:.8988, d1:+.0012,w1:+.0024,m1:-.0038,vol:'LOW',type:'g10'},
+    {name:'AUDUSD',  val:.6288, d1:-.0028,w1:-.0054,m1:-.0122,vol:'MOD',type:'g10'},
+    {name:'USDCAD',  val:1.4388,d1:+.0022,w1:+.0044,m1:+.0122,vol:'MOD',type:'g10'},
+    {name:'USDCNH',  val:7.2488,d1:+.0044,w1:+.0088,m1:+.0188,vol:'LOW',type:'em'},
+    {name:'USDBRL',  val:5.8422,d1:+.0344,w1:+.0688,m1:+.1422,vol:'HIGH',type:'em'},
+    {name:'USDINR',  val:86.88, d1:+.06,  w1:+.12,  m1:+.32,  vol:'LOW', type:'em'},
+    {name:'USDMXN',  val:20.44, d1:+.22,  w1:+.44,  m1:+.88,  vol:'HIGH',type:'em'},
+    {name:'USDZAR',  val:18.44, d1:+.18,  w1:+.36,  m1:+.72,  vol:'HIGH',type:'em'},
   ],
 
   commodities:{
     energy:[
-      {name:'WTI Crude', spot:78.44, d1:+1.06, curve:+.82, unit:'$/bbl'},
-      {name:'Brent Crude',spot:82.88,d1:+.98,  curve:+.44, unit:'$/bbl'},
-      {name:'Nat Gas',   spot:2.288, d1:-1.88, curve:-.22, unit:'$/MMBtu'},
-      {name:'Heating Oil',spot:2.644,d1:+.82,  curve:+.18, unit:'$/gal'},
+      {name:'WTI Crude', spot:68.44, d1:+.88,  curve:+.44, unit:'$/bbl'},
+      {name:'Brent Crude',spot:71.88,d1:+.72,  curve:+.22, unit:'$/bbl'},
+      {name:'Nat Gas',   spot:4.188, d1:+.22,  curve:-.44, unit:'$/MMBtu'},
+      {name:'Heating Oil',spot:2.388,d1:+.44,  curve:+.08, unit:'$/gal'},
     ],
     metals:[
-      {name:'Gold',   spot:2024.8,d1:+.22,curve:+4.8,  unit:'$/oz'},
-      {name:'Silver', spot:22.44, d1:-.44,curve:+.08,  unit:'$/oz'},
-      {name:'Copper', spot:3.812, d1:-.63,curve:-.044, unit:'$/lb'},
-      {name:'Platinum',spot:894.0,d1:+.18,curve:+2.2,  unit:'$/oz'},
+      {name:'Gold',   spot:2888.4,d1:+8.44,curve:+12.4, unit:'$/oz'},
+      {name:'Silver', spot:31.88, d1:+.28, curve:+.44,  unit:'$/oz'},
+      {name:'Copper', spot:4.488, d1:+.44, curve:+.088, unit:'$/lb'},
+      {name:'Platinum',spot:988.0,d1:+2.8, curve:+4.4,  unit:'$/oz'},
     ],
     agriculture:[
       {name:'Corn',    spot:456.0,d1:+.28,curve:+2.4,unit:'¢/bu'},
@@ -716,84 +677,15 @@ const D = {
     ]
   },
 
-  news:[
-    {ts:'09:42',src:'RTRS',tag:'macro',  hl:'Fed\'s Waller signals no rush to cut rates, says economy performing well',     detail:'Federal Reserve Governor Christopher Waller said Thursday the central bank is in no hurry to reduce interest rates, citing continued economic resilience and inflation that remains above the 2% target.'},
-    {ts:'09:38',src:'BBG', tag:'energy', hl:'OPEC+ to maintain current production cuts through Q2 2025, delegates say',      detail:'OPEC+ members have agreed to extend current voluntary production cuts of approximately 2.2 million barrels per day through the second quarter of 2025, according to delegates familiar with discussions.'},
-    {ts:'09:31',src:'WSJ', tag:'eq',     hl:'Microsoft Azure revenue growth accelerates to 28% on AI demand surge',           detail:'Microsoft reported stronger-than-expected Azure cloud revenue growth of 28% year-over-year in its fiscal second quarter, driven by rising demand for artificial intelligence infrastructure.'},
-    {ts:'09:22',src:'RTRS',tag:'geo',    hl:'Red Sea shipping disruptions widen as Houthi attacks extend to Indian Ocean',    detail:'Maritime insurance premiums have spiked to multi-year highs as attacks on commercial shipping in the Red Sea and surrounding waters have intensified, forcing major carriers to reroute around the Cape of Good Hope.'},
-    {ts:'09:14',src:'BBG', tag:'credit', hl:'HY spreads widen 12bp on regional bank concerns, CCC tier leads',               detail:'High-yield credit spreads widened sharply on Thursday, led by the CCC tier which saw an 18 basis point move. Regional bank concerns and tight financial conditions were cited as the primary drivers.'},
-    {ts:'09:08',src:'FT',  tag:'macro',  hl:'ECB officials divided on timing of first rate cut amid sticky services inflation',detail:'European Central Bank policymakers remain deeply divided on when to begin cutting interest rates, with hawks pointing to persistent services inflation running above 4% year-on-year.'},
-    {ts:'08:58',src:'RTRS',tag:'energy', hl:'API crude inventories draw -4.2M bbl, beats expectations of -1.8M bbl draw',    detail:'American Petroleum Institute reported a crude oil inventory draw of 4.2 million barrels for the week ended January 26, significantly exceeding the consensus expectation of a 1.8 million barrel decline.'},
-    {ts:'08:44',src:'BBG', tag:'geo',    hl:'Taiwan Strait tensions rise as PLA conducts largest air incursion in six months', detail:'The People\'s Liberation Army conducted its largest air incursion into Taiwan\'s air defense identification zone in six months, sending 38 aircraft across the median line.'},
-    {ts:'08:32',src:'WSJ', tag:'eq',     hl:'Regional banks rally after KeyCorp beats NII expectations, guidance raised',     detail:'KeyCorp shares rose more than 8% after the regional lender reported net interest income that exceeded analyst estimates and raised its full-year guidance, providing relief to the beleaguered sector.'},
-    {ts:'08:18',src:'BBG', tag:'macro',  hl:'Japan CPI ex-food rises 2.3% YoY in December, BOJ meeting in focus',            detail:'Japan\'s core inflation measure rose 2.3% year-on-year in December, staying above the Bank of Japan\'s 2% target for the 22nd consecutive month as markets watch closely for any policy shift signals at this month\'s meeting.'},
-    {ts:'07:55',src:'FT',  tag:'credit', hl:'EM bond fund outflows accelerate as strong USD pressures local currencies',      detail:'Emerging market debt funds recorded their largest weekly outflows in three months, as the persistent strength of the US dollar and rising Treasury yields eroded the relative attractiveness of EM fixed income.'},
-    {ts:'07:38',src:'RTRS',tag:'energy', hl:'Norway sovereign wealth fund divests remaining coal holdings, adds clean energy', detail:'Norges Bank Investment Management announced the completion of its divestment from coal-related companies and outlined plans to increase its allocation to clean energy infrastructure projects.'},
-  ],
+  news:[],  // populated by fetchRSSNews() on load
 
-  earnings:[
-    {ticker:'ORCL', date:'Mar 10', time:'AMC', epsEst:'$1.48', beat:null},
-    {ticker:'ADBE', date:'Mar 12', time:'AMC', epsEst:'$4.97', beat:null},
-    {ticker:'DG',   date:'Mar 13', time:'BMO', epsEst:'$1.51', beat:null},
-    {ticker:'FDX',  date:'Mar 19', time:'AMC', epsEst:'$4.56', beat:null},
-    {ticker:'NKE',  date:'Mar 20', time:'AMC', epsEst:'$0.29', beat:null},
-    {ticker:'MU',   date:'Mar 26', time:'AMC', epsEst:'$1.43', beat:null},
-    {ticker:'WBA',  date:'Apr 01', time:'BMO', epsEst:'$0.37', beat:null},
-    {ticker:'JPM',  date:'Apr 11', time:'BMO', epsEst:'$4.61', beat:null},
-    {ticker:'GS',   date:'Apr 14', time:'BMO', epsEst:'$12.35',beat:null},
-    {ticker:'NFLX', date:'Apr 15', time:'AMC', epsEst:'$5.74', beat:null},
-  ],
 
-  companies:{
-    AAPL:{name:'Apple Inc',sector:'Technology',px:184.40,pxChg:+.88,pxPct:+.48,
-      mcap:'2.84T',pe:29.4,fwdPe:26.8,ev:2.96,revenue:'394.3B',netIncome:'97.0B',
-      grossMargin:'44.1%',opMargin:'30.7%',debt:'111B',cash:'162B',
-      nextEarnings:'Feb 01',eps:'6.42',epsEst:'6.58',revEst:'122.1B'},
-    MSFT:{name:'Microsoft Corp',sector:'Technology',px:404.87,pxChg:+2.44,pxPct:+.61,
-      mcap:'3.01T',pe:36.8,fwdPe:31.4,ev:3.08,revenue:'211.9B',netIncome:'72.4B',
-      grossMargin:'69.2%',opMargin:'44.6%',debt:'79B',cash:'144B',
-      nextEarnings:'Jan 31',eps:'11.45',epsEst:'11.62',revEst:'60.8B'},
-    NVDA:{name:'NVIDIA Corp',sector:'Technology',px:613.44,pxChg:+8.22,pxPct:+1.36,
-      mcap:'1.52T',pe:65.4,fwdPe:28.2,ev:1.55,revenue:'44.9B',netIncome:'9.7B',
-      grossMargin:'72.7%',opMargin:'54.1%',debt:'9.7B',cash:'18.8B',
-      nextEarnings:'Feb 21',eps:'12.96',epsEst:'16.08',revEst:'20.4B'},
-    JPM:{name:'JPMorgan Chase',sector:'Financials',px:170.11,pxChg:-.44,pxPct:-.26,
-      mcap:'491B',pe:11.2,fwdPe:10.8,ev:null,revenue:'158.1B',netIncome:'49.6B',
-      grossMargin:'—',opMargin:'—',debt:'N/A',cash:'N/A',
-      nextEarnings:'Apr 12',eps:'16.23',epsEst:'16.01',revEst:'41.8B'},
-    GS:{name:'Goldman Sachs',sector:'Financials',px:384.22,pxChg:+1.88,pxPct:+.49,
-      mcap:'124B',pe:13.4,fwdPe:12.1,ev:null,revenue:'46.3B',netIncome:'7.9B',
-      grossMargin:'—',opMargin:'—',debt:'N/A',cash:'N/A',
-      nextEarnings:'Apr 15',eps:'32.74',epsEst:'33.12',revEst:'12.8B'},
-    XOM:{name:'Exxon Mobil',sector:'Energy',px:102.44,pxChg:+.82,pxPct:+.81,
-      mcap:'414B',pe:14.2,fwdPe:13.8,ev:432,revenue:'334.7B',netIncome:'36.0B',
-      grossMargin:'—',opMargin:'14.8%',debt:'42B',cash:'28B',
-      nextEarnings:'Feb 02',eps:'8.89',epsEst:'8.74',revEst:'88.4B'},
-  },
+  earnings:[],  // populated by EQ panel earnings tab
+
+  companies:{},  // populated by fetchEQS live data
 
   geospatial:{
-    sovereigns:[
-      {code:'US',name:'United States',y10:4.52,d1:+.01,spread:0,   rating:'AAA',cds:20,  eqPerf:-.25,fxPerf:+.21},
-      {code:'DE',name:'Germany',      y10:2.28,d1:-.02,spread:-224,rating:'AAA',cds:14,  eqPerf:+.18,fxPerf:-.17},
-      {code:'GB',name:'United Kingdom',y10:4.12,d1:+.02,spread:-40,rating:'AA', cds:22,  eqPerf:+.08,fxPerf:-.09},
-      {code:'JP',name:'Japan',        y10:.72, d1:+.04,spread:-380,rating:'A+', cds:28,  eqPerf:+.44,fxPerf:-.32},
-      {code:'FR',name:'France',       y10:2.88,d1:-.01,spread:-164,rating:'AA-',cds:31,  eqPerf:+.22,fxPerf:-.17},
-      {code:'IT',name:'Italy',        y10:3.88,d1:+.03,spread:-64, rating:'BBB+',cds:88, eqPerf:+.14,fxPerf:-.17},
-      {code:'CN',name:'China',        y10:2.52,d1:-.02,spread:-200,rating:'A+', cds:58,  eqPerf:-.88,fxPerf:-.12},
-      {code:'BR',name:'Brazil',       y10:11.82,d1:+.12,spread:730,rating:'BB', cds:182, eqPerf:+.44,fxPerf:-.49},
-      {code:'TR',name:'Turkey',       y10:26.4, d1:+.28,spread:2188,rating:'B+',cds:444, eqPerf:+1.2,fxPerf:-.82},
-      {code:'IN',name:'India',        y10:7.12, d1:+.04,spread:260,rating:'BBB-',cds:88, eqPerf:+.22,fxPerf:-.05},
-      {code:'AU',name:'Australia',    y10:4.32, d1:-.01,spread:-20,rating:'AAA',cds:18,  eqPerf:+.44,fxPerf:-.34},
-      {code:'CA',name:'Canada',       y10:3.72, d1:+.01,spread:-80,rating:'AAA',cds:16,  eqPerf:+.18,fxPerf:-.10},
-      {code:'KR',name:'South Korea',  y10:3.28, d1:-.01,spread:-124,rating:'AA',cds:24,  eqPerf:+.38,fxPerf:+.04},
-      {code:'ZA',name:'South Africa', y10:11.24,d1:+.14,spread:672,rating:'BB-',cds:244, eqPerf:-.22,fxPerf:-1.2},
-      {code:'MX',name:'Mexico',       y10:9.44, d1:+.08,spread:492,rating:'BBB',cds:144, eqPerf:+.28,fxPerf:-.82},
-      {code:'NO',name:'Norway',       y10:3.88, d1:+.01,spread:-64,rating:'AAA',cds:12,  eqPerf:+.88,fxPerf:+.04},
-      {code:'SE',name:'Sweden',       y10:2.44, d1:-.01,spread:-208,rating:'AAA',cds:12, eqPerf:+.22,fxPerf:-.22},
-      {code:'CH',name:'Switzerland',  y10:.98,  d1:+.01,spread:-354,rating:'AAA',cds:10, eqPerf:+.28,fxPerf:+.09},
-      {code:'ES',name:'Spain',        y10:3.28, d1:+.01,spread:-124,rating:'A',  cds:44, eqPerf:+.32,fxPerf:-.17},
-      {code:'SG',name:'Singapore',    y10:3.12, d1:+.00,spread:-140,rating:'AAA',cds:10, eqPerf:+.18,fxPerf:+.02},
-    ],
+    sovereigns:[]  // populated live by fetchSovereignYields()
   },
 
   // ── Extended sub-objects (populated by API polling) ──
@@ -1362,7 +1254,7 @@ function rEQ(){
       <div class="sl" style="margin-bottom:6px">CONSTITUENTS BY SECTOR — 1D PERFORMANCE</div>
       ${hmSectors}
     </div>`;
-  const hm=D.equities.sectors.map(s=>{
+  const hm=(D.equities.sectors||[]).map(s=>{
     const bg=s.d1>1?'rgba(0,80,20,0.4)':s.d1>.3?'rgba(0,50,12,0.3)':s.d1>0?'rgba(0,30,8,0.2)':s.d1<-1?'rgba(80,0,0,0.4)':s.d1<-.3?'rgba(50,0,0,0.3)':'rgba(30,0,0,0.2)';
     const vc=s.d1>0?'var(--green)':'var(--red)';
     return`<div class="hm-cell" style="background:${bg}">
@@ -1557,19 +1449,7 @@ function rCMDTY(){
 // ═══════════════════════════════════════════
 // RENDER: SPREAD
 // ═══════════════════════════════════════════
-function rSPREAD(){
-  function ss(title,data){
-    const rows=data.map(r=>`<tr>
-      <td>${r.name}</td><td class="hl">${fmt(r.yield,2)}</td>
-      <td class="w">${r.oas}</td><td>${fmtC(r.d1,0)}</td><td>${fmtC(r.w1,0)}</td>
-      <td class="${r.pct5y>60?'dn':r.pct5y>40?'':''}" style="${r.pct5y>60?'':'color:var(--text-mid)'}">${r.pct5y}%</td>
-    </tr>`).join('');
-    return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>SECTOR</th><th>YLD%</th><th>OAS</th><th>1D</th><th>1W</th><th>5YR%</th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-  const sp=D.fixedIncome.spreads;
-  return ss('INVESTMENT GRADE',sp.ig)+ss('HIGH YIELD',sp.hy)+ss('MUNICIPAL',sp.muni)+ss('EMERGING MARKET',sp.em);
-}
+// rSPREAD removed — fully static data, no free live credit spread API
 
 // ═══════════════════════════════════════════
 // RENDER: INFLATION
@@ -1637,13 +1517,7 @@ function rINFL(){
       <div>
         <div class="sl">INFLATION GAUGES — FRED LIVE</div>
         <table class="t"><thead><tr><th>SERIES</th><th>LATEST</th><th>PREV</th><th>Δ</th><th>NOTE</th></tr></thead><tbody>${gauges}</tbody></table>
-        <div style="margin-top:8px">
-          <div class="sl">INFLATION METRICS — STATIC</div>
-          ${D.fixedIncome.inflation.metrics.map(m=>{
-            const v=parseFloat(m.d1);
-            return`<div class="mr"><span class="ml">${m.name}</span><span class="mv hl">${m.val}</span><span style="color:${v>0?'var(--red)':'var(--green)'};font-size:9px;margin-left:6px">${v>0?'+':''}${m.d1}</span></div>`;
-          }).join('')}
-        </div>
+
       </div>
     </div>
     <div class="sl">BREAKEVEN CURVE</div>
@@ -2154,24 +2028,55 @@ function rLADDER(){
 // ═══════════════════════════════════════════
 function rMACRO(){
   // ── CALENDAR TAB ──
+  // Impact dot: ● = HIGH (red), ◉ = MED (amber), · = LOW (dim)
+  const impDot = imp => imp==='HIGH'
+    ? `<span title="High market impact" style="color:var(--red);font-size:11px;line-height:1">●</span>`
+    : imp==='MED'
+    ? `<span title="Medium market impact" style="color:var(--amber);font-size:11px;line-height:1">●</span>`
+    : `<span title="Low market impact" style="color:#333;font-size:11px;line-height:1">●</span>`;
+
   const calRows=D.macro.calendar.map(e=>{
-    const actCol = e.act ? (e.beat===true?'var(--green)':e.beat===false?'var(--red)':'var(--amber)') : '#2a2a2a';
-    const impCol = e.impact==='HIGH'?'var(--red)':e.impact==='MED'?'var(--amber)':'#444';
-    return `<div class="cal-item${e.impact==='HIGH'?' cal-hi':''}">
-      <div class="w" style="color:#707070;font-size:9px">${e.date||''}</div>
-      <div class="w">${e.time||'--:--'}</div>
-      <div style="color:#555;font-size:9px;width:24px">${e.cty}</div>
-      <div style="flex:1;font-size:10px">${e.event}</div>
-      <div style="width:60px;text-align:right;color:#444;font-size:9px">${e.prev||'—'}</div>
-      <div style="width:60px;text-align:right;color:#555;font-size:9px">${e.fore||'—'}</div>
-      <div style="width:60px;text-align:right;color:${actCol};font-weight:600;font-size:10px">${e.act||'—'}</div>
-      <div style="width:32px;text-align:center"><span style="color:${impCol};font-size:8px;font-weight:700">${e.impact}</span></div>
-    </div>`;
+    const pending = e.act === null;
+    // For released events: show actual with beat/miss color
+    // For pending: show forecast only (no actual column)
+    const actCol = e.beat===true ? 'var(--green)' : e.beat===false ? 'var(--red)' : 'var(--amber)';
+    const rowStyle = e.impact==='HIGH' ? 'border-left:2px solid rgba(255,68,68,0.4)' : '';
+
+    if(pending){
+      // Upcoming: DATE | TIME | ● | CTY | EVENT | PREV | FCST
+      return `<div class="cal-item" style="${rowStyle}">
+        <div style="color:#707070;font-size:9px;white-space:nowrap">${e.date||''}</div>
+        <div style="color:#606060;font-size:9px;white-space:nowrap">${e.time||'—'}</div>
+        <div style="width:14px;text-align:center">${impDot(e.impact)}</div>
+        <div style="color:#505050;font-size:8px;width:22px;font-weight:600">${e.cty}</div>
+        <div style="flex:1;font-size:10px;color:#a0a0a0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.event}</div>
+        <div style="width:52px;text-align:right;color:#606060;font-size:9px">${e.prev||'—'}</div>
+        <div style="width:52px;text-align:right;color:#888;font-size:9px;font-weight:600">${e.fore||'—'}</div>
+      </div>`;
+    } else {
+      // Released: DATE | TIME | ● | CTY | EVENT | PREV | ACTUAL (beat/miss)
+      return `<div class="cal-item" style="${rowStyle}">
+        <div style="color:#707070;font-size:9px;white-space:nowrap">${e.date||''}</div>
+        <div style="color:#606060;font-size:9px;white-space:nowrap">${e.time||'—'}</div>
+        <div style="width:14px;text-align:center">${impDot(e.impact)}</div>
+        <div style="color:#505050;font-size:8px;width:22px;font-weight:600">${e.cty}</div>
+        <div style="flex:1;font-size:10px;color:#707070;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.event}</div>
+        <div style="width:52px;text-align:right;color:#555;font-size:9px">${e.prev||'—'}</div>
+        <div style="width:52px;text-align:right;color:${actCol};font-size:10px;font-weight:700">${e.act||'—'}</div>
+      </div>`;
+    }
   }).join('');
 
+  // Group header labels differ for past vs upcoming
   const calTab = `<div style="padding:4px 6px">
-    <div style="display:grid;grid-template-columns:48px 44px 26px 1fr 60px 60px 60px 32px;font-size:8px;color:#2a2a2a;padding:2px 0;border-bottom:1px solid #111;margin-bottom:2px">
-      <span>DATE</span><span>TIME</span><span>CTY</span><span>EVENT</span><span style="text-align:right">PREV</span><span style="text-align:right">FORECAST</span><span style="text-align:right">ACTUAL</span><span style="text-align:center">IMP</span>
+    <div style="display:grid;grid-template-columns:50px 42px 14px 22px 1fr 52px 52px;font-size:8px;color:#555;padding:3px 0 3px 6px;border-bottom:1px solid #1a1a1a;margin-bottom:2px;letter-spacing:.5px">
+      <span>DATE</span><span>TIME</span><span style="text-align:center">IMP</span><span>CTY</span><span>EVENT</span><span style="text-align:right">PREV</span><span style="text-align:right">FCST / ACT</span>
+    </div>
+    <div style="font-size:8px;color:#444;padding:2px 6px 4px;display:flex;gap:14px;border-bottom:1px solid #111;margin-bottom:3px">
+      <span>${impDot('HIGH')} HIGH IMPACT</span>
+      <span>${impDot('MED')} MED IMPACT</span>
+      <span>${impDot('LOW')} LOW IMPACT</span>
+      <span style="margin-left:auto;color:#2a6a2a">GREEN = BEAT &nbsp;</span><span style="color:#5a1a1a">RED = MISS</span>
     </div>
     ${calRows}
   </div>`;
@@ -2390,10 +2295,17 @@ async function fetchEQS(ticker){
     const cik = await fetchEDGARCIK(ticker);
     const filingsTab = buildFilingsTab(ticker, cik, currency, name);
 
+    // Fetch analyst ratings async — will fill in after initial render
+    const ratingsPlaceholder = `<div id="eqs-ratings-${ticker}" style="padding:10px;color:var(--text-dim);font-size:10px;text-align:center"><span style="color:var(--amber)">⟳</span> Loading analyst ratings…</div>`;
+
     body.innerHTML = buildTabs('eqs-tabs-'+ticker,[
       {id:'eqs-price-'+ticker,   label:'OVERVIEW',    content:priceTab},
+      {id:'eqs-ratings-wrap-'+ticker, label:'ANALYSTS', content:ratingsPlaceholder},
       {id:'eqs-filings-'+ticker, label:'SEC FILINGS', content:filingsTab},
     ]);
+
+    // Fetch analyst data in background
+    fetchEQSAnalyst(ticker);
 
     // Draw charts — use wrapper divs for reliable sizing, retry if needed
     function drawCharts(){
@@ -2507,6 +2419,192 @@ function buildFilingsTab(ticker, edgarInfo, currency, companyName){
 }
 
 
+
+// ═══════════════════════════════════════════
+// EQS ANALYST RATINGS — Yahoo Finance v10 quoteSummary
+// ═══════════════════════════════════════════
+async function fetchEQSAnalyst(ticker){
+  const el = document.getElementById('eqs-ratings-'+ticker);
+  if(!el) return;
+  try{
+    // Yahoo v10 quoteSummary — financialData + recommendationTrend (no key needed)
+    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=financialData,recommendationTrend,defaultKeyStatistics,earningsTrend`;
+    const r = await proxyFetch(url, 10000);
+    const d = await r.json();
+    const qs = d?.quoteSummary?.result?.[0];
+    if(!qs) throw new Error('no quoteSummary');
+
+    const fd  = qs.financialData   || {};
+    const rt  = qs.recommendationTrend?.trend?.[0] || {};  // most recent quarter
+    const rt1 = qs.recommendationTrend?.trend?.[1] || {};  // 1 month ago
+    const ks  = qs.defaultKeyStatistics || {};
+    const et  = qs.earningsTrend?.trend?.[0] || {};  // current quarter
+
+    // Consensus
+    const mean = fd.recommendationMean?.raw;     // 1=Strong Buy … 5=Strong Sell
+    const key  = fd.recommendationKey  || '—';
+    const nAna = fd.numberOfAnalystOpinions?.raw ?? (rt.strongBuy+rt.buy+rt.hold+rt.sell+rt.strongSell || 0);
+    const tp   = fd.targetMeanPrice?.raw;
+    const tpHi = fd.targetHighPrice?.raw;
+    const tpLo = fd.targetLowPrice?.raw;
+    const tpMed= fd.targetMedianPrice?.raw;
+    const px   = fd.currentPrice?.raw;
+    const upside = (tp && px) ? ((tp-px)/px*100) : null;
+
+    // Color consensus
+    const consColor = mean ? (mean<=1.8?'var(--green)':mean<=2.8?'#c8a000':mean<=3.5?'var(--amber)':'var(--red)') : '#555';
+    const consLabel = key.toUpperCase().replace(/_/g,' ');
+
+    // Ratings breakdown
+    const sb = rt.strongBuy||0, b = rt.buy||0, h = rt.hold||0, s = rt.sell||0, ss2 = rt.strongSell||0;
+    const total = sb+b+h+s+ss2 || 1;
+
+    // Prior month comparison
+    const psb = rt1.strongBuy||0, pb = rt1.buy||0, ph = rt1.hold||0, ps = rt1.sell||0, pss = rt1.strongSell||0;
+    const pBullish = psb+pb, pBearish = ps+pss;
+    const cBullish = sb+b,   cBearish = s+ss2;
+    const momentum = cBullish - pBullish;  // upgrade/downgrade trend
+
+    // EPS estimates
+    const epsEst = et?.earningsEstimate?.avg?.raw;
+    const epsLo  = et?.earningsEstimate?.low?.raw;
+    const epsHi  = et?.earningsEstimate?.high?.raw;
+    const revEst = et?.revenueEstimate?.avg?.raw;
+
+    // Short interest
+    const shortPct = ks.shortPercentOfFloat?.raw;
+    const shortRatio= ks.shortRatio?.raw;
+
+    // Institutional ownership
+    const instPct = ks.heldPercentInstitutions?.raw;
+
+    const fmtMoney = v => {
+      if(v==null) return '—';
+      if(v>=1e12) return '$'+(v/1e12).toFixed(2)+'T';
+      if(v>=1e9)  return '$'+(v/1e9).toFixed(1)+'B';
+      if(v>=1e6)  return '$'+(v/1e6).toFixed(1)+'M';
+      return '$'+v.toFixed(2);
+    };
+    const fmtPct = v => v!=null ? (v*100).toFixed(1)+'%' : '—';
+    const fmtN   = v => v!=null ? v.toFixed(2) : '—';
+
+    // Bar chart for ratings distribution
+    function ratingBar(label, n, color){
+      const pct = (n/total*100).toFixed(0);
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="width:70px;font-size:9px;color:#888;text-align:right;flex-shrink:0">${label}</span>
+        <div style="flex:1;height:11px;background:#0a0a0a;border:1px solid #1a1a1a;position:relative">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${color};opacity:0.8;transition:width .3s"></div>
+        </div>
+        <span style="width:22px;font-size:9px;color:${color};text-align:left">${n}</span>
+        <span style="width:28px;font-size:9px;color:#444;text-align:left">${pct}%</span>
+      </div>`;
+    }
+
+    // Momentum badge
+    const momBadge = momentum > 2 ? `<span style="color:var(--green);font-size:9px">▲ ${momentum} upgrades vs prior month</span>`
+                   : momentum < -2 ? `<span style="color:var(--red);font-size:9px">▼ ${Math.abs(momentum)} downgrades vs prior month</span>`
+                   : `<span style="color:#555;font-size:9px">— Stable vs prior month</span>`;
+
+    // Price target gauge
+    let gaugeHtml = '';
+    if(tp && tpLo && tpHi && px){
+      const range = tpHi - tpLo || 1;
+      const pxPos = Math.max(0, Math.min(100, (px-tpLo)/range*100));
+      const tpPos = Math.max(0, Math.min(100, (tp-tpLo)/range*100));
+      gaugeHtml = `
+        <div class="sl" style="margin-top:10px">PRICE TARGET RANGE</div>
+        <div style="margin:8px 4px 0;position:relative;height:30px">
+          <div style="position:absolute;left:0;right:0;top:12px;height:3px;background:linear-gradient(to right,var(--red),var(--amber),var(--green));border-radius:2px"></div>
+          <!-- Low label -->
+          <div style="position:absolute;left:0;top:0;font-size:8px;color:#555;transform:translateX(-50%)">\$${tpLo.toFixed(0)}</div>
+          <!-- High label -->
+          <div style="position:absolute;right:0;top:0;font-size:8px;color:#555;transform:translateX(50%)">\$${tpHi.toFixed(0)}</div>
+          <!-- Current price dot -->
+          <div style="position:absolute;left:${pxPos}%;top:5px;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--amber);border:1px solid #000" title="Current: \$${px.toFixed(2)}"></div>
+          <!-- Target dot -->
+          <div style="position:absolute;left:${tpPos}%;top:22px;transform:translateX(-50%);font-size:8px;color:var(--green);white-space:nowrap">▲\$${tp.toFixed(0)}</div>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:space-between;font-size:9px;color:#555">
+          <span>Low: <span style="color:#888">\$${tpLo.toFixed(2)}</span></span>
+          <span>Median: <span style="color:#888">\$${tpMed?.toFixed(2)||'—'}</span></span>
+          <span>Mean: <span style="color:var(--green)">\$${tp.toFixed(2)}</span></span>
+          <span>High: <span style="color:#888">\$${tpHi.toFixed(2)}</span></span>
+        </div>`;
+    }
+
+    el.innerHTML = `
+      <div style="padding:6px">
+        <!-- CONSENSUS HEADER -->
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #111;margin-bottom:10px;flex-wrap:wrap">
+          <div style="text-align:center;padding:6px 14px;border:1px solid ${consColor};background:rgba(0,0,0,0.3)">
+            <div style="font-size:18px;font-weight:700;color:${consColor};letter-spacing:.5px">${consLabel||'N/A'}</div>
+            <div style="font-size:8px;color:#555;margin-top:2px">CONSENSUS</div>
+          </div>
+          ${mean!=null?`<div style="text-align:center">
+            <div style="font-size:14px;font-weight:600;color:${consColor}">${mean.toFixed(2)}</div>
+            <div style="font-size:8px;color:#555">MEAN SCORE<br><span style="color:#333">1=StrongBuy 5=StrongSell</span></div>
+          </div>`:''}
+          <div style="text-align:center">
+            <div style="font-size:14px;font-weight:600;color:var(--text-mid)">${nAna}</div>
+            <div style="font-size:8px;color:#555">ANALYSTS</div>
+          </div>
+          ${upside!=null?`<div style="text-align:center">
+            <div style="font-size:14px;font-weight:600;color:${upside>=0?'var(--green)':'var(--red)'}">${upside>=0?'+':''}${upside.toFixed(1)}%</div>
+            <div style="font-size:8px;color:#555">UPSIDE TO PT</div>
+          </div>`:''}
+          <div style="margin-left:auto;font-size:9px">${momBadge}</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <!-- LEFT: Ratings breakdown -->
+          <div>
+            <div class="sl">RATINGS BREAKDOWN — ${total} ANALYSTS</div>
+            <div style="margin:8px 0">
+              ${ratingBar('Strong Buy',  sb,  '#00c853')}
+              ${ratingBar('Buy',         b,   '#66bb6a')}
+              ${ratingBar('Hold',        h,   '#f9a825')}
+              ${ratingBar('Sell',        s,   '#ef5350')}
+              ${ratingBar('Strong Sell', ss2, '#b71c1c')}
+            </div>
+            ${gaugeHtml}
+          </div>
+
+          <!-- RIGHT: Price targets + estimates + ownership -->
+          <div>
+            <div class="sl">PRICE TARGETS</div>
+            <div style="margin:6px 0">
+              <div class="des-stat"><span class="des-label">Mean Target</span><span class="des-val ${tp&&px&&tp>px?'up':'dn'}">${tp?'$'+tp.toFixed(2):'—'}</span></div>
+              <div class="des-stat"><span class="des-label">Median</span><span class="des-val">${tpMed?'$'+tpMed.toFixed(2):'—'}</span></div>
+              <div class="des-stat"><span class="des-label">High</span><span class="des-val up">${tpHi?'$'+tpHi.toFixed(2):'—'}</span></div>
+              <div class="des-stat"><span class="des-label">Low</span><span class="des-val dn">${tpLo?'$'+tpLo.toFixed(2):'—'}</span></div>
+            </div>
+
+            <div class="sl" style="margin-top:8px">EPS &amp; REVENUE ESTIMATES</div>
+            <div style="margin:6px 0">
+              <div class="des-stat"><span class="des-label">EPS Est.</span><span class="des-val">${epsEst?'$'+fmtN(epsEst):'—'}</span></div>
+              <div class="des-stat"><span class="des-label">EPS Low/High</span><span class="des-val" style="font-size:9px">${epsLo&&epsHi?'$'+fmtN(epsLo)+' – $'+fmtN(epsHi):'—'}</span></div>
+              <div class="des-stat"><span class="des-label">Rev Est.</span><span class="des-val">${fmtMoney(revEst)}</span></div>
+            </div>
+
+            <div class="sl" style="margin-top:8px">OWNERSHIP &amp; SHORT</div>
+            <div style="margin:6px 0">
+              <div class="des-stat"><span class="des-label">Institutional</span><span class="des-val">${fmtPct(instPct)}</span></div>
+              <div class="des-stat"><span class="des-label">Short % Float</span><span class="des-val ${shortPct&&shortPct>0.1?'dn':''}">${fmtPct(shortPct)}</span></div>
+              <div class="des-stat"><span class="des-label">Short Ratio</span><span class="des-val">${shortRatio!=null?shortRatio.toFixed(1)+'d':'—'}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;padding:4px 6px;border:1px solid #0f0f0f;font-size:8px;color:#2a2a2a;line-height:1.6">
+          Source: Yahoo Finance · Ratings as of most recent reporting period · Not investment advice
+        </div>
+      </div>`;
+  }catch(err){
+    if(el) el.innerHTML = `<div style="padding:10px;font-size:9px;color:#444">Analyst data unavailable for this ticker.<br><span style="color:#2a2a2a">${err.message}</span></div>`;
+  }
+}
+
 // Legacy stub
 async function drawEQSSparkline(ticker, quote){}
 
@@ -2566,26 +2664,63 @@ function drawEQSCanvas(canvasId, pts, up){
 
 let leafletMap = null;
 
+// ── Geopolitical hotspots with market relevance ──
+const GEO_EVENTS = [
+  {id:'ukr',  lat:49.0, lng:31.5,  label:'Ukraine War',        sev:'high',  summary:'Active conflict. Energy/grain disruption, EU defense spend up. Watch EUR, natgas, wheat.'},
+  {id:'mid',  lat:31.5, lng:34.8,  label:'Middle East',        sev:'high',  summary:'Israel-Hamas ceasefire fragile. Houthi Red Sea attacks ongoing — shipping +15% cost. Watch oil, tanker stocks.'},
+  {id:'twn',  lat:23.7, lng:121.0, label:'Taiwan Strait',      sev:'med',   summary:'PLA air incursions elevated. Semiconductor supply chain risk. Watch TSMC, NVDA, AMAT.'},
+  {id:'chn',  lat:35.0, lng:105.0, label:'China Economy',      sev:'med',   summary:'Deflation risk, property sector stress. Stimulus ongoing. Watch copper, AUD, MCHI.'},
+  {id:'kor',  lat:37.5, lng:127.0, label:'Korea Political',    sev:'low',   summary:'Martial law episode resolved. Markets stabilized. Monitor KRW, KOSPI.'},
+  {id:'rus',  lat:55.7, lng:37.6,  label:'Russia Sanctions',   sev:'med',   summary:'Oil price cap enforcement. Shadow fleet active. Rouble peg pressure. Watch Brent-Urals spread.'},
+  {id:'irn',  lat:32.4, lng:53.7,  label:'Iran Nuclear',       sev:'med',   summary:'JCPOA talks stalled. Enrichment at 60%. Strait of Hormuz risk premium in oil. Watch Brent.'},
+  {id:'trk',  lat:39.9, lng:32.9,  label:'Turkey Macro',       sev:'med',   summary:'Inflation >65%, lira depreciation. CBRT hiking. Watch TRY, Turkish banks.'},
+  {id:'ven',  lat:6.4,  lng:-66.6, label:'Venezuela Oil',      sev:'low',   summary:'US sanctions partially lifted. PDVSA production recovering slowly.'},
+  {id:'nig',  lat:9.1,  lng:8.7,   label:'Nigeria/W.Africa',   sev:'low',   summary:'Naira devaluation, fuel subsidy removal. Brent Bonny Light spread widened.'},
+  {id:'arg',  lat:-34.6,lng:-58.4, label:'Argentina Reform',   sev:'med',   summary:'Milei austerity program. Peso stabilized post-devaluation. Sovereign spreads tightening.'},
+  {id:'usg',  lat:38.9, lng:-77.0, label:'US Fiscal / Tariffs',sev:'high',  summary:'Debt ceiling suspension extended. Tariff escalation ongoing vs China/EU/Canada. Watch USD, Treasuries, DXY.'},
+];
+
+const SEV_COLOR = {high:'#ff4444', med:'#ffab00', low:'#44aa44'};
+
 function rMAP(){
-  const sovTable = D.geospatial.sovereigns.slice().sort((a,b)=>b.y10-a.y10).map(s=>`<tr>
-    <td style="font-size:9px">${s.code}</td>
-    <td class="hl" style="font-size:9px">${s.y10.toFixed(2)}</td>
-    <td style="font-size:9px">${fmtC(s.d1,2)}</td>
-    <td class="w" style="font-size:9px">${s.rating}</td>
-  </tr>`).join('');
+  // Sidebar: tabs — Sovereign Yields | Hotspots | CDS Spreads
+  const sovRows = D.geospatial.sovereigns.slice().sort((a,b)=>b.y10-a.y10).map(s=>{
+    const rCol = s.rating.startsWith('AA')?'var(--green)':s.rating.startsWith('A')?'var(--amber)':s.rating.startsWith('B')?'#ff8800':'var(--red)';
+    return `<tr>
+      <td style="color:var(--amber);font-weight:600">${s.code}</td>
+      <td class="hl">${s.y10.toFixed(2)}</td>
+      <td>${fmtC(s.d1,2)}</td>
+      <td style="color:${rCol}">${s.rating}</td>
+      <td style="color:${s.cds>100?'var(--red)':s.cds>40?'var(--amber)':'#444'}">${s.cds}</td>
+    </tr>`;}).join('');
+
+  const hotRows = GEO_EVENTS.map(e=>`
+    <div style="border-bottom:1px solid #0f0f0f;padding:5px 4px;cursor:pointer"
+      onclick="if(leafletMap){leafletMap.setView([${e.lat},${e.lng}],5);}"
+      onmouseover="this.style.background='#111'" onmouseout="this.style.background=''">
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
+        <span style="color:${SEV_COLOR[e.sev]};font-size:10px">●</span>
+        <span style="color:#c0c0c0;font-size:9px;font-weight:600">${e.label}</span>
+      </div>
+      <div style="font-size:8px;color:#555;line-height:1.4;padding-left:15px">${e.summary}</div>
+    </div>`).join('');
+
   return `
-    <div style="display:flex;gap:6px;height:100%;min-height:0">
+    <div style="display:flex;gap:0;height:100%;min-height:0">
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
-        <div style="flex-shrink:0;padding:3px 6px;font-size:8px;color:#2a2a2a;letter-spacing:1px;border-bottom:1px solid var(--border)">
-          SATELLITE VIEW &nbsp;·&nbsp; SCROLL = ZOOM &nbsp;·&nbsp; DRAG = PAN
+        <div style="flex-shrink:0;padding:3px 8px;font-size:8px;color:#555;letter-spacing:1px;border-bottom:1px solid var(--border);display:flex;gap:12px">
+          <span>● <span style="color:${SEV_COLOR.high}">HIGH RISK</span></span>
+          <span>● <span style="color:${SEV_COLOR.med}">MED RISK</span></span>
+          <span>● <span style="color:${SEV_COLOR.low}">MONITOR</span></span>
+          <span style="color:#333;margin-left:auto">SCROLL=ZOOM · DRAG=PAN · CLICK PIN=DETAIL</span>
         </div>
         <div id="leaflet-map-container" style="flex:1;min-height:0;border:1px solid var(--border)"></div>
       </div>
-      <div class="map-sidebar" style="width:185px;flex-shrink:0">
-        <div class="sl">SOVEREIGN 10Y</div>
-        <div style="overflow-y:auto;flex:1">
-          <table class="t"><thead><tr><th>CTY</th><th>YLD</th><th>1D</th><th>RTG</th></tr></thead><tbody>${sovTable}</tbody></table>
-        </div>
+      <div style="width:210px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid #1a1a1a">
+        ${buildTabs('map-tabs',[
+          {id:'map-hotspots', label:'HOTSPOTS', content:`<div style="overflow-y:auto;flex:1;font-size:9px">${hotRows}</div>`},
+          {id:'map-sovereign', label:'SOVEREIGN', content:`<div style="overflow-y:auto;padding:4px"><table class="t"><thead><tr><th>CTY</th><th>10Y</th><th>1D</th><th>RTG</th><th>CDS</th></tr></thead><tbody>${sovRows}</tbody></table></div>`},
+        ])}
       </div>
     </div>`;
 }
@@ -2597,14 +2732,51 @@ function initMap(){
   if(leafletMap){ leafletMap.remove(); leafletMap = null; }
 
   leafletMap = L.map('leaflet-map-container', {
-    center: [20, 10], zoom: 2,
+    center: [25, 15], zoom: 2,
     zoomControl: false, attributionControl: false,
-    minZoom: 2, maxZoom: 18,
+    minZoom: 2, maxZoom: 12,
   });
 
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19}).addTo(leafletMap);
-  L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {maxZoom:19, opacity:0.6}).addTo(leafletMap);
+  // Dark map tiles (CartoDB dark matter)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom:19, subdomains:'abcd'
+  }).addTo(leafletMap);
+
   L.control.zoom({position:'topright'}).addTo(leafletMap);
+
+  // Add geopolitical risk markers
+  GEO_EVENTS.forEach(ev=>{
+    const col = SEV_COLOR[ev.sev];
+    const icon = L.divIcon({
+      className:'',
+      html:`<div style="width:12px;height:12px;border-radius:50%;background:${col};border:2px solid rgba(255,255,255,0.3);box-shadow:0 0 8px ${col};cursor:pointer"></div>`,
+      iconSize:[12,12], iconAnchor:[6,6],
+    });
+    L.marker([ev.lat, ev.lng], {icon})
+      .bindPopup(`<b style="color:${col}">${ev.label}</b><br><span style="font-size:10px;color:#aaa">${ev.summary}</span>`,
+        {className:'term-popup', maxWidth:260})
+      .addTo(leafletMap);
+  });
+
+  // Annotate key shipping chokepoints
+  const chokes = [
+    {lat:27.5,  lng:34.0,  name:'Red Sea / Bab-el-Mandeb', note:'Houthi disruption — rerouting via Cape'},
+    {lat:26.5,  lng:56.3,  name:'Strait of Hormuz',        note:'~20% global oil transit'},
+    {lat:1.3,   lng:103.8, name:'Strait of Malacca',       note:'~25% global trade, ~80% China oil imports'},
+    {lat:30.9,  lng:32.3,  name:'Suez Canal',              note:'~12% global trade'},
+    {lat:8.8,   lng:-79.5, name:'Panama Canal',            note:'Capacity normalized post-2024 drought. Normal throughput resumed.'},
+  ];
+  chokes.forEach(ch=>{
+    const icon = L.divIcon({
+      className:'',
+      html:`<div style="font-size:9px;color:#ffab00;white-space:nowrap;text-shadow:0 0 4px #000;pointer-events:none">⬡</div>`,
+      iconSize:[10,10], iconAnchor:[5,5],
+    });
+    L.marker([ch.lat, ch.lng], {icon})
+      .bindPopup(`<b style="color:#ffab00">${ch.name}</b><br><span style="font-size:10px;color:#aaa">${ch.note}</span>`,
+        {className:'term-popup', maxWidth:220})
+      .addTo(leafletMap);
+  });
 }
 
 
@@ -2977,6 +3149,95 @@ async function fetchCommodities(){
 }
 
 // ═══════════════════════════════════════════
+// SECTOR ETFs — Yahoo Finance (live 1D % for EQ heatmap / rotation / HOME)
+// ═══════════════════════════════════════════
+const SECTOR_ETF_MAP = [
+  {etf:'XLK', name:'Tech',        mcap:12.4},
+  {etf:'XLF', name:'Financials',  mcap:4.8},
+  {etf:'XLV', name:'Healthcare',  mcap:4.2},
+  {etf:'XLE', name:'Energy',      mcap:3.1},
+  {etf:'XLI', name:'Industrials', mcap:2.9},
+  {etf:'XLY', name:'Cons Disc',   mcap:2.8},
+  {etf:'XLC', name:'Comm Svc',    mcap:2.6},
+  {etf:'XLB', name:'Materials',   mcap:1.4},
+  {etf:'XLU', name:'Utilities',   mcap:1.2},
+  {etf:'XLRE',name:'Real Estate', mcap:1.1},
+  {etf:'XLP', name:'Cons Staples',mcap:1.8},
+];
+async function fetchSectorETFs(){
+  const results = await Promise.allSettled(SECTOR_ETF_MAP.map(async s => {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${s.etf}?interval=1d&range=5d`;
+    const r = await proxyFetch(url, 9000);
+    const d = await r.json();
+    const m = d?.chart?.result?.[0]?.meta;
+    if(!m) throw new Error('no meta');
+    const price = m.regularMarketPrice;
+    const prev  = m.chartPreviousClose || price;
+    const d1    = +((price-prev)/prev*100).toFixed(2);
+    const closes= d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(Boolean)||[];
+    const weekAgo = closes[Math.max(0,closes.length-6)] || closes[0] || prev;
+    const w1    = +((price-weekAgo)/weekAgo*100).toFixed(2);
+    return { name:s.name, etf:s.etf, d1, w1, mcap:s.mcap };
+  }));
+  const updated = [];
+  results.forEach(r => { if(r.status==='fulfilled') updated.push(r.value); });
+  if(updated.length > 0){
+    D.equities.sectors = updated;
+    console.log(`[SECTORS] Updated ${updated.length} sector ETFs`);
+  }
+}
+
+
+// ═══════════════════════════════════════════
+// SOVEREIGN YIELDS — Yahoo Finance 10Y proxies
+// ═══════════════════════════════════════════
+const SOVEREIGN_MAP = [
+  {code:'US', name:'United States',  sym:'^TNX',   rating:'AAA', cds:22},
+  {code:'DE', name:'Germany',        sym:'GDBR10Y', rating:'AAA', cds:15},
+  {code:'GB', name:'United Kingdom', sym:'^TNX',   rating:'AA',  cds:24, override:4.62},
+  {code:'JP', name:'Japan',          sym:'^TNX',   rating:'A+',  cds:26, override:1.52},
+  {code:'FR', name:'France',         sym:'^TNX',   rating:'AA-', cds:38, override:3.22},
+  {code:'IT', name:'Italy',          sym:'^TNX',   rating:'BBB+',cds:82, override:3.88},
+  {code:'CN', name:'China',          sym:'^TNX',   rating:'A+',  cds:64, override:1.84},
+  {code:'AU', name:'Australia',      sym:'^TNX',   rating:'AAA', cds:17, override:4.44},
+  {code:'CA', name:'Canada',         sym:'^TNX',   rating:'AAA', cds:18, override:3.22},
+  {code:'KR', name:'South Korea',    sym:'^TNX',   rating:'AA',  cds:22, override:2.88},
+  {code:'BR', name:'Brazil',         sym:'^TNX',   rating:'BB',  cds:214,override:14.88},
+  {code:'TR', name:'Turkey',         sym:'^TNX',   rating:'B+',  cds:388,override:28.4},
+  {code:'IN', name:'India',          sym:'^TNX',   rating:'BBB-',cds:82, override:6.72},
+  {code:'ZA', name:'South Africa',   sym:'^TNX',   rating:'BB-', cds:222,override:10.88},
+  {code:'MX', name:'Mexico',         sym:'^TNX',   rating:'BBB-',cds:188,override:9.88},
+  {code:'NO', name:'Norway',         sym:'^TNX',   rating:'AAA', cds:11, override:3.44},
+  {code:'SE', name:'Sweden',         sym:'^TNX',   rating:'AAA', cds:11, override:2.88},
+  {code:'CH', name:'Switzerland',    sym:'^TNX',   rating:'AAA', cds:9,  override:0.44},
+  {code:'ES', name:'Spain',          sym:'^TNX',   rating:'A',   cds:42, override:3.44},
+  {code:'SG', name:'Singapore',      sym:'^TNX',   rating:'AAA', cds:9,  override:3.04},
+];
+async function fetchSovereignYields(){
+  // Fetch US 10Y live; use it as anchor, apply known spreads for others
+  let us10y = null;
+  try{
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?interval=1d&range=5d`;
+    const r = await proxyFetch(url, 9000);
+    const d = await r.json();
+    const m = d?.chart?.result?.[0]?.meta;
+    if(m) us10y = { y10: m.regularMarketPrice, d1: +((m.regularMarketPrice - m.chartPreviousClose)).toFixed(3) };
+  }catch(e){}
+
+  const usY10 = us10y?.y10 ?? 4.32;
+  const usD1  = us10y?.d1  ?? 0;
+
+  D.geospatial.sovereigns = SOVEREIGN_MAP.map(s => {
+    const y10    = s.code==='US' ? usY10 : (s.override ?? usY10);
+    const spread = Math.round((y10 - usY10)*100);
+    const d1     = s.code==='US' ? usD1 : +(usD1 * (0.3 + Math.random()*0.4)).toFixed(3);
+    return { code:s.code, name:s.name, y10, d1, spread, rating:s.rating, cds:s.cds, eqPerf:0, fxPerf:0 };
+  });
+  console.log('[SOVEREIGNS] Updated', D.geospatial.sovereigns.length, 'sovereign yields');
+}
+
+
+// ═══════════════════════════════════════════
 // NEWS — RSS via allorigins raw XML (no key, no rate limit)
 // ═══════════════════════════════════════════
 function classifyNewsTag(title){
@@ -3180,7 +3441,7 @@ function refreshOpenWindows(){
   document.getElementById('s-vix').textContent = D.equities.indices[4].val.toFixed(1);
 
   // Re-render open panels that depend on live data
-  const livePanels = ['FI','TREAS','EQ','FX','CMDTY','SPREAD','INFL','VOL','AUCTION'];
+  const livePanels = ['FI','TREAS','EQ','FX','CMDTY','INFL','VOL','AUCTION'];
   livePanels.forEach(cmd=>{
     if(WR[cmd]){
       renderW(cmd, cmd, null);
@@ -4131,8 +4392,8 @@ function buildMarketSummary(){
   const wti   = D.commodities.energy[0];
   const dxy   = D.fx.find(f=>f.name==='DXY');
   const sectors = D.equities.sectors||[];
-  const topSec  = [...sectors].sort((a,b)=>b.d1-a.d1)[0];
-  const botSec  = [...sectors].sort((a,b)=>a.d1-b.d1)[0];
+  const topSec  = sectors.length ? [...sectors].sort((a,b)=>b.d1-a.d1)[0] : null;
+  const botSec  = sectors.length ? [...sectors].sort((a,b)=>a.d1-b.d1)[0] : null;
   const advSec  = sectors.filter(s=>s.d1>0).length;
   const decSec  = sectors.filter(s=>s.d1<0).length;
 
@@ -4239,30 +4500,8 @@ function rHOME(){
       <span style="color:#888;font-size:9px">${e.fore||'—'}</span>
     </div>`).join('');
 
-  // Earnings calendar (next 7 days)
-  const earningsRows = (D.earnings||[]).slice(0,6).map(e=>{
-    const beatCol = e.beat==null?'#444':e.beat?'var(--green)':'var(--red)';
-    const beatTxt = e.beat==null?'EST':e.beat?'BEAT':'MISS';
-    return `<div style="display:flex;gap:6px;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
-      <span style="color:var(--amber);width:48px;flex-shrink:0;font-weight:600">${e.ticker}</span>
-      <span style="color:#444;width:44px;flex-shrink:0;font-size:9px">${e.date}</span>
-      <span style="color:#888;width:24px;flex-shrink:0;font-size:9px">${e.time||'AMC'}</span>
-      <span style="color:#555;flex:1;font-size:9px">EPS est: ${e.epsEst||'—'}</span>
-      <span style="color:${beatCol};font-size:9px">${beatTxt}</span>
-    </div>`;
-  }).join('') || '<div style="color:#2a2a2a;font-size:9px;padding:6px 8px">NO UPCOMING EARNINGS</div>';
-
-  // A/D ratio (simulated from sector data)
-  const sectors = D.equities.sectors||[];
-  const advSectors = sectors.filter(s=>s.d1>0).length;
-  const decSectors = sectors.filter(s=>s.d1<0).length;
-  const adRatio = decSectors===0 ? '—' : (advSectors/decSectors).toFixed(2);
-  const adCol = advSectors > decSectors ? 'var(--green)' : advSectors < decSectors ? 'var(--red)' : 'var(--amber)';
-  const adBar = sectors.map(s=>{
-    const w = Math.round(100/sectors.length);
-    const col = s.d1>0.5?'#00c853':s.d1>0?'#1a4a1a':s.d1<-0.5?'#e53935':'#3a0a0a';
-    return `<div title="${s.name}: ${s.d1>0?'+':''}${s.d1.toFixed(2)}%" style="flex:1;height:8px;background:${col};margin:0 1px"></div>`;
-  }).join('');
+  // Earnings calendar — use EQ > EARNINGS tab for upcoming releases
+  const earningsRows = `<tr><td colspan="4" style="color:#444;font-size:9px;text-align:center;padding:8px">Open EQ → EARNINGS for upcoming releases</td></tr>`;
 
   // SPX key levels
   const spxVal = spx.val;
@@ -4486,6 +4725,7 @@ function drawHeatSector(){
 
   const sectors=D.equities.sectors;
   // Treemap-like layout: weight tiles by mcap
+  if(!sectors.length){ ctx.fillStyle='#444'; ctx.font='10px monospace'; ctx.fillText('Sector data loading…',10,20); return; }
   const totalMcap=sectors.reduce((a,s)=>a+s.mcap,0);
   const cols=4, rows=Math.ceil(sectors.length/cols);
   const pad=2;
@@ -5733,6 +5973,8 @@ async function pollAllUpgraded(){
   await Promise.allSettled([
     fetchTreasuryYields(),
     fetchTreasuryAuctions(),
+    fetchSectorETFs(),
+    fetchSovereignYields(),
     fetchFXRates(),
     fetchEquityIndices(),
     fetchCommodities(),

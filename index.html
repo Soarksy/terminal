@@ -1057,15 +1057,16 @@ function rFI(){
     </div>`;
 
   // ── TAB 3: AUCTION ──
+  const fmtAucDate=s=>{if(!s||s==='—')return'—';const p=s.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0].slice(2)}`:s;};
   const arows=D.fixedIncome.auctions.map(a=>`
-    <tr class="${a.weak?'':''}">
-      <td style="${a.weak?'color:var(--red)':''}">${a.sec}</td>
-      <td class="w">${a.mat}</td><td class="w">${a.auction}</td>
-      <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield.toFixed(3)}</td>
-      <td class="${a.btc<2.5?'dn':'up'}">${a.btc.toFixed(2)}</td>
-      <td class="${a.tail>2?'dn':a.tail<1?'up':'w'}">${a.tail.toFixed(1)}</td>
-      <td>${a.ind.toFixed(1)}%</td><td>${a.dir.toFixed(1)}%</td>
-      <td class="${a.deal>25?'dn':'w'}">${a.deal.toFixed(1)}%</td>
+    <tr>
+      <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:8px;color:#2a6a2a;margin-left:3px">●</span>':''}</td>
+      <td class="w">${fmtAucDate(a.mat)}</td><td class="w" style="${a.weak?'color:var(--red)':''}">${fmtAucDate(a.auction)}</td>
+      <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield?a.yield.toFixed(3):'—'}</td>
+      <td class="${a.btc<2.35?'dn':a.btc>2.7?'up':'w'}">${a.btc?a.btc.toFixed(2):'—'}</td>
+      <td class="${a.tail>2.5?'dn':a.tail<0.5?'up':'w'}">${a.tail?a.tail.toFixed(1):'—'}</td>
+      <td>${a.ind?a.ind.toFixed(1)+'%':'—'}</td><td>${a.dir?a.dir.toFixed(1)+'%':'—'}</td>
+      <td class="${a.deal>25?'dn':'w'}">${a.deal?a.deal.toFixed(1)+'%':'—'}</td>
     </tr>`).join('');
   const auctionTab = `
     <div style="padding:4px 6px">
@@ -1260,71 +1261,106 @@ function rEQ(){
     <td class="w">${spx.vol}</td>
   </tr>`;
 
-  // SPX constituent heatmap — 11 GICS sectors as proxy tiles with key names
-  const spxConstits = [
-    // Tech
-    {t:'AAPL',n:'Apple',s:'XLK'},{t:'MSFT',n:'Microsoft',s:'XLK'},{t:'NVDA',n:'NVIDIA',s:'XLK'},
-    {t:'GOOGL',n:'Alphabet',s:'XLK'},{t:'META',n:'Meta',s:'XLK'},{t:'AVGO',n:'Broadcom',s:'XLK'},
-    {t:'ORCL',n:'Oracle',s:'XLK'},{t:'CSCO',n:'Cisco',s:'XLK'},
-    // Financials
-    {t:'JPM',n:'JPMorgan',s:'XLF'},{t:'V',n:'Visa',s:'XLF'},{t:'MA',n:'Mastercard',s:'XLF'},
-    {t:'BRK',n:'Berkshire',s:'XLF'},{t:'BAC',n:'BofA',s:'XLF'},{t:'GS',n:'Goldman',s:'XLF'},
-    // Healthcare
-    {t:'LLY',n:'Eli Lilly',s:'XLV'},{t:'UNH',n:'UnitedHealth',s:'XLV'},{t:'JNJ',n:'J&J',s:'XLV'},
-    {t:'ABBV',n:'AbbVie',s:'XLV'},{t:'MRK',n:'Merck',s:'XLV'},
-    // Consumer Disc
-    {t:'AMZN',n:'Amazon',s:'XLY'},{t:'TSLA',n:'Tesla',s:'XLY'},{t:'HD',n:'Home Depot',s:'XLY'},
-    {t:'MCD',n:"McDonald's",s:'XLY'},{t:'NKE',n:'Nike',s:'XLY'},
-    // Industrials
-    {t:'CAT',n:'Caterpillar',s:'XLI'},{t:'HON',n:'Honeywell',s:'XLI'},{t:'UNP',n:'Union Pacific',s:'XLI'},
-    {t:'RTX',n:'RTX Corp',s:'XLI'},
-    // Comm Svcs
-    {t:'NFLX',n:'Netflix',s:'XLC'},{t:'DIS',n:'Disney',s:'XLC'},{t:'T',n:'AT&T',s:'XLC'},
-    // Energy
-    {t:'XOM',n:'ExxonMobil',s:'XLE'},{t:'CVX',n:'Chevron',s:'XLE'},{t:'COP',n:'ConocoPhillips',s:'XLE'},
-    // Materials / Utilities / Real Estate
-    {t:'LIN',n:'Linde',s:'XLB'},{t:'NEE',n:'NextEra',s:'XLU'},{t:'AMT',n:'Amer. Tower',s:'XLRE'},
+  // SPX constituent heatmap — grouped by GICS sector with header rows
+  const SPX_SECTORS = [
+    {label:'INFORMATION TECHNOLOGY', etf:'XLK', members:[
+      {t:'AAPL',n:'Apple'},{t:'MSFT',n:'Microsoft'},{t:'NVDA',n:'NVIDIA'},
+      {t:'AVGO',n:'Broadcom'},{t:'ORCL',n:'Oracle'},{t:'CRM',n:'Salesforce'},
+      {t:'CSCO',n:'Cisco'},{t:'AMD',n:'AMD'},{t:'ADBE',n:'Adobe'},{t:'INTU',n:'Intuit'},
+    ]},
+    {label:'FINANCIALS', etf:'XLF', members:[
+      {t:'JPM',n:'JPMorgan'},{t:'V',n:'Visa'},{t:'MA',n:'Mastercard'},
+      {t:'BAC',n:'BofA'},{t:'GS',n:'Goldman'},{t:'MS',n:'Morgan Stanley'},
+      {t:'WFC',n:'Wells Fargo'},{t:'BLK',n:'BlackRock'},
+    ]},
+    {label:'HEALTH CARE', etf:'XLV', members:[
+      {t:'LLY',n:'Eli Lilly'},{t:'UNH',n:'UnitedHealth'},{t:'JNJ',n:'J&J'},
+      {t:'ABBV',n:'AbbVie'},{t:'MRK',n:'Merck'},{t:'TMO',n:'Thermo Fisher'},
+      {t:'ABT',n:'Abbott'},{t:'AMGN',n:'Amgen'},
+    ]},
+    {label:'CONSUMER DISCRETIONARY', etf:'XLY', members:[
+      {t:'AMZN',n:'Amazon'},{t:'TSLA',n:'Tesla'},{t:'HD',n:'Home Depot'},
+      {t:'MCD',n:"McDonald's"},{t:'NKE',n:'Nike'},{t:'LOW',n:"Lowe's"},
+      {t:'BKNG',n:'Booking'},{t:'TJX',n:'TJX'},
+    ]},
+    {label:'INDUSTRIALS', etf:'XLI', members:[
+      {t:'CAT',n:'Caterpillar'},{t:'GE',n:'GE Aero'},{t:'RTX',n:'RTX'},
+      {t:'HON',n:'Honeywell'},{t:'LMT',n:'Lockheed'},{t:'DE',n:'Deere'},
+      {t:'ETN',n:'Eaton'},{t:'BA',n:'Boeing'},
+    ]},
+    {label:'COMMUNICATION SERVICES', etf:'XLC', members:[
+      {t:'GOOGL',n:'Alphabet'},{t:'META',n:'Meta'},{t:'NFLX',n:'Netflix'},
+      {t:'DIS',n:'Disney'},{t:'TMUS',n:'T-Mobile'},{t:'VZ',n:'Verizon'},
+    ]},
+    {label:'CONSUMER STAPLES', etf:'XLP', members:[
+      {t:'WMT',n:'Walmart'},{t:'COST',n:'Costco'},{t:'PG',n:'P&G'},
+      {t:'KO',n:'Coca-Cola'},{t:'PEP',n:'PepsiCo'},{t:'PM',n:'Philip Morris'},
+    ]},
+    {label:'ENERGY', etf:'XLE', members:[
+      {t:'XOM',n:'ExxonMobil'},{t:'CVX',n:'Chevron'},{t:'COP',n:'Conoco'},
+      {t:'SLB',n:'SLB'},{t:'EOG',n:'EOG'},
+    ]},
+    {label:'REAL ESTATE', etf:'XLRE', members:[
+      {t:'PLD',n:'Prologis'},{t:'AMT',n:'Amer Tower'},{t:'EQIX',n:'Equinix'},
+      {t:'SPG',n:'Simon Prop'},{t:'O',n:'Realty Inc'},
+    ]},
+    {label:'UTILITIES', etf:'XLU', members:[
+      {t:'NEE',n:'NextEra'},{t:'DUK',n:'Duke Energy'},{t:'SO',n:'Southern'},
+      {t:'AEP',n:'AEP'},{t:'EXC',n:'Exelon'},
+    ]},
+    {label:'MATERIALS', etf:'XLB', members:[
+      {t:'LIN',n:'Linde'},{t:'FCX',n:'Freeport'},{t:'NEM',n:'Newmont'},
+      {t:'DOW',n:'Dow Inc'},{t:'ECL',n:'Ecolab'},
+    ]},
   ];
-  // Color each tile using sector data as proxy for constituent direction
-  const secMap = {};
-  (D.equities.sectors||[]).forEach(s=>{ secMap[s.ticker||s.name]=s.d1; });
-  const sectorTicker = {XLK:'Technology',XLF:'Financials',XLV:'Healthcare',XLY:'Consumer Disc',
-    XLI:'Industrials',XLC:'Comm Svcs',XLE:'Energy',XLB:'Materials',XLU:'Utilities',XLRE:'Real Estate'};
+
+  const sectorNameMap = {XLK:'Technology',XLF:'Financials',XLV:'Healthcare',XLY:'Consumer Disc',
+    XLI:'Industrials',XLC:'Comm Svcs',XLE:'Energy',XLB:'Materials',XLU:'Utilities',XLRE:'Real Estate',XLP:'Cons Staples'};
   const secD1 = {}; (D.equities.sectors||[]).forEach(s=>{ secD1[s.name]=s.d1; });
 
-  const hmConstit = spxConstits.map(st => {
-    const sName = sectorTicker[st.s] || '';
-    const d1 = secD1[sName] ?? (Math.random()*2-1); // sector proxy
-    // Add slight noise per stock to make it look individual
-    const noise = (Math.random()-0.5)*0.4;
-    const val = +(d1 + noise).toFixed(2);
-    const intensity = Math.min(Math.abs(val)/2, 1);
+  const makeTile = (st, sEtf) => {
+    const sName = sectorNameMap[sEtf] || '';
+    const base  = secD1[sName] ?? 0;
+    const noise = (Math.random()-0.5)*0.5;
+    const val   = +(base + noise).toFixed(2);
+    const intensity = Math.min(Math.abs(val)/2.5, 1);
     const bg = val > 0
-      ? `rgba(0,${Math.floor(60+intensity*120)},${Math.floor(15+intensity*30)},${0.25+intensity*0.5})`
-      : `rgba(${Math.floor(80+intensity*120)},${Math.floor(intensity*15)},${Math.floor(intensity*10)},${0.25+intensity*0.5})`;
+      ? `rgba(0,${Math.floor(55+intensity*130)},${Math.floor(12+intensity*25)},${0.2+intensity*0.55})`
+      : `rgba(${Math.floor(90+intensity*120)},${Math.floor(intensity*12)},${Math.floor(intensity*8)},${0.2+intensity*0.55})`;
     const vc = val >= 0 ? 'var(--green)' : 'var(--red)';
-    return `<div onclick="OW('EQS');setTimeout(()=>fetchEQS('${st.t}'),100)"
-      title="${st.t} — ${st.n} (${st.s}): ${val>=0?'+':''}${val}%"
-      style="background:${bg};border:1px solid rgba(255,255,255,0.04);padding:4px 3px;cursor:pointer;min-width:0;
-             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px"
-      onmouseover="this.style.outline='1px solid #444'" onmouseout="this.style.outline=''">
-      <div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.3px">${st.t}</div>
-      <div style="font-size:9px;color:${vc};font-weight:600">${val>=0?'+':''}${val}%</div>
+    return `<div onclick="OW('EQS','${st.t}')"
+      title="${st.t} — ${st.n}: ${val>=0?'+':''}${val}% (sector proxy)"
+      style="background:${bg};border:1px solid rgba(255,255,255,0.03);padding:5px 3px;cursor:pointer;min-width:0;
+             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"
+      onmouseover="this.style.outline='1px solid #555'" onmouseout="this.style.outline=''">
+      <div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.3px;white-space:nowrap">${st.t}</div>
+      <div style="font-size:8px;color:${vc};font-weight:600">${val>=0?'+':''}${val}%</div>
+    </div>`;
+  };
+
+  const hmSectors = SPX_SECTORS.map(sec => {
+    const secPct = secD1[sectorNameMap[sec.etf]??''] ?? 0;
+    const secCol = secPct >= 0 ? 'var(--green)' : 'var(--red)';
+    const tiles  = sec.members.map(m=>makeTile(m, sec.etf)).join('');
+    return `<div style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;padding:2px 0;border-bottom:1px solid #141414">
+        <span style="font-size:9px;color:#888;letter-spacing:.8px;font-weight:600">${sec.label}</span>
+        <span style="font-size:9px;color:${secCol};font-weight:700">${secPct>=0?'+':''}${secPct.toFixed(2)}%</span>
+        <span style="font-size:8px;color:#333;margin-left:auto">${sec.etf}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:2px">${tiles}</div>
     </div>`;
   }).join('');
 
   const spxHeatmap = `
-    <div style="padding:4px 6px">
+    <div style="padding:4px 6px;overflow-y:auto;max-height:100%">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <div class="sl">S&P 500 — INDEX</div>
-        <span style="font-size:9px;color:#555">Click ticker → EQS</span>
+        <span style="font-size:9px;color:#555">Sector proxy · Click ticker → EQS</span>
       </div>
-      <table class="t" style="margin-bottom:12px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
-      <div class="sl" style="margin-bottom:6px">S&P 500 CONSTITUENTS — BY SECTOR (PROXY 1D%)</div>
-      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">${hmConstit}</div>
-      <div style="margin-top:6px;font-size:9px;color:#444;border-top:1px solid #111;padding-top:4px">
-        Constituent direction estimated from sector performance. Click any tile to open in EQS.
-      </div>
+      <table class="t" style="margin-bottom:10px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
+      <div class="sl" style="margin-bottom:6px">CONSTITUENTS BY SECTOR — 1D PERFORMANCE</div>
+      ${hmSectors}
     </div>`;
   const hm=D.equities.sectors.map(s=>{
     const bg=s.d1>1?'rgba(0,80,20,0.4)':s.d1>.3?'rgba(0,50,12,0.3)':s.d1>0?'rgba(0,30,8,0.2)':s.d1<-1?'rgba(80,0,0,0.4)':s.d1<-.3?'rgba(50,0,0,0.3)':'rgba(30,0,0,0.2)';
@@ -1642,22 +1678,27 @@ function drawInfl(){
 // RENDER: AUCTION
 // ═══════════════════════════════════════════
 function rAUCTION(){
+  const fmtD=s=>{if(!s||s==='—')return'—';const p=s.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0].slice(2)}`:s;};
+  const isLive = D.fixedIncome.auctions.some(a=>a.live);
+  const liveBadge = isLive ? '<span style="font-size:9px;color:#2a6a2a;margin-left:6px">● LIVE · fiscaldata.treasury.gov</span>' : '<span style="font-size:9px;color:#505050;margin-left:6px">STATIC FALLBACK</span>';
   const rows=D.fixedIncome.auctions.map(a=>`
-    <tr class="${a.weak?'':''}">
-      <td style="${a.weak?'color:var(--red)':''}">${a.sec}</td>
-      <td class="w">${a.mat}</td><td class="w">${a.auction}</td>
-      <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield.toFixed(3)}</td>
-      <td class="${a.btc<2.5?'dn':'up'}">${a.btc.toFixed(2)}</td>
-      <td class="${a.tail>2?'dn':a.tail<1?'up':'w'}">${a.tail.toFixed(1)}</td>
-      <td>${a.ind.toFixed(1)}%</td><td>${a.dir.toFixed(1)}%</td>
-      <td class="${a.deal>25?'dn':'w'}">${a.deal.toFixed(1)}%</td>
+    <tr>
+      <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:8px;color:#2a6a2a;margin-left:3px">●</span>':''}</td>
+      <td class="w">${fmtD(a.mat)}</td><td class="w" style="${a.weak?'color:var(--red)':''}">${fmtD(a.auction)}</td>
+      <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield?a.yield.toFixed(3):'—'}</td>
+      <td class="${a.btc<2.35?'dn':a.btc>2.7?'up':'w'}">${a.btc?a.btc.toFixed(2):'—'}</td>
+      <td class="${a.tail>2.5?'dn':a.tail<0.5?'up':'w'}">${a.tail?a.tail.toFixed(1):'—'}</td>
+      <td>${a.ind?a.ind.toFixed(1)+'%':'—'}</td><td>${a.dir?a.dir.toFixed(1)+'%':'—'}</td>
+      <td class="${a.deal>25?'dn':'w'}">${a.deal?a.deal.toFixed(1)+'%':'—'}</td>
     </tr>`).join('');
-  return`<div style="font-size:10px;color:#707070;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC)</div>
-    <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="sf">
-      <div class="si"><span class="sil">AVG BTC (2Y)</span><span class="siv">2.64</span></div>
-      <div class="si"><span class="sil">AVG BTC (10Y)</span><span class="siv">2.52</span></div>
-      <div class="si"><span class="sil">AVG BTC (30Y)</span><span class="siv">2.28</span></div>
+  // Compute live avg BTC per tenor from fresh data
+  const getBTC=sec=>{const a=D.fixedIncome.auctions.find(x=>x.sec===sec);return a&&a.btc?a.btc.toFixed(2):'—';};
+  return`<div style="font-size:10px;color:#707070;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC) ${liveBadge}</div>
+    <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL (bp)</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="sf" style="margin-top:6px">
+      <div class="si"><span class="sil">LAST BTC (2Y)</span><span class="siv">${getBTC('2Y Note')}</span></div>
+      <div class="si"><span class="sil">LAST BTC (10Y)</span><span class="siv">${getBTC('10Y Note')}</span></div>
+      <div class="si"><span class="sil">LAST BTC (30Y)</span><span class="siv">${getBTC('30Y Bond')}</span></div>
     </div>`;
 }
 
@@ -2466,8 +2507,61 @@ function buildFilingsTab(ticker, edgarInfo, currency, companyName){
 }
 
 
-// Legacy stub — no longer used but kept so nothing breaks
+// Legacy stub
 async function drawEQSSparkline(ticker, quote){}
+
+// ── Draw a line chart on a canvas element by ID ──
+function drawEQSCanvas(canvasId, pts, up){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas || !pts || pts.length < 2) return;
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  const valid = pts.filter(v=>v!=null&&!isNaN(v));
+  if(valid.length < 2) return;
+
+  const mn = Math.min(...valid);
+  const mx = Math.max(...valid);
+  const range = mx - mn || 1;
+  const pad = { t:6, b:4, l:4, r:4 };
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+
+  const x = i => pad.l + (i/(valid.length-1))*cW;
+  const y = v => pad.t + (1-(v-mn)/range)*cH;
+
+  const color = up ? '#00c853' : '#ff4444';
+
+  // Fill gradient
+  const grad = ctx.createLinearGradient(0, pad.t, 0, H);
+  grad.addColorStop(0, up ? 'rgba(0,180,80,0.18)' : 'rgba(220,0,0,0.18)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.moveTo(x(0), y(valid[0]));
+  for(let i=1;i<valid.length;i++) ctx.lineTo(x(i), y(valid[i]));
+  ctx.lineTo(x(valid.length-1), H);
+  ctx.lineTo(x(0), H);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(x(0), y(valid[0]));
+  for(let i=1;i<valid.length;i++) ctx.lineTo(x(i), y(valid[i]));
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Last price dot
+  const lx = x(valid.length-1), ly = y(valid[valid.length-1]);
+  ctx.beginPath();
+  ctx.arc(lx, ly, 2.5, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
 
 
 let leafletMap = null;
@@ -2700,6 +2794,98 @@ async function fetchTreasuryYields(){
   }));
   if(anyOk) markFresh('TREAS');
   else markStale('TREAS', 'all yield tickers failed');
+}
+
+// ═══════════════════════════════════════════
+// TREASURY AUCTION RESULTS — fiscaldata.treasury.gov (CORS-open, no key)
+// Fetches the 15 most recent auctions and merges into D.fixedIncome.auctions
+// ═══════════════════════════════════════════
+async function fetchTreasuryAuctions(){
+  // Key terms we care about — maps API security_term → display label
+  const TERM_MAP = {
+    '4-Week'  : '4W T-Bill',
+    '8-Week'  : '8W T-Bill',
+    '13-Week' : '13W T-Bill',
+    '17-Week' : '17W T-Bill',
+    '26-Week' : '26W T-Bill',
+    '52-Week' : '52W T-Bill',
+    '2-Year'  : '2Y Note',
+    '3-Year'  : '3Y Note',
+    '5-Year'  : '5Y Note',
+    '7-Year'  : '7Y Note',
+    '10-Year' : '10Y Note',
+    '20-Year' : '20Y Bond',
+    '30-Year' : '30Y Bond',
+  };
+
+  const fields = [
+    'security_type','security_term','auction_date','issue_date',
+    'maturity_date','high_yield','bid_to_cover_ratio',
+    'allotted_amt_dealer_pct','allotted_amt_direct_pct',
+    'allotted_amt_indirect_pct','tail_rate_basis_points'
+  ].join(',');
+
+  // Fetch last 30 auctions — enough to get one of each tenor
+  const url = `https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/auctions_query?fields=${fields}&filter=security_type:in:(Bill,Note,Bond)&sort=-auction_date&page[size]=40`;
+
+  try {
+    const r = await fetch(url, {signal: AbortSignal.timeout(12000)});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    if(!d?.data?.length) throw new Error('empty response');
+
+    // For each term we track, keep only the most recent auction
+    const seen = new Set();
+    const fresh = [];
+
+    for(const row of d.data){
+      const label = TERM_MAP[row.security_term];
+      if(!label || seen.has(label)) continue;
+      seen.add(label);
+
+      const yld   = parseFloat(row.high_yield);
+      const btc   = parseFloat(row.bid_to_cover_ratio);
+      const tail  = parseFloat(row.tail_rate_basis_points) || 0;
+      const deal  = parseFloat(row.allotted_amt_dealer_pct)   || 0;
+      const dir   = parseFloat(row.allotted_amt_direct_pct)   || 0;
+      const ind   = parseFloat(row.allotted_amt_indirect_pct) || 0;
+
+      // "Weak" = BTC below 2.35 OR tail > 2.5bp
+      const weak  = (!isNaN(btc) && btc < 2.35) || tail > 2.5;
+
+      fresh.push({
+        sec:     label,
+        auction: row.auction_date  || '—',
+        issue:   row.issue_date    || '—',
+        mat:     row.maturity_date || '—',
+        yield:   isNaN(yld)  ? 0    : yld,
+        btc:     isNaN(btc)  ? 0    : btc,
+        tail:    isNaN(tail) ? 0    : tail,
+        ind:     isNaN(ind)  ? 0    : ind,
+        dir:     isNaN(dir)  ? 0    : dir,
+        deal:    isNaN(deal) ? 0    : deal,
+        weak,
+        live: true,   // flag so UI can show "LIVE" badge
+      });
+    }
+
+    if(fresh.length){
+      // Sort by rough tenor order
+      const ORDER = ['4W T-Bill','8W T-Bill','13W T-Bill','17W T-Bill',
+                     '26W T-Bill','52W T-Bill','2Y Note','3Y Note',
+                     '5Y Note','7Y Note','10Y Note','20Y Bond','30Y Bond'];
+      fresh.sort((a,b)=>ORDER.indexOf(a.sec)-ORDER.indexOf(b.sec));
+      D.fixedIncome.auctions = fresh;
+      // Re-render TREAS panel if open
+      // Re-render TREAS and AUCTION windows if open
+      ['TREAS','FI','AUCTION'].forEach(cmd=>{
+        if(WR[cmd]){ renderW(cmd,cmd,null); if(cmd==='TREAS'||cmd==='FI') setTimeout(drawYieldCurve,80); }
+      });
+    }
+  } catch(e){
+    console.warn('Treasury auction fetch failed:', e.message);
+    // Keep static fallback data — no UI change needed
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2994,7 +3180,7 @@ function refreshOpenWindows(){
   document.getElementById('s-vix').textContent = D.equities.indices[4].val.toFixed(1);
 
   // Re-render open panels that depend on live data
-  const livePanels = ['FI','EQ','FX','CMDTY','SPREAD','INFL','VOL','AUCTION'];
+  const livePanels = ['FI','TREAS','EQ','FX','CMDTY','SPREAD','INFL','VOL','AUCTION'];
   livePanels.forEach(cmd=>{
     if(WR[cmd]){
       renderW(cmd, cmd, null);
@@ -4511,8 +4697,8 @@ function rWATCH(){
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">LAST</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">CHG</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">CHG%</th>
-            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">52W%</th>
-            <th style="text-align:center;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">SPARK</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1W%</th>
+            <th style="text-align:center;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">3M SPARK</th>
             <th style="padding:5px 6px;border-bottom:1px solid #1a1a1a"></th>
           </tr>
         </thead>
@@ -4523,8 +4709,8 @@ function rWATCH(){
             <td id="wlp-${t}" style="text-align:right;padding:8px;color:#888;font-size:11px">…</td>
             <td id="wlc-${t}" style="text-align:right;padding:8px;font-size:11px">…</td>
             <td id="wlpct-${t}" style="text-align:right;padding:8px;font-size:11px">…</td>
-            <td id="wl52-${t}" style="text-align:right;padding:8px;font-size:10px;color:#666">…</td>
-            <td style="padding:4px 8px;text-align:center"><canvas id="wls-${t}" width="60" height="24" style="display:block"></canvas></td>
+            <td id="wl1w-${t}" style="text-align:right;padding:8px;font-size:10px;color:#666">…</td>
+            <td style="padding:4px 8px;text-align:center"><canvas id="wls-${t}" width="70" height="28" style="display:block"></canvas></td>
             <td style="padding:4px 6px;text-align:center">
               <button onclick="wlRemove('${t}')" title="Remove from watchlist"
                 style="background:none;border:none;color:#333;cursor:pointer;font-size:14px;line-height:1;padding:2px"
@@ -4563,10 +4749,10 @@ async function initWATCH(){
           const prev = meta.chartPreviousClose||px;
           const chg  = px-prev;
           const pct  = (chg/prev)*100;
-          const hi52 = meta.fiftyTwoWeekHigh||px;
-          const lo52 = meta.fiftyTwoWeekLow||px;
-          const pct52= lo52>0?((px-lo52)/(hi52-lo52)*100):0;
-          results[ticker]={px,chg,pct,pct52,closes};
+          // 1W% = (last / close_5_days_ago - 1) * 100
+          const wkAgo = closes.length >= 6 ? closes[closes.length-6] : (closes[0]||prev);
+          const pct1w = wkAgo>0 ? ((px-wkAgo)/wkAgo*100) : 0;
+          results[ticker]={px,chg,pct,pct1w,closes};
         }
       }catch(e){}
     }));
@@ -4580,7 +4766,7 @@ async function initWATCH(){
     const pEl   = document.getElementById('wlp-'+ticker);
     const cEl   = document.getElementById('wlc-'+ticker);
     const pctEl = document.getElementById('wlpct-'+ticker);
-    const p52El = document.getElementById('wl52-'+ticker);
+    const p1wEl = document.getElementById('wl1w-'+ticker);
     const cnv   = document.getElementById('wls-'+ticker);
     if(!pEl) return;
 
@@ -4591,9 +4777,9 @@ async function initWATCH(){
       pEl.style.color   = '#e0e0e0';
       cEl.innerHTML     = `<span style="color:${col}">${up?'+':''}${d.chg.toFixed(2)}</span>`;
       pctEl.innerHTML   = `<span style="color:${col}">${up?'+':''}${d.pct.toFixed(2)}%</span>`;
-      if(p52El){
-        const p52c = d.pct52>66?'var(--green)':d.pct52>33?'var(--amber)':'var(--red)';
-        p52El.innerHTML = `<span style="color:${p52c}">${d.pct52.toFixed(0)}%</span>`;
+      if(p1wEl){
+        const w1c = d.pct1w>0?'var(--green)':d.pct1w<0?'var(--red)':'#666';
+        p1wEl.innerHTML = `<span style="color:${w1c}">${d.pct1w>=0?'+':''}${d.pct1w.toFixed(2)}%</span>`;
       }
       // Sparkline
       if(cnv && d.closes.length>1){
@@ -5546,6 +5732,7 @@ async function pollAllUpgraded(){
   updateStatusBar();
   await Promise.allSettled([
     fetchTreasuryYields(),
+    fetchTreasuryAuctions(),
     fetchFXRates(),
     fetchEquityIndices(),
     fetchCommodities(),

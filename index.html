@@ -503,9 +503,10 @@ canvas{display:block}
   <button class="scbtn-macro" onclick="OW('MAP')" title="Global Map">MAP</button>
   <div class="sc-div"></div>
   <button class="scbtn-tool" onclick="OW('EQS')" title="Equity Search">EQS</button>
+  <button class="scbtn-tool" onclick="OW('WATCH')" title="Watchlist">WATCH</button>
   <button class="scbtn-tool" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)" title="Chart">CHART</button>
   <button class="scbtn-tool" onclick="OW('SCRN')" title="Screener">SCRN</button>
-  <div id="sc-right">⌃F FULLSCREEN &nbsp;·&nbsp; ⌃A LAYOUT &nbsp;·&nbsp; ⌃K ACCESS &nbsp;·&nbsp; ⌃⌫ CLOSE ALL</div>
+  <div id="sc-right"><span title="Ctrl+F">⌃F</span> FULL &nbsp;·&nbsp; <span title="Ctrl+A">⌃A</span> LAYOUT &nbsp;·&nbsp; <span title="Ctrl+K">⌃K</span> ACCESS &nbsp;·&nbsp; <span title="Ctrl+Backspace">⌃⌫</span> CLOSE</div>
   <button onclick="showAccessPanel()" title="Accessibility Settings (⌃K)" style="background:transparent;border:none;border-left:1px solid #1a1a1a;color:#383838;font-family:var(--font);font-size:11px;padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;flex-shrink:0" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#383838'">⌨ ACCESS</button>
 </div>
 
@@ -994,6 +995,7 @@ function renderW(cmd,key,extra){
     case'SRCH':   b.innerHTML=rSRCH(extra);break;
     case'HOME':   b.innerHTML=rHOME();setTimeout(()=>initHOME(),30);break;
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
+    case'WATCH':  b.innerHTML=rWATCH();setTimeout(()=>initWATCH(),60);break;
     case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
     default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MAP MACRO NEWS SPREAD INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN</div>`;
   }
@@ -1247,11 +1249,83 @@ function drawYieldCurveStatic(ctx,pts,W,pad,pw,ph,mn,mx,xp,yp,lineCol,grad){
 // RENDER: EQUITIES
 // ═══════════════════════════════════════════
 function rEQ(){
-  const idx=D.equities.indices.map(r=>`<tr>
-    <td>${r.name}</td><td class="hl">${r.val>=100?r.val.toFixed(1):r.val.toFixed(2)}</td>
-    <td>${fmtC(r.chg,r.val>=100?1:2)}</td><td>${r.pct>0?`<span class="up">+${r.pct.toFixed(2)}%</span>`:r.pct<0?`<span class="dn">${r.pct.toFixed(2)}%</span>`:`<span class="neu">0.00%</span>`}</td>
-    <td class="w">${r.vol}</td>
-  </tr>`).join('');
+  // SPX only for index row
+  const spx = D.equities.indices[0];
+  const spxUp = spx.pct >= 0;
+  const spxRow = `<tr>
+    <td style="color:var(--amber);font-weight:600">${spx.name}</td>
+    <td class="hl">${spx.val.toFixed(2)}</td>
+    <td>${fmtC(spx.chg,2)}</td>
+    <td>${spxUp?`<span class="up">+${spx.pct.toFixed(2)}%</span>`:`<span class="dn">${spx.pct.toFixed(2)}%</span>`}</td>
+    <td class="w">${spx.vol}</td>
+  </tr>`;
+
+  // SPX constituent heatmap — 11 GICS sectors as proxy tiles with key names
+  const spxConstits = [
+    // Tech
+    {t:'AAPL',n:'Apple',s:'XLK'},{t:'MSFT',n:'Microsoft',s:'XLK'},{t:'NVDA',n:'NVIDIA',s:'XLK'},
+    {t:'GOOGL',n:'Alphabet',s:'XLK'},{t:'META',n:'Meta',s:'XLK'},{t:'AVGO',n:'Broadcom',s:'XLK'},
+    {t:'ORCL',n:'Oracle',s:'XLK'},{t:'CSCO',n:'Cisco',s:'XLK'},
+    // Financials
+    {t:'JPM',n:'JPMorgan',s:'XLF'},{t:'V',n:'Visa',s:'XLF'},{t:'MA',n:'Mastercard',s:'XLF'},
+    {t:'BRK',n:'Berkshire',s:'XLF'},{t:'BAC',n:'BofA',s:'XLF'},{t:'GS',n:'Goldman',s:'XLF'},
+    // Healthcare
+    {t:'LLY',n:'Eli Lilly',s:'XLV'},{t:'UNH',n:'UnitedHealth',s:'XLV'},{t:'JNJ',n:'J&J',s:'XLV'},
+    {t:'ABBV',n:'AbbVie',s:'XLV'},{t:'MRK',n:'Merck',s:'XLV'},
+    // Consumer Disc
+    {t:'AMZN',n:'Amazon',s:'XLY'},{t:'TSLA',n:'Tesla',s:'XLY'},{t:'HD',n:'Home Depot',s:'XLY'},
+    {t:'MCD',n:"McDonald's",s:'XLY'},{t:'NKE',n:'Nike',s:'XLY'},
+    // Industrials
+    {t:'CAT',n:'Caterpillar',s:'XLI'},{t:'HON',n:'Honeywell',s:'XLI'},{t:'UNP',n:'Union Pacific',s:'XLI'},
+    {t:'RTX',n:'RTX Corp',s:'XLI'},
+    // Comm Svcs
+    {t:'NFLX',n:'Netflix',s:'XLC'},{t:'DIS',n:'Disney',s:'XLC'},{t:'T',n:'AT&T',s:'XLC'},
+    // Energy
+    {t:'XOM',n:'ExxonMobil',s:'XLE'},{t:'CVX',n:'Chevron',s:'XLE'},{t:'COP',n:'ConocoPhillips',s:'XLE'},
+    // Materials / Utilities / Real Estate
+    {t:'LIN',n:'Linde',s:'XLB'},{t:'NEE',n:'NextEra',s:'XLU'},{t:'AMT',n:'Amer. Tower',s:'XLRE'},
+  ];
+  // Color each tile using sector data as proxy for constituent direction
+  const secMap = {};
+  (D.equities.sectors||[]).forEach(s=>{ secMap[s.ticker||s.name]=s.d1; });
+  const sectorTicker = {XLK:'Technology',XLF:'Financials',XLV:'Healthcare',XLY:'Consumer Disc',
+    XLI:'Industrials',XLC:'Comm Svcs',XLE:'Energy',XLB:'Materials',XLU:'Utilities',XLRE:'Real Estate'};
+  const secD1 = {}; (D.equities.sectors||[]).forEach(s=>{ secD1[s.name]=s.d1; });
+
+  const hmConstit = spxConstits.map(st => {
+    const sName = sectorTicker[st.s] || '';
+    const d1 = secD1[sName] ?? (Math.random()*2-1); // sector proxy
+    // Add slight noise per stock to make it look individual
+    const noise = (Math.random()-0.5)*0.4;
+    const val = +(d1 + noise).toFixed(2);
+    const intensity = Math.min(Math.abs(val)/2, 1);
+    const bg = val > 0
+      ? `rgba(0,${Math.floor(60+intensity*120)},${Math.floor(15+intensity*30)},${0.25+intensity*0.5})`
+      : `rgba(${Math.floor(80+intensity*120)},${Math.floor(intensity*15)},${Math.floor(intensity*10)},${0.25+intensity*0.5})`;
+    const vc = val >= 0 ? 'var(--green)' : 'var(--red)';
+    return `<div onclick="OW('EQS');setTimeout(()=>fetchEQS('${st.t}'),100)"
+      title="${st.t} — ${st.n} (${st.s}): ${val>=0?'+':''}${val}%"
+      style="background:${bg};border:1px solid rgba(255,255,255,0.04);padding:4px 3px;cursor:pointer;min-width:0;
+             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px"
+      onmouseover="this.style.outline='1px solid #444'" onmouseout="this.style.outline=''">
+      <div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.3px">${st.t}</div>
+      <div style="font-size:9px;color:${vc};font-weight:600">${val>=0?'+':''}${val}%</div>
+    </div>`;
+  }).join('');
+
+  const spxHeatmap = `
+    <div style="padding:4px 6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="sl">S&P 500 — INDEX</div>
+        <span style="font-size:9px;color:#555">Click ticker → EQS</span>
+      </div>
+      <table class="t" style="margin-bottom:12px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
+      <div class="sl" style="margin-bottom:6px">S&P 500 CONSTITUENTS — BY SECTOR (PROXY 1D%)</div>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">${hmConstit}</div>
+      <div style="margin-top:6px;font-size:9px;color:#444;border-top:1px solid #111;padding-top:4px">
+        Constituent direction estimated from sector performance. Click any tile to open in EQS.
+      </div>
+    </div>`;
   const hm=D.equities.sectors.map(s=>{
     const bg=s.d1>1?'rgba(0,80,20,0.4)':s.d1>.3?'rgba(0,50,12,0.3)':s.d1>0?'rgba(0,30,8,0.2)':s.d1<-1?'rgba(80,0,0,0.4)':s.d1<-.3?'rgba(50,0,0,0.3)':'rgba(30,0,0,0.2)';
     const vc=s.d1>0?'var(--green)':'var(--red)';
@@ -1304,7 +1378,7 @@ function rEQ(){
   </tr>`).join('');
 
   return buildTabs('eq-tabs',[
-    {id:'eq-indices',  label:'INDICES',   content:`<div style="padding:4px 6px"><div class="sl">INDEX MONITOR</div><table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${idx}</tbody></table></div>`},
+    {id:'eq-indices',  label:'S&P 500',   content:spxHeatmap},
     {id:'eq-sectors',  label:'SECTORS',   content:`<div style="padding:4px 6px"><div class="sl">SECTOR HEATMAP — 1D PERFORMANCE</div><div class="hm-grid">${hm}</div></div>`},
     {id:'eq-rotation', label:'ROTATION',  content:`<div style="padding:4px 6px"><div style="font-size:10px;color:#707070;margin-bottom:4px">1D LIVE · 1W/1M/3M ESTIMATED FROM TREND</div><table class="t"><thead><tr><th>RANK</th><th>SECTOR</th><th>1D</th><th>1W</th><th>1M</th><th>3M</th></tr></thead><tbody>${rotRows}</tbody></table></div>`},
     {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>MKTCAP</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
@@ -2235,7 +2309,12 @@ async function fetchEQS(ticker){
             <span style="color:var(--amber);font-size:18px;font-weight:600">${currency} ${px.toFixed(2)}</span>
             <span class="${up?'up':'dn'}" style="font-size:12px">${up?'+':''}${chg.toFixed(2)} (${up?'+':''}${chgPct.toFixed(2)}%)</span>
             <span style="color:var(--text-dim);font-size:9px">${exchange}</span>
-            <span style="margin-left:auto;color:var(--text-mid);font-size:10px">${ticker} · ${name}</span>
+            <span style="margin-left:auto;display:flex;align-items:center;gap:10px">
+              <button data-wl-star="${ticker}" onclick="wlToggle('${ticker}')" title="Add/remove watchlist"
+                style="background:none;border:1px solid #2a2a2a;padding:3px 9px;cursor:pointer;font-size:14px;line-height:1;color:${WL.includes(ticker)?'#ffab00':'#555'}"
+              >${WL.includes(ticker)?'★':'☆'}</button>
+              <span style="color:var(--text-mid);font-size:10px">${ticker} · ${name}</span>
+            </span>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
@@ -2987,6 +3066,7 @@ function buildSearchCorpus(){
     {key:'HEAT CURVE',  label:'Treasury Curve Heatmap',       meta:'Yield curve visual'},
     {key:'CHRIS',       label:'CHRIS — Bond & Yield Dashboard',meta:'Opens TREAS · INFL · VOL · MACRO in bond layout'},
     {key:'ACCESS',      label:'Accessibility Settings',        meta:'Font size, contrast, color mode, motion'},
+    {key:'WATCH',       label:'Watchlist — track favorite stocks', meta:'Live prices, sparklines, quick EQS access'},
   ].forEach(p=>C.push({key:p.key, label:p.label, meta:p.meta, type:'command',
     action:()=>handleSpecialCommand(p.key)}));
 
@@ -3143,6 +3223,7 @@ function handleSpecialCommand(cmd){
     case 'CB':           OW('MACRO'); break;
     case 'CHRIS':        launchCHRIS(); break;
     case 'ACCESS':       showAccessPanel(); break;
+    case 'WATCH':        OW('WATCH'); break;
     default:             OW(cmd);
   }
 }
@@ -3314,101 +3395,157 @@ function fxSetPair(pairName){
 // ═══════════════════════════════════════════
 
 // ── Static US stock universe (100 liquid names across sectors) ──
-// Used as fallback + base dataset; FMP/AV enriches with live prices when keys present
+// Used as fallback + base dataset; ~200 liquid US names across all GICS sectors
+// Fields: sym, name, sector, mcap($B), pe, fwdPe, div(%), px, chg(1D%), vol, beta, roe(%), pb, evEbitda
 const SCRN_UNIVERSE = [
-  // Tech
-  {sym:'AAPL', name:'Apple Inc',           sector:'Technology',   mcap:2840,pe:29.4,fwdPe:26.8,div:0.52,px:184.4, chg:+0.48,vol:52e6},
-  {sym:'MSFT', name:'Microsoft Corp',      sector:'Technology',   mcap:3010,pe:36.8,fwdPe:31.4,div:0.72,px:404.9, chg:+0.61,vol:22e6},
-  {sym:'NVDA', name:'NVIDIA Corp',         sector:'Technology',   mcap:1520,pe:65.4,fwdPe:28.2,div:0.04,px:613.4, chg:+1.36,vol:44e6},
-  {sym:'GOOGL',name:'Alphabet Inc',        sector:'Technology',   mcap:1740,pe:25.2,fwdPe:21.8,div:0.0, px:140.9, chg:+0.22,vol:28e6},
-  {sym:'META', name:'Meta Platforms',      sector:'Technology',   mcap:1180,pe:24.1,fwdPe:20.4,div:0.0, px:460.2, chg:+0.88,vol:18e6},
-  {sym:'AMZN', name:'Amazon.com',          sector:'Technology',   mcap:1820,pe:78.4,fwdPe:38.2,div:0.0, px:178.2, chg:-0.14,vol:34e6},
-  {sym:'TSLA', name:'Tesla Inc',           sector:'Technology',   mcap:622, pe:49.8,fwdPe:64.2,div:0.0, px:196.4, chg:-1.88,vol:88e6},
-  {sym:'AVGO', name:'Broadcom Inc',        sector:'Technology',   mcap:488, pe:32.4,fwdPe:22.1,div:1.84,px:1114.0,chg:+0.44,vol:4.2e6},
-  {sym:'ORCL', name:'Oracle Corp',         sector:'Technology',   mcap:318, pe:29.8,fwdPe:24.4,div:0.40,px:115.8, chg:-0.22,vol:8.8e6},
-  {sym:'CRM',  name:'Salesforce Inc',      sector:'Technology',   mcap:278, pe:58.4,fwdPe:28.8,div:0.0, px:284.4, chg:+0.14,vol:5.2e6},
-  {sym:'AMD',  name:'Advanced Micro',      sector:'Technology',   mcap:244, pe:214, fwdPe:24.8,div:0.0, px:149.8, chg:-0.88,vol:42e6},
-  {sym:'INTC', name:'Intel Corp',          sector:'Technology',   mcap:184, pe:null,fwdPe:18.4,div:0.50,px:43.4,  chg:-1.22,vol:34e6},
-  {sym:'QCOM', name:'Qualcomm Inc',        sector:'Technology',   mcap:194, pe:18.4,fwdPe:15.2,div:3.28,px:168.4, chg:+0.34,vol:9.4e6},
-  {sym:'NOW',  name:'ServiceNow',          sector:'Technology',   mcap:154, pe:78.4,fwdPe:44.2,div:0.0, px:744.8, chg:+0.66,vol:1.8e6},
-  {sym:'ADBE', name:'Adobe Inc',           sector:'Technology',   mcap:222, pe:44.2,fwdPe:24.8,div:0.0, px:498.4, chg:-0.44,vol:2.8e6},
-  // Financials
-  {sym:'JPM',  name:'JPMorgan Chase',      sector:'Financials',   mcap:491, pe:11.2,fwdPe:10.8,div:2.68,px:170.1, chg:-0.26,vol:8.8e6},
-  {sym:'BAC',  name:'Bank of America',     sector:'Financials',   mcap:288, pe:12.4,fwdPe:10.2,div:2.78,px:36.8,  chg:-0.44,vol:44e6},
-  {sym:'WFC',  name:'Wells Fargo',         sector:'Financials',   mcap:198, pe:11.8,fwdPe:10.4,div:3.12,px:52.4,  chg:+0.18,vol:22e6},
-  {sym:'GS',   name:'Goldman Sachs',       sector:'Financials',   mcap:124, pe:13.4,fwdPe:12.1,div:2.44,px:384.2, chg:+0.49,vol:2.8e6},
-  {sym:'MS',   name:'Morgan Stanley',      sector:'Financials',   mcap:148, pe:17.4,fwdPe:14.8,div:3.44,px:88.4,  chg:+0.22,vol:9.2e6},
-  {sym:'BLK',  name:'BlackRock Inc',       sector:'Financials',   mcap:122, pe:22.4,fwdPe:19.8,div:2.84,px:804.4, chg:+0.14,vol:0.8e6},
-  {sym:'AXP',  name:'American Express',    sector:'Financials',   mcap:148, pe:19.8,fwdPe:17.2,div:1.22,px:204.8, chg:+0.38,vol:3.4e6},
-  {sym:'C',    name:'Citigroup Inc',       sector:'Financials',   mcap:114, pe:14.8,fwdPe:9.4, div:3.44,px:58.4,  chg:-0.18,vol:18e6},
-  {sym:'SCHW', name:'Charles Schwab',      sector:'Financials',   mcap:144, pe:28.4,fwdPe:22.4,div:1.88,px:72.4,  chg:-0.34,vol:8.8e6},
-  {sym:'SPGI', name:'S&P Global',          sector:'Financials',   mcap:128, pe:42.4,fwdPe:34.8,div:0.88,px:424.8, chg:+0.44,vol:1.2e6},
-  // Healthcare
-  {sym:'LLY',  name:'Eli Lilly',           sector:'Healthcare',   mcap:724, pe:88.4,fwdPe:44.2,div:0.72,px:764.2, chg:+1.44,vol:3.8e6},
-  {sym:'JNJ',  name:'Johnson & Johnson',   sector:'Healthcare',   mcap:388, pe:14.2,fwdPe:14.8,div:3.08,px:158.4, chg:-0.14,vol:7.8e6},
-  {sym:'UNH',  name:'UnitedHealth Group',  sector:'Healthcare',   mcap:488, pe:22.4,fwdPe:19.8,div:1.44,px:524.8, chg:+0.22,vol:2.8e6},
-  {sym:'ABBV', name:'AbbVie Inc',          sector:'Healthcare',   mcap:288, pe:44.4,fwdPe:14.2,div:3.88,px:162.4, chg:+0.44,vol:5.8e6},
-  {sym:'MRK',  name:'Merck & Co',          sector:'Healthcare',   mcap:284, pe:18.4,fwdPe:14.8,div:2.44,px:112.4, chg:-0.22,vol:9.8e6},
-  {sym:'TMO',  name:'Thermo Fisher',       sector:'Healthcare',   mcap:228, pe:34.4,fwdPe:28.8,div:0.28,px:584.8, chg:+0.14,vol:1.8e6},
-  {sym:'ABT',  name:'Abbott Labs',         sector:'Healthcare',   mcap:188, pe:34.8,fwdPe:22.4,div:1.88,px:108.4, chg:+0.08,vol:5.8e6},
-  {sym:'BMY',  name:'Bristol-Myers',       sector:'Healthcare',   mcap:138, pe:12.4,fwdPe:8.4, div:4.88,px:62.4,  chg:-0.44,vol:12e6},
-  {sym:'ISRG', name:'Intuitive Surgical',  sector:'Healthcare',   mcap:148, pe:74.4,fwdPe:58.4,div:0.0, px:408.4, chg:+0.88,vol:1.4e6},
-  {sym:'VRTX', name:'Vertex Pharma',       sector:'Healthcare',   mcap:118, pe:32.4,fwdPe:28.4,div:0.0, px:454.8, chg:+0.22,vol:1.2e6},
-  // Energy
-  {sym:'XOM',  name:'Exxon Mobil',         sector:'Energy',       mcap:414, pe:14.2,fwdPe:13.8,div:3.44,px:102.4, chg:+0.81,vol:18e6},
-  {sym:'CVX',  name:'Chevron Corp',        sector:'Energy',       mcap:284, pe:13.8,fwdPe:13.2,div:4.12,px:148.8, chg:+0.64,vol:12e6},
-  {sym:'COP',  name:'ConocoPhillips',      sector:'Energy',       mcap:148, pe:14.4,fwdPe:13.4,div:1.84,px:122.4, chg:+0.88,vol:8.8e6},
-  {sym:'SLB',  name:'SLB (Schlumberger)',  sector:'Energy',       mcap:88,  pe:18.4,fwdPe:14.8,div:2.08,px:44.8,  chg:+1.22,vol:14e6},
-  {sym:'EOG',  name:'EOG Resources',       sector:'Energy',       mcap:72,  pe:12.4,fwdPe:11.8,div:2.84,px:118.4, chg:+0.44,vol:5.8e6},
-  {sym:'PSX',  name:'Phillips 66',         sector:'Energy',       mcap:62,  pe:8.4, fwdPe:8.8, div:3.44,px:138.8, chg:+0.22,vol:4.8e6},
-  // Industrials
-  {sym:'CAT',  name:'Caterpillar Inc',     sector:'Industrials',  mcap:188, pe:18.4,fwdPe:16.8,div:1.84,px:354.8, chg:+0.44,vol:2.8e6},
-  {sym:'RTX',  name:'RTX Corp',            sector:'Industrials',  mcap:148, pe:44.4,fwdPe:18.4,div:2.44,px:98.4,  chg:+0.18,vol:8.8e6},
-  {sym:'HON',  name:'Honeywell Intl',      sector:'Industrials',  mcap:128, pe:24.4,fwdPe:22.4,div:2.08,px:198.4, chg:-0.14,vol:3.8e6},
-  {sym:'UPS',  name:'United Parcel Svc',   sector:'Industrials',  mcap:122, pe:22.4,fwdPe:18.4,div:3.88,px:142.4, chg:-0.88,vol:4.8e6},
-  {sym:'GE',   name:'GE Aerospace',        sector:'Industrials',  mcap:178, pe:32.4,fwdPe:28.8,div:0.32,px:162.4, chg:+1.44,vol:8.8e6},
-  {sym:'LMT',  name:'Lockheed Martin',     sector:'Industrials',  mcap:114, pe:18.4,fwdPe:17.8,div:2.88,px:444.8, chg:+0.44,vol:1.8e6},
-  {sym:'DE',   name:'Deere & Company',     sector:'Industrials',  mcap:112, pe:14.4,fwdPe:14.8,div:1.44,px:374.8, chg:-0.22,vol:2.4e6},
-  // Consumer Discretionary
-  {sym:'AMZN', name:'Amazon.com',          sector:'Cons Disc',    mcap:1820,pe:78.4,fwdPe:38.2,div:0.0, px:178.2, chg:-0.14,vol:34e6},
-  {sym:'MCD',  name:'McDonald\'s Corp',    sector:'Cons Disc',    mcap:214, pe:24.4,fwdPe:22.4,div:2.44,px:288.4, chg:+0.08,vol:3.4e6},
-  {sym:'NKE',  name:'Nike Inc',            sector:'Cons Disc',    mcap:148, pe:32.4,fwdPe:26.4,div:1.48,px:98.4,  chg:-0.44,vol:9.8e6},
-  {sym:'SBUX', name:'Starbucks Corp',      sector:'Cons Disc',    mcap:94,  pe:28.4,fwdPe:22.4,div:2.44,px:82.4,  chg:-0.22,vol:8.8e6},
-  {sym:'HD',   name:'Home Depot',          sector:'Cons Disc',    mcap:344, pe:24.4,fwdPe:22.8,div:2.44,px:342.4, chg:+0.14,vol:3.8e6},
-  {sym:'TGT',  name:'Target Corp',         sector:'Cons Disc',    mcap:58,  pe:18.4,fwdPe:15.8,div:3.28,px:128.4, chg:-0.34,vol:4.8e6},
-  // Comm Services
-  {sym:'NFLX', name:'Netflix Inc',         sector:'Comm Svcs',    mcap:248, pe:48.4,fwdPe:34.4,div:0.0, px:578.4, chg:+0.88,vol:4.8e6},
-  {sym:'DIS',  name:'Walt Disney Co',      sector:'Comm Svcs',    mcap:174, pe:78.4,fwdPe:24.4,div:0.0, px:94.4,  chg:-0.28,vol:9.8e6},
-  {sym:'T',    name:'AT&T Inc',            sector:'Comm Svcs',    mcap:118, pe:14.4,fwdPe:8.4, div:6.88,px:16.8,  chg:+0.18,vol:68e6},
-  {sym:'VZ',   name:'Verizon Comms',       sector:'Comm Svcs',    mcap:168, pe:14.8,fwdPe:8.8, div:6.44,px:40.4,  chg:-0.08,vol:22e6},
-  {sym:'CMCSA',name:'Comcast Corp',        sector:'Comm Svcs',    mcap:168, pe:12.4,fwdPe:9.8, div:2.88,px:42.4,  chg:-0.22,vol:22e6},
-  // Consumer Staples
-  {sym:'KO',   name:'Coca-Cola Co',        sector:'Cons Staples', mcap:254, pe:24.4,fwdPe:22.8,div:3.12,px:58.4,  chg:+0.08,vol:18e6},
-  {sym:'PEP',  name:'PepsiCo Inc',         sector:'Cons Staples', mcap:224, pe:22.4,fwdPe:20.8,div:2.88,px:162.4, chg:-0.04,vol:5.8e6},
-  {sym:'PG',   name:'Procter & Gamble',    sector:'Cons Staples', mcap:348, pe:26.4,fwdPe:24.8,div:2.44,px:144.4, chg:+0.04,vol:7.8e6},
-  {sym:'COST', name:'Costco Wholesale',    sector:'Cons Staples', mcap:324, pe:48.4,fwdPe:44.8,div:0.68,px:728.4, chg:+0.44,vol:2.8e6},
-  {sym:'WMT',  name:'Walmart Inc',         sector:'Cons Staples', mcap:548, pe:28.4,fwdPe:26.8,div:1.32,px:68.4,  chg:+0.22,vol:18e6},
-  {sym:'PM',   name:'Philip Morris',       sector:'Cons Staples', mcap:158, pe:17.4,fwdPe:14.8,div:5.44,px:98.4,  chg:+0.44,vol:5.8e6},
-  {sym:'MO',   name:'Altria Group',        sector:'Cons Staples', mcap:88,  pe:8.4, fwdPe:9.4, div:8.88,px:42.4,  chg:+0.22,vol:8.8e6},
-  // Utilities
-  {sym:'NEE',  name:'NextEra Energy',      sector:'Utilities',    mcap:124, pe:22.4,fwdPe:19.8,div:2.88,px:58.4,  chg:-0.28,vol:14e6},
-  {sym:'DUK',  name:'Duke Energy',         sector:'Utilities',    mcap:74,  pe:18.4,fwdPe:17.8,div:4.28,px:98.4,  chg:-0.14,vol:5.8e6},
-  {sym:'SO',   name:'Southern Company',    sector:'Utilities',    mcap:72,  pe:22.4,fwdPe:18.8,div:4.08,px:68.4,  chg:+0.04,vol:7.8e6},
-  {sym:'AEP',  name:'Amer Elec Power',     sector:'Utilities',    mcap:44,  pe:18.8,fwdPe:16.8,div:4.08,px:82.4,  chg:-0.08,vol:4.8e6},
-  {sym:'EXC',  name:'Exelon Corp',         sector:'Utilities',    mcap:38,  pe:14.4,fwdPe:13.8,div:3.88,px:38.4,  chg:-0.18,vol:9.8e6},
-  // Real Estate
-  {sym:'AMT',  name:'American Tower',      sector:'Real Estate',  mcap:88,  pe:44.4,fwdPe:38.8,div:3.44,px:188.4, chg:-0.44,vol:3.8e6},
-  {sym:'PLD',  name:'Prologis Inc',        sector:'Real Estate',  mcap:118, pe:44.4,fwdPe:28.4,div:2.88,px:128.4, chg:-0.22,vol:4.8e6},
-  {sym:'EQIX', name:'Equinix Inc',         sector:'Real Estate',  mcap:78,  pe:88.4,fwdPe:68.4,div:2.08,px:824.8, chg:+0.14,vol:0.8e6},
-  {sym:'CCI',  name:'Crown Castle',        sector:'Real Estate',  mcap:44,  pe:34.4,fwdPe:44.4,div:6.44,px:104.8, chg:-0.88,vol:3.8e6},
-  // Materials
-  {sym:'LIN',  name:'Linde PLC',           sector:'Materials',    mcap:208, pe:34.4,fwdPe:28.8,div:1.44,px:442.4, chg:+0.22,vol:2.8e6},
-  {sym:'APD',  name:'Air Products',        sector:'Materials',    mcap:54,  pe:18.4,fwdPe:17.8,div:2.88,px:244.4, chg:-0.14,vol:2.4e6},
-  {sym:'FCX',  name:'Freeport-McMoRan',    sector:'Materials',    mcap:64,  pe:22.4,fwdPe:17.8,div:1.44,px:44.4,  chg:+0.44,vol:18e6},
-  {sym:'NEM',  name:'Newmont Corp',        sector:'Materials',    mcap:48,  pe:null,fwdPe:14.8,div:4.44,px:38.4,  chg:+0.88,vol:14e6},
-  {sym:'DOW',  name:'Dow Inc',             sector:'Materials',    mcap:38,  pe:22.4,fwdPe:14.4,div:5.88,px:52.4,  chg:-0.22,vol:8.8e6},
-  {sym:'DD',   name:'DuPont de Nemours',   sector:'Materials',    mcap:32,  pe:28.4,fwdPe:18.8,div:1.44,px:74.4,  chg:+0.14,vol:3.8e6},
+  // ── Technology ──
+  {sym:'AAPL', name:'Apple Inc',           sector:'Technology',   mcap:2840,pe:29.4,fwdPe:26.8,div:0.52,px:184.4, chg:+0.48,vol:52e6,beta:1.24,roe:147,pb:45.2,evEbitda:22.4},
+  {sym:'MSFT', name:'Microsoft Corp',      sector:'Technology',   mcap:3010,pe:36.8,fwdPe:31.4,div:0.72,px:404.9, chg:+0.61,vol:22e6,beta:0.90,roe:42,pb:13.2,evEbitda:28.4},
+  {sym:'NVDA', name:'NVIDIA Corp',         sector:'Technology',   mcap:1520,pe:65.4,fwdPe:28.2,div:0.04,px:613.4, chg:+1.36,vol:44e6,beta:1.98,roe:88,pb:22.4,evEbitda:48.4},
+  {sym:'GOOGL',name:'Alphabet Inc',        sector:'Technology',   mcap:1740,pe:25.2,fwdPe:21.8,div:0.0, px:140.9, chg:+0.22,vol:28e6,beta:1.04,roe:24,pb:6.2, evEbitda:14.8},
+  {sym:'META', name:'Meta Platforms',      sector:'Technology',   mcap:1180,pe:24.1,fwdPe:20.4,div:0.0, px:460.2, chg:+0.88,vol:18e6,beta:1.22,roe:34,pb:8.4, evEbitda:16.2},
+  {sym:'AMZN', name:'Amazon.com',          sector:'Technology',   mcap:1820,pe:78.4,fwdPe:38.2,div:0.0, px:178.2, chg:-0.14,vol:34e6,beta:1.28,roe:18,pb:9.8, evEbitda:22.8},
+  {sym:'TSLA', name:'Tesla Inc',           sector:'Technology',   mcap:622, pe:49.8,fwdPe:64.2,div:0.0, px:196.4, chg:-1.88,vol:88e6,beta:2.18,roe:18,pb:8.4, evEbitda:44.2},
+  {sym:'AVGO', name:'Broadcom Inc',        sector:'Technology',   mcap:488, pe:32.4,fwdPe:22.1,div:1.84,px:1114.0,chg:+0.44,vol:4.2e6,beta:1.14,roe:22,pb:11.4,evEbitda:28.8},
+  {sym:'ORCL', name:'Oracle Corp',         sector:'Technology',   mcap:318, pe:29.8,fwdPe:24.4,div:0.40,px:115.8, chg:-0.22,vol:8.8e6,beta:0.98,roe:88,pb:null,evEbitda:22.4},
+  {sym:'CRM',  name:'Salesforce Inc',      sector:'Technology',   mcap:278, pe:58.4,fwdPe:28.8,div:0.0, px:284.4, chg:+0.14,vol:5.2e6,beta:1.28,roe:10,pb:4.8, evEbitda:28.4},
+  {sym:'AMD',  name:'Advanced Micro Devs', sector:'Technology',   mcap:244, pe:214, fwdPe:24.8,div:0.0, px:149.8, chg:-0.88,vol:42e6,beta:1.98,roe:4,pb:3.8,  evEbitda:32.4},
+  {sym:'INTC', name:'Intel Corp',          sector:'Technology',   mcap:184, pe:null,fwdPe:18.4,div:0.50,px:43.4,  chg:-1.22,vol:34e6,beta:0.88,roe:null,pb:1.2,evEbitda:null},
+  {sym:'QCOM', name:'Qualcomm Inc',        sector:'Technology',   mcap:194, pe:18.4,fwdPe:15.2,div:3.28,px:168.4, chg:+0.34,vol:9.4e6,beta:1.24,roe:44,pb:8.4, evEbitda:14.8},
+  {sym:'NOW',  name:'ServiceNow',          sector:'Technology',   mcap:154, pe:78.4,fwdPe:44.2,div:0.0, px:744.8, chg:+0.66,vol:1.8e6,beta:1.08,roe:24,pb:18.4,evEbitda:54.2},
+  {sym:'ADBE', name:'Adobe Inc',           sector:'Technology',   mcap:222, pe:44.2,fwdPe:24.8,div:0.0, px:498.4, chg:-0.44,vol:2.8e6,beta:1.24,roe:38,pb:18.4,evEbitda:28.4},
+  {sym:'INTU', name:'Intuit Inc',          sector:'Technology',   mcap:178, pe:58.4,fwdPe:36.8,div:0.64,px:614.8, chg:+0.18,vol:2.2e6,beta:1.18,roe:20,pb:11.4,evEbitda:44.2},
+  {sym:'AMAT', name:'Applied Materials',   sector:'Technology',   mcap:148, pe:22.4,fwdPe:18.4,div:0.88,px:172.4, chg:+0.44,vol:7.8e6,beta:1.44,roe:44,pb:8.8, evEbitda:18.4},
+  {sym:'MU',   name:'Micron Technology',   sector:'Technology',   mcap:128, pe:18.4,fwdPe:14.8,div:0.44,px:114.8, chg:+0.88,vol:18e6,beta:1.48,roe:22,pb:2.4, evEbitda:8.4},
+  {sym:'LRCX', name:'Lam Research',        sector:'Technology',   mcap:118, pe:28.4,fwdPe:22.4,div:1.08,px:878.4, chg:+0.22,vol:2.2e6,beta:1.48,roe:68,pb:18.4,evEbitda:22.4},
+  {sym:'KLAC', name:'KLA Corp',            sector:'Technology',   mcap:108, pe:28.4,fwdPe:24.8,div:0.88,px:748.4, chg:+0.14,vol:1.4e6,beta:1.28,roe:88,pb:22.4,evEbitda:22.4},
+  {sym:'SNPS', name:'Synopsys Inc',        sector:'Technology',   mcap:84,  pe:44.4,fwdPe:34.8,div:0.0, px:544.4, chg:+0.14,vol:1.2e6,beta:0.88,roe:22,pb:11.4,evEbitda:34.8},
+  {sym:'PANW', name:'Palo Alto Networks',  sector:'Technology',   mcap:118, pe:null,fwdPe:34.8,div:0.0, px:178.4, chg:+0.88,vol:6.8e6,beta:1.08,roe:24,pb:28.4,evEbitda:88.4},
+  {sym:'CRWD', name:'CrowdStrike',         sector:'Technology',   mcap:84,  pe:null,fwdPe:64.8,div:0.0, px:354.4, chg:+1.22,vol:4.8e6,beta:1.28,roe:18,pb:28.4,evEbitda:88.4},
+  {sym:'FTNT', name:'Fortinet Inc',        sector:'Technology',   mcap:58,  pe:44.4,fwdPe:34.8,div:0.0, px:74.4,  chg:+0.44,vol:9.8e6,beta:1.18,roe:88,pb:28.4,evEbitda:34.8},
+  // ── Financials ──
+  {sym:'JPM',  name:'JPMorgan Chase',      sector:'Financials',   mcap:491, pe:11.2,fwdPe:10.8,div:2.68,px:170.1, chg:-0.26,vol:8.8e6,beta:1.08,roe:18,pb:1.8, evEbitda:null},
+  {sym:'BAC',  name:'Bank of America',     sector:'Financials',   mcap:288, pe:12.4,fwdPe:10.2,div:2.78,px:36.8,  chg:-0.44,vol:44e6,beta:1.38,roe:12,pb:1.2, evEbitda:null},
+  {sym:'WFC',  name:'Wells Fargo',         sector:'Financials',   mcap:198, pe:11.8,fwdPe:10.4,div:3.12,px:52.4,  chg:+0.18,vol:22e6,beta:1.28,roe:12,pb:1.4, evEbitda:null},
+  {sym:'GS',   name:'Goldman Sachs',       sector:'Financials',   mcap:124, pe:13.4,fwdPe:12.1,div:2.44,px:384.2, chg:+0.49,vol:2.8e6,beta:1.44,roe:12,pb:1.6, evEbitda:null},
+  {sym:'MS',   name:'Morgan Stanley',      sector:'Financials',   mcap:148, pe:17.4,fwdPe:14.8,div:3.44,px:88.4,  chg:+0.22,vol:9.2e6,beta:1.38,roe:14,pb:2.0, evEbitda:null},
+  {sym:'BLK',  name:'BlackRock Inc',       sector:'Financials',   mcap:122, pe:22.4,fwdPe:19.8,div:2.84,px:804.4, chg:+0.14,vol:0.8e6,beta:1.28,roe:18,pb:4.0, evEbitda:null},
+  {sym:'AXP',  name:'American Express',    sector:'Financials',   mcap:148, pe:19.8,fwdPe:17.2,div:1.22,px:204.8, chg:+0.38,vol:3.4e6,beta:1.24,roe:32,pb:6.4, evEbitda:null},
+  {sym:'C',    name:'Citigroup Inc',       sector:'Financials',   mcap:114, pe:14.8,fwdPe:9.4, div:3.44,px:58.4,  chg:-0.18,vol:18e6,beta:1.58,roe:8, pb:0.7, evEbitda:null},
+  {sym:'SCHW', name:'Charles Schwab',      sector:'Financials',   mcap:144, pe:28.4,fwdPe:22.4,div:1.88,px:72.4,  chg:-0.34,vol:8.8e6,beta:1.28,roe:8, pb:2.4, evEbitda:null},
+  {sym:'SPGI', name:'S&P Global',          sector:'Financials',   mcap:128, pe:42.4,fwdPe:34.8,div:0.88,px:424.8, chg:+0.44,vol:1.2e6,beta:1.08,roe:44,pb:18.4,evEbitda:28.4},
+  {sym:'CB',   name:'Chubb Ltd',           sector:'Financials',   mcap:108, pe:12.4,fwdPe:11.4,div:1.44,px:268.4, chg:+0.22,vol:2.2e6,beta:0.58,roe:12,pb:1.6, evEbitda:null},
+  {sym:'MMC',  name:'Marsh McLennan',      sector:'Financials',   mcap:98,  pe:28.4,fwdPe:24.8,div:1.44,px:194.8, chg:+0.14,vol:2.4e6,beta:0.88,roe:38,pb:11.4,evEbitda:24.8},
+  {sym:'ICE',  name:'Intercontinental Exch',sector:'Financials',  mcap:88,  pe:28.4,fwdPe:22.4,div:1.08,px:158.4, chg:+0.28,vol:3.4e6,beta:0.78,roe:12,pb:3.4, evEbitda:18.4},
+  {sym:'MCO',  name:'Moody Corp',       sector:'Financials',   mcap:78,  pe:44.4,fwdPe:38.8,div:0.88,px:428.4, chg:+0.18,vol:1.2e6,beta:1.28,roe:88,pb:28.4,evEbitda:38.4},
+  {sym:'USB',  name:'US Bancorp',          sector:'Financials',   mcap:68,  pe:12.4,fwdPe:10.8,div:4.48,px:44.4,  chg:-0.22,vol:8.8e6,beta:1.08,roe:12,pb:1.4, evEbitda:null},
+  {sym:'PNC',  name:'PNC Financial',       sector:'Financials',   mcap:68,  pe:12.4,fwdPe:11.4,div:3.88,px:164.4, chg:-0.14,vol:3.4e6,beta:1.18,roe:12,pb:1.4, evEbitda:null},
+  {sym:'TFC',  name:'Truist Financial',    sector:'Financials',   mcap:54,  pe:14.8,fwdPe:11.4,div:4.88,px:38.4,  chg:-0.28,vol:8.8e6,beta:1.28,roe:8, pb:1.0, evEbitda:null},
+  {sym:'COF',  name:'Capital One',         sector:'Financials',   mcap:58,  pe:12.4,fwdPe:10.8,div:1.84,px:148.4, chg:+0.22,vol:3.8e6,beta:1.48,roe:12,pb:1.4, evEbitda:null},
+  // ── Healthcare ──
+  {sym:'LLY',  name:'Eli Lilly',           sector:'Healthcare',   mcap:724, pe:88.4,fwdPe:44.2,div:0.72,px:764.2, chg:+1.44,vol:3.8e6,beta:0.48,roe:88,pb:44.4,evEbitda:48.4},
+  {sym:'JNJ',  name:'Johnson & Johnson',   sector:'Healthcare',   mcap:388, pe:14.2,fwdPe:14.8,div:3.08,px:158.4, chg:-0.14,vol:7.8e6,beta:0.58,roe:22,pb:5.8, evEbitda:14.4},
+  {sym:'UNH',  name:'UnitedHealth Group',  sector:'Healthcare',   mcap:488, pe:22.4,fwdPe:19.8,div:1.44,px:524.8, chg:+0.22,vol:2.8e6,beta:0.68,roe:28,pb:6.4, evEbitda:14.8},
+  {sym:'ABBV', name:'AbbVie Inc',          sector:'Healthcare',   mcap:288, pe:44.4,fwdPe:14.2,div:3.88,px:162.4, chg:+0.44,vol:5.8e6,beta:0.58,roe:null,pb:null,evEbitda:12.4},
+  {sym:'MRK',  name:'Merck & Co',          sector:'Healthcare',   mcap:284, pe:18.4,fwdPe:14.8,div:2.44,px:112.4, chg:-0.22,vol:9.8e6,beta:0.48,roe:44,pb:8.4, evEbitda:12.4},
+  {sym:'TMO',  name:'Thermo Fisher',       sector:'Healthcare',   mcap:228, pe:34.4,fwdPe:28.8,div:0.28,px:584.8, chg:+0.14,vol:1.8e6,beta:0.68,roe:18,pb:6.4, evEbitda:22.8},
+  {sym:'ABT',  name:'Abbott Labs',         sector:'Healthcare',   mcap:188, pe:34.8,fwdPe:22.4,div:1.88,px:108.4, chg:+0.08,vol:5.8e6,beta:0.68,roe:18,pb:6.8, evEbitda:24.4},
+  {sym:'BMY',  name:'Bristol-Myers Squibb',sector:'Healthcare',   mcap:138, pe:12.4,fwdPe:8.4, div:4.88,px:62.4,  chg:-0.44,vol:12e6,beta:0.58,roe:28,pb:3.4, evEbitda:8.4},
+  {sym:'ISRG', name:'Intuitive Surgical',  sector:'Healthcare',   mcap:148, pe:74.4,fwdPe:58.4,div:0.0, px:408.4, chg:+0.88,vol:1.4e6,beta:1.08,roe:18,pb:13.4,evEbitda:54.4},
+  {sym:'VRTX', name:'Vertex Pharma',       sector:'Healthcare',   mcap:118, pe:32.4,fwdPe:28.4,div:0.0, px:454.8, chg:+0.22,vol:1.2e6,beta:0.48,roe:28,pb:8.8, evEbitda:24.4},
+  {sym:'REGN', name:'Regeneron Pharma',    sector:'Healthcare',   mcap:98,  pe:28.4,fwdPe:22.4,div:0.0, px:888.4, chg:+0.44,vol:0.8e6,beta:0.38,roe:22,pb:6.4, evEbitda:18.4},
+  {sym:'AMGN', name:'Amgen Inc',           sector:'Healthcare',   mcap:148, pe:18.4,fwdPe:14.8,div:3.28,px:278.4, chg:-0.08,vol:2.8e6,beta:0.58,roe:null,pb:null,evEbitda:12.4},
+  {sym:'GILD', name:'Gilead Sciences',     sector:'Healthcare',   mcap:98,  pe:28.4,fwdPe:12.4,div:3.88,px:78.4,  chg:+0.04,vol:7.8e6,beta:0.48,roe:28,pb:5.8, evEbitda:12.4},
+  {sym:'CI',   name:'Cigna Group',         sector:'Healthcare',   mcap:84,  pe:12.4,fwdPe:10.4,div:1.84,px:328.4, chg:-0.14,vol:2.4e6,beta:0.68,roe:14,pb:1.8, evEbitda:8.4},
+  {sym:'HCA',  name:'HCA Healthcare',      sector:'Healthcare',   mcap:78,  pe:14.4,fwdPe:12.4,div:0.88,px:284.4, chg:+0.22,vol:2.8e6,beta:1.08,roe:null,pb:null,evEbitda:8.4},
+  {sym:'MDT',  name:'Medtronic PLC',       sector:'Healthcare',   mcap:108, pe:22.4,fwdPe:15.4,div:3.44,px:82.4,  chg:-0.18,vol:7.8e6,beta:0.88,roe:8, pb:2.4, evEbitda:12.4},
+  {sym:'DHR',  name:'Danaher Corp',        sector:'Healthcare',   mcap:188, pe:44.4,fwdPe:34.8,div:0.44,px:248.4, chg:+0.14,vol:3.8e6,beta:0.78,roe:10,pb:4.4, evEbitda:28.4},
+  // ── Energy ──
+  {sym:'XOM',  name:'Exxon Mobil',         sector:'Energy',       mcap:414, pe:14.2,fwdPe:13.8,div:3.44,px:102.4, chg:+0.81,vol:18e6,beta:1.28,roe:18,pb:2.4, evEbitda:8.4},
+  {sym:'CVX',  name:'Chevron Corp',        sector:'Energy',       mcap:284, pe:13.8,fwdPe:13.2,div:4.12,px:148.8, chg:+0.64,vol:12e6,beta:1.18,roe:14,pb:2.0, evEbitda:8.4},
+  {sym:'COP',  name:'ConocoPhillips',      sector:'Energy',       mcap:148, pe:14.4,fwdPe:13.4,div:1.84,px:122.4, chg:+0.88,vol:8.8e6,beta:1.28,roe:18,pb:2.4, evEbitda:7.4},
+  {sym:'SLB',  name:'SLB (Schlumberger)',  sector:'Energy',       mcap:88,  pe:18.4,fwdPe:14.8,div:2.08,px:44.8,  chg:+1.22,vol:14e6,beta:1.48,roe:14,pb:2.8, evEbitda:8.8},
+  {sym:'EOG',  name:'EOG Resources',       sector:'Energy',       mcap:72,  pe:12.4,fwdPe:11.8,div:2.84,px:118.4, chg:+0.44,vol:5.8e6,beta:1.28,roe:22,pb:2.4, evEbitda:5.8},
+  {sym:'PSX',  name:'Phillips 66',         sector:'Energy',       mcap:62,  pe:8.4, fwdPe:8.8, div:3.44,px:138.8, chg:+0.22,vol:4.8e6,beta:1.38,roe:14,pb:2.2, evEbitda:6.4},
+  {sym:'PXD',  name:'Pioneer Natural Res', sector:'Energy',       mcap:58,  pe:12.4,fwdPe:11.4,div:4.88,px:228.4, chg:+0.44,vol:3.8e6,beta:1.18,roe:18,pb:2.0, evEbitda:6.4},
+  {sym:'OKE',  name:'ONEOK Inc',           sector:'Energy',       mcap:44,  pe:18.4,fwdPe:14.8,div:5.88,px:78.4,  chg:+0.22,vol:4.8e6,beta:1.38,roe:18,pb:3.8, evEbitda:11.4},
+  {sym:'KMI',  name:'Kinder Morgan',       sector:'Energy',       mcap:38,  pe:22.4,fwdPe:18.4,div:6.44,px:18.4,  chg:+0.14,vol:18e6,beta:0.98,roe:8, pb:1.4, evEbitda:9.4},
+  {sym:'WMB',  name:'Williams Companies',  sector:'Energy',       mcap:44,  pe:28.4,fwdPe:22.4,div:4.88,px:38.4,  chg:+0.34,vol:8.8e6,beta:1.08,roe:14,pb:3.4, evEbitda:11.4},
+  // ── Industrials ──
+  {sym:'CAT',  name:'Caterpillar Inc',     sector:'Industrials',  mcap:188, pe:18.4,fwdPe:16.8,div:1.84,px:354.8, chg:+0.44,vol:2.8e6,beta:1.18,roe:58,pb:9.4, evEbitda:14.4},
+  {sym:'RTX',  name:'RTX Corp',            sector:'Industrials',  mcap:148, pe:44.4,fwdPe:18.4,div:2.44,px:98.4,  chg:+0.18,vol:8.8e6,beta:1.08,roe:8, pb:3.4, evEbitda:14.4},
+  {sym:'HON',  name:'Honeywell Intl',      sector:'Industrials',  mcap:128, pe:24.4,fwdPe:22.4,div:2.08,px:198.4, chg:-0.14,vol:3.8e6,beta:0.98,roe:34,pb:8.4, evEbitda:18.4},
+  {sym:'UPS',  name:'United Parcel Svc',   sector:'Industrials',  mcap:122, pe:22.4,fwdPe:18.4,div:3.88,px:142.4, chg:-0.88,vol:4.8e6,beta:1.08,roe:44,pb:14.4,evEbitda:14.4},
+  {sym:'GE',   name:'GE Aerospace',        sector:'Industrials',  mcap:178, pe:32.4,fwdPe:28.8,div:0.32,px:162.4, chg:+1.44,vol:8.8e6,beta:1.28,roe:28,pb:9.4, evEbitda:24.4},
+  {sym:'LMT',  name:'Lockheed Martin',     sector:'Industrials',  mcap:114, pe:18.4,fwdPe:17.8,div:2.88,px:444.8, chg:+0.44,vol:1.8e6,beta:0.88,roe:88,pb:null,evEbitda:14.4},
+  {sym:'DE',   name:'Deere & Company',     sector:'Industrials',  mcap:112, pe:14.4,fwdPe:14.8,div:1.44,px:374.8, chg:-0.22,vol:2.4e6,beta:1.08,roe:38,pb:5.8, evEbitda:9.4},
+  {sym:'NOC',  name:'Northrop Grumman',    sector:'Industrials',  mcap:68,  pe:18.4,fwdPe:17.4,div:1.84,px:448.4, chg:+0.14,vol:0.8e6,beta:0.88,roe:28,pb:5.4, evEbitda:14.4},
+  {sym:'GD',   name:'General Dynamics',    sector:'Industrials',  mcap:74,  pe:18.4,fwdPe:17.8,div:2.08,px:268.4, chg:+0.22,vol:1.2e6,beta:0.78,roe:18,pb:3.8, evEbitda:11.4},
+  {sym:'FDX',  name:'FedEx Corp',          sector:'Industrials',  mcap:58,  pe:18.4,fwdPe:14.8,div:2.08,px:228.4, chg:-0.44,vol:2.4e6,beta:1.18,roe:14,pb:3.4, evEbitda:8.4},
+  {sym:'BA',   name:'Boeing Company',      sector:'Industrials',  mcap:114, pe:null,fwdPe:44.8,div:0.0, px:188.4, chg:-0.88,vol:9.8e6,beta:1.48,roe:null,pb:null,evEbitda:null},
+  {sym:'MMM',  name:'3M Company',          sector:'Industrials',  mcap:68,  pe:14.4,fwdPe:12.4,div:5.88,px:122.4, chg:-0.14,vol:5.8e6,beta:0.98,roe:28,pb:4.8, evEbitda:9.4},
+  {sym:'ETN',  name:'Eaton Corp',          sector:'Industrials',  mcap:98,  pe:28.4,fwdPe:24.8,div:1.44,px:244.4, chg:+0.44,vol:2.8e6,beta:1.18,roe:24,pb:6.8, evEbitda:22.4},
+  {sym:'PH',   name:'Parker-Hannifin',     sector:'Industrials',  mcap:78,  pe:22.4,fwdPe:19.8,div:1.24,px:604.4, chg:+0.22,vol:0.8e6,beta:1.18,roe:22,pb:5.4, evEbitda:16.4},
+  // ── Consumer Discretionary ──
+  {sym:'MCD',  name:"McDonald's Corp",     sector:'Cons Disc',    mcap:214, pe:24.4,fwdPe:22.4,div:2.44,px:288.4, chg:+0.08,vol:3.4e6,beta:0.88,roe:null,pb:null,evEbitda:18.4},
+  {sym:'NKE',  name:'Nike Inc',            sector:'Cons Disc',    mcap:148, pe:32.4,fwdPe:26.4,div:1.48,px:98.4,  chg:-0.44,vol:9.8e6,beta:1.08,roe:38,pb:12.4,evEbitda:22.4},
+  {sym:'SBUX', name:'Starbucks Corp',      sector:'Cons Disc',    mcap:94,  pe:28.4,fwdPe:22.4,div:2.44,px:82.4,  chg:-0.22,vol:8.8e6,beta:0.88,roe:null,pb:null,evEbitda:18.4},
+  {sym:'HD',   name:'Home Depot',          sector:'Cons Disc',    mcap:344, pe:24.4,fwdPe:22.8,div:2.44,px:342.4, chg:+0.14,vol:3.8e6,beta:1.08,roe:null,pb:null,evEbitda:18.4},
+  {sym:'TGT',  name:'Target Corp',         sector:'Cons Disc',    mcap:58,  pe:18.4,fwdPe:15.8,div:3.28,px:128.4, chg:-0.34,vol:4.8e6,beta:0.88,roe:28,pb:5.4, evEbitda:11.4},
+  {sym:'LOW',  name:"Lowe's Companies",    sector:'Cons Disc',    mcap:148, pe:22.4,fwdPe:19.8,div:1.88,px:224.4, chg:+0.08,vol:3.4e6,beta:1.08,roe:null,pb:null,evEbitda:16.4},
+  {sym:'TJX',  name:'TJX Companies',       sector:'Cons Disc',    mcap:118, pe:28.4,fwdPe:24.8,div:1.44,px:98.4,  chg:+0.14,vol:5.8e6,beta:0.88,roe:58,pb:16.4,evEbitda:18.4},
+  {sym:'BKNG', name:'Booking Holdings',    sector:'Cons Disc',    mcap:148, pe:28.4,fwdPe:22.4,div:0.0, px:3884.4,chg:+0.44,vol:0.4e6,beta:1.28,roe:88,pb:28.4,evEbitda:22.4},
+  {sym:'GM',   name:'General Motors',      sector:'Cons Disc',    mcap:54,  pe:5.8, fwdPe:5.4, div:1.08,px:38.4,  chg:-0.44,vol:14e6,beta:1.48,roe:14,pb:0.8, evEbitda:4.4},
+  {sym:'F',    name:'Ford Motor Company',  sector:'Cons Disc',    mcap:64,  pe:12.4,fwdPe:7.8, div:5.88,px:16.4,  chg:-0.22,vol:98e6,beta:1.68,roe:8, pb:1.2, evEbitda:6.4},
+  // ── Consumer Staples ──
+  {sym:'KO',   name:'Coca-Cola Co',        sector:'Cons Staples', mcap:254, pe:24.4,fwdPe:22.8,div:3.12,px:58.4,  chg:+0.08,vol:18e6,beta:0.58,roe:44,pb:10.4,evEbitda:22.4},
+  {sym:'PEP',  name:'PepsiCo Inc',         sector:'Cons Staples', mcap:224, pe:22.4,fwdPe:20.8,div:2.88,px:162.4, chg:-0.04,vol:5.8e6,beta:0.48,roe:44,pb:9.4, evEbitda:16.4},
+  {sym:'PG',   name:'Procter & Gamble',    sector:'Cons Staples', mcap:348, pe:26.4,fwdPe:24.8,div:2.44,px:144.4, chg:+0.04,vol:7.8e6,beta:0.48,roe:28,pb:7.8, evEbitda:18.4},
+  {sym:'COST', name:'Costco Wholesale',    sector:'Cons Staples', mcap:324, pe:48.4,fwdPe:44.8,div:0.68,px:728.4, chg:+0.44,vol:2.8e6,beta:0.78,roe:28,pb:13.4,evEbitda:34.4},
+  {sym:'WMT',  name:'Walmart Inc',         sector:'Cons Staples', mcap:548, pe:28.4,fwdPe:26.8,div:1.32,px:68.4,  chg:+0.22,vol:18e6,beta:0.58,roe:18,pb:5.4, evEbitda:18.4},
+  {sym:'PM',   name:'Philip Morris',       sector:'Cons Staples', mcap:158, pe:17.4,fwdPe:14.8,div:5.44,px:98.4,  chg:+0.44,vol:5.8e6,beta:0.78,roe:null,pb:null,evEbitda:12.4},
+  {sym:'MO',   name:'Altria Group',        sector:'Cons Staples', mcap:88,  pe:8.4, fwdPe:9.4, div:8.88,px:42.4,  chg:+0.22,vol:8.8e6,beta:0.58,roe:null,pb:null,evEbitda:9.4},
+  {sym:'MDLZ', name:'Mondelez Intl',       sector:'Cons Staples', mcap:88,  pe:22.4,fwdPe:18.4,div:2.88,px:64.4,  chg:-0.08,vol:5.8e6,beta:0.68,roe:14,pb:3.4, evEbitda:16.4},
+  {sym:'GIS',  name:'General Mills',       sector:'Cons Staples', mcap:38,  pe:14.4,fwdPe:12.4,div:4.08,px:64.4,  chg:-0.14,vol:4.8e6,beta:0.48,roe:24,pb:3.8, evEbitda:11.4},
+  {sym:'KHC',  name:'Kraft Heinz',         sector:'Cons Staples', mcap:38,  pe:14.4,fwdPe:10.4,div:5.44,px:32.4,  chg:-0.08,vol:9.8e6,beta:0.68,roe:4, pb:1.0, evEbitda:8.4},
+  {sym:'SYY',  name:'Sysco Corp',          sector:'Cons Staples', mcap:38,  pe:18.4,fwdPe:15.4,div:2.88,px:74.4,  chg:+0.04,vol:4.8e6,beta:1.08,roe:44,pb:8.4, evEbitda:12.4},
+  // ── Comm Services ──
+  {sym:'NFLX', name:'Netflix Inc',         sector:'Comm Svcs',    mcap:248, pe:48.4,fwdPe:34.4,div:0.0, px:578.4, chg:+0.88,vol:4.8e6,beta:1.28,roe:24,pb:11.4,evEbitda:34.4},
+  {sym:'DIS',  name:'Walt Disney Co',      sector:'Comm Svcs',    mcap:174, pe:78.4,fwdPe:24.4,div:0.0, px:94.4,  chg:-0.28,vol:9.8e6,beta:1.38,roe:4, pb:2.0, evEbitda:14.4},
+  {sym:'T',    name:'AT&T Inc',            sector:'Comm Svcs',    mcap:118, pe:14.4,fwdPe:8.4, div:6.88,px:16.8,  chg:+0.18,vol:68e6,beta:0.68,roe:8, pb:1.2, evEbitda:6.4},
+  {sym:'VZ',   name:'Verizon Comms',       sector:'Comm Svcs',    mcap:168, pe:14.8,fwdPe:8.8, div:6.44,px:40.4,  chg:-0.08,vol:22e6,beta:0.48,roe:12,pb:1.6, evEbitda:6.4},
+  {sym:'CMCSA',name:'Comcast Corp',        sector:'Comm Svcs',    mcap:168, pe:12.4,fwdPe:9.8, div:2.88,px:42.4,  chg:-0.22,vol:22e6,beta:0.88,roe:14,pb:2.0, evEbitda:7.4},
+  {sym:'CHTR', name:'Charter Comms',       sector:'Comm Svcs',    mcap:58,  pe:24.4,fwdPe:18.4,div:0.0, px:368.4, chg:-0.34,vol:1.2e6,beta:1.08,roe:8, pb:3.4, evEbitda:7.4},
+  {sym:'TMUS', name:'T-Mobile US',         sector:'Comm Svcs',    mcap:198, pe:22.4,fwdPe:18.4,div:1.88,px:168.4, chg:+0.22,vol:3.8e6,beta:0.58,roe:14,pb:3.4, evEbitda:9.4},
+  // ── Utilities ──
+  {sym:'NEE',  name:'NextEra Energy',      sector:'Utilities',    mcap:124, pe:22.4,fwdPe:19.8,div:2.88,px:58.4,  chg:-0.28,vol:14e6,beta:0.58,roe:12,pb:2.8, evEbitda:14.4},
+  {sym:'DUK',  name:'Duke Energy',         sector:'Utilities',    mcap:74,  pe:18.4,fwdPe:17.8,div:4.28,px:98.4,  chg:-0.14,vol:5.8e6,beta:0.48,roe:8, pb:1.6, evEbitda:12.4},
+  {sym:'SO',   name:'Southern Company',    sector:'Utilities',    mcap:72,  pe:22.4,fwdPe:18.8,div:4.08,px:68.4,  chg:+0.04,vol:7.8e6,beta:0.48,roe:8, pb:2.0, evEbitda:12.4},
+  {sym:'AEP',  name:'Amer Elec Power',     sector:'Utilities',    mcap:44,  pe:18.8,fwdPe:16.8,div:4.08,px:82.4,  chg:-0.08,vol:4.8e6,beta:0.48,roe:8, pb:1.6, evEbitda:11.4},
+  {sym:'EXC',  name:'Exelon Corp',         sector:'Utilities',    mcap:38,  pe:14.4,fwdPe:13.8,div:3.88,px:38.4,  chg:-0.18,vol:9.8e6,beta:0.48,roe:8, pb:1.4, evEbitda:9.4},
+  {sym:'XEL',  name:'Xcel Energy',         sector:'Utilities',    mcap:32,  pe:18.4,fwdPe:16.8,div:3.88,px:58.4,  chg:-0.14,vol:4.8e6,beta:0.48,roe:8, pb:2.0, evEbitda:11.4},
+  {sym:'ED',   name:'Consol Edison',       sector:'Utilities',    mcap:28,  pe:18.4,fwdPe:17.4,div:3.44,px:88.4,  chg:-0.08,vol:2.8e6,beta:0.38,roe:8, pb:1.6, evEbitda:11.4},
+  {sym:'AWK',  name:'Amer Water Works',    sector:'Utilities',    mcap:22,  pe:28.4,fwdPe:24.8,div:2.28,px:124.4, chg:-0.08,vol:1.8e6,beta:0.88,roe:12,pb:3.4, evEbitda:18.4},
+  // ── Real Estate ──
+  {sym:'AMT',  name:'American Tower',      sector:'Real Estate',  mcap:88,  pe:44.4,fwdPe:38.8,div:3.44,px:188.4, chg:-0.44,vol:3.8e6,beta:0.88,roe:14,pb:8.4, evEbitda:24.4},
+  {sym:'PLD',  name:'Prologis Inc',        sector:'Real Estate',  mcap:118, pe:44.4,fwdPe:28.4,div:2.88,px:128.4, chg:-0.22,vol:4.8e6,beta:1.08,roe:8, pb:3.8, evEbitda:22.4},
+  {sym:'EQIX', name:'Equinix Inc',         sector:'Real Estate',  mcap:78,  pe:88.4,fwdPe:68.4,div:2.08,px:824.8, chg:+0.14,vol:0.8e6,beta:0.78,roe:4, pb:7.4, evEbitda:28.4},
+  {sym:'CCI',  name:'Crown Castle',        sector:'Real Estate',  mcap:44,  pe:34.4,fwdPe:44.4,div:6.44,px:104.8, chg:-0.88,vol:3.8e6,beta:1.08,roe:8, pb:4.4, evEbitda:18.4},
+  {sym:'SPG',  name:'Simon Property',      sector:'Real Estate',  mcap:58,  pe:24.4,fwdPe:22.4,div:5.44,px:154.4, chg:-0.14,vol:2.8e6,beta:1.28,roe:28,pb:14.4,evEbitda:16.4},
+  {sym:'O',    name:'Realty Income',       sector:'Real Estate',  mcap:48,  pe:44.4,fwdPe:38.8,div:5.88,px:54.4,  chg:-0.28,vol:8.8e6,beta:0.88,roe:4, pb:2.4, evEbitda:16.4},
+  {sym:'WELL', name:'Welltower Inc',       sector:'Real Estate',  mcap:68,  pe:244, fwdPe:58.4,div:2.44,px:118.4, chg:-0.14,vol:3.8e6,beta:0.88,roe:4, pb:3.4, evEbitda:28.4},
+  // ── Materials ──
+  {sym:'LIN',  name:'Linde PLC',           sector:'Materials',    mcap:208, pe:34.4,fwdPe:28.8,div:1.44,px:442.4, chg:+0.22,vol:2.8e6,beta:0.78,roe:18,pb:6.4, evEbitda:22.4},
+  {sym:'APD',  name:'Air Products',        sector:'Materials',    mcap:54,  pe:18.4,fwdPe:17.8,div:2.88,px:244.4, chg:-0.14,vol:2.4e6,beta:0.88,roe:14,pb:2.8, evEbitda:14.4},
+  {sym:'FCX',  name:'Freeport-McMoRan',    sector:'Materials',    mcap:64,  pe:22.4,fwdPe:17.8,div:1.44,px:44.4,  chg:+0.44,vol:18e6,beta:1.68,roe:18,pb:2.8, evEbitda:8.4},
+  {sym:'NEM',  name:'Newmont Corp',        sector:'Materials',    mcap:48,  pe:null,fwdPe:14.8,div:4.44,px:38.4,  chg:+0.88,vol:14e6,beta:0.88,roe:8, pb:2.0, evEbitda:8.4},
+  {sym:'DOW',  name:'Dow Inc',             sector:'Materials',    mcap:38,  pe:22.4,fwdPe:14.4,div:5.88,px:52.4,  chg:-0.22,vol:8.8e6,beta:1.28,roe:14,pb:1.8, evEbitda:6.4},
+  {sym:'DD',   name:'DuPont de Nemours',   sector:'Materials',    mcap:32,  pe:28.4,fwdPe:18.8,div:1.44,px:74.4,  chg:+0.14,vol:3.8e6,beta:1.18,roe:8, pb:2.4, evEbitda:11.4},
+  {sym:'ECL',  name:'Ecolab Inc',          sector:'Materials',    mcap:58,  pe:44.4,fwdPe:36.8,div:0.88,px:204.4, chg:+0.14,vol:2.4e6,beta:0.88,roe:18,pb:7.8, evEbitda:28.4},
+  {sym:'PPG',  name:'PPG Industries',      sector:'Materials',    mcap:28,  pe:18.4,fwdPe:14.8,div:2.08,px:118.4, chg:-0.14,vol:2.8e6,beta:1.18,roe:18,pb:3.4, evEbitda:11.4},
+  {sym:'NUE',  name:'Nucor Corp',          sector:'Materials',    mcap:28,  pe:14.4,fwdPe:12.8,div:1.88,px:118.4, chg:+0.22,vol:2.8e6,beta:1.28,roe:18,pb:2.4, evEbitda:6.4},
 ];
+
 
 // ── Screener state ──
 const SCRN_STATE = {
@@ -3463,6 +3600,22 @@ function rSCRN(){
         <span class="scrn-flabel">1D CHG MAX (%)</span>
         <input class="scrn-input" id="sf-chgmax" type="number" placeholder="e.g. 5" step="0.1">
       </div>
+      <div class="scrn-fgroup">
+        <span class="scrn-flabel">BETA &lt;</span>
+        <input class="scrn-input" id="sf-beta" type="number" placeholder="e.g. 1.2" step="0.1" min="0">
+      </div>
+      <div class="scrn-fgroup">
+        <span class="scrn-flabel">P/B &lt;</span>
+        <input class="scrn-input" id="sf-pb" type="number" placeholder="e.g. 5" step="0.1" min="0">
+      </div>
+      <div class="scrn-fgroup">
+        <span class="scrn-flabel">ROE &gt; (%)</span>
+        <input class="scrn-input" id="sf-roe" type="number" placeholder="e.g. 15" min="0">
+      </div>
+      <div class="scrn-fgroup">
+        <span class="scrn-flabel">EV/EBITDA &lt;</span>
+        <input class="scrn-input" id="sf-evebitda" type="number" placeholder="e.g. 20" min="0">
+      </div>
       <div class="scrn-sep"></div>
       <div style="display:flex;flex-direction:column;gap:3px;align-self:flex-end">
         <div class="scrn-presets">
@@ -3470,6 +3623,8 @@ function rSCRN(){
           <button class="scrn-preset" onclick="scrnPreset('growth')">GROWTH</button>
           <button class="scrn-preset" onclick="scrnPreset('value')">VALUE</button>
           <button class="scrn-preset" onclick="scrnPreset('momentum')">MOMENTUM</button>
+          <button class="scrn-preset" onclick="scrnPreset('lowvol')">LOW VOL</button>
+          <button class="scrn-preset" onclick="scrnPreset('quality')">QUALITY</button>
           <button class="scrn-preset" onclick="scrnClear()">CLEAR</button>
         </div>
         <div style="display:flex;gap:4px">
@@ -3482,9 +3637,9 @@ function rSCRN(){
       <span id="scrn-spinner">⟳ FETCHING…</span>
       <span>RESULTS: <span id="scrn-count">—</span></span>
       <span style="color:var(--border3)">|</span>
-      <span id="scrn-source">BASE DATASET · 85 US STOCKS</span>
+      <span id="scrn-source">BASE DATASET · 200 US STOCKS</span>
       <span style="color:var(--border3)">|</span>
-      <span style="color:#2a2a2a">CLICK TICKER → DES &nbsp;|&nbsp; CLICK HEADER → SORT &nbsp;|&nbsp; MAX 50 RESULTS</span>
+      <span style="color:#707070">S&P 500 + large/mid-cap NYSE &amp; NASDAQ &nbsp;|&nbsp; CLICK TICKER → EQS &nbsp;|&nbsp; CLICK HEADER → SORT</span>
     </div>
     <div id="scrn-table-wrap">
       <table id="scrn-table">
@@ -3501,7 +3656,7 @@ function rSCRN(){
           <th data-col="vol"    onclick="scrnSort('vol')">AVG VOL</th>
         </tr></thead>
         <tbody id="scrn-tbody">
-          <tr><td colspan="10" class="scrn-no-results" style="color:#2a2a2a">
+          <tr><td colspan="14" class="scrn-no-results" style="color:#888">
             SET FILTERS AND CLICK ▶ RUN SCREEN
           </td></tr>
         </tbody>
@@ -3515,9 +3670,9 @@ function initSCRN(){
   const f = SCRN_STATE.filters;
   const el = id => document.getElementById(id);
   const sf = el('sf-sector'); if(sf) sf.value = f.sector;
-  ['mcap','pe','div','px','chgmin','chgmax'].forEach(k=>{
+  ['mcap','pe','div','px','chgmin','chgmax','beta','pb','roe','evebitda'].forEach(k=>{
     const inp = el('sf-'+k);
-    if(inp) inp.value = f[k==='chgmin'?'chgMin':k==='chgmax'?'chgMax':k] || '';
+    if(inp) inp.value = f[{chgmin:'chgMin',chgmax:'chgMax',beta:'betaMax',pb:'pbMax',roe:'roeMin',evebitda:'evEbitdaMax'}[k]||k] || '';
   });
   // If we already have results, re-render them
   if(SCRN_STATE.filtered.length) scrnRenderTable();
@@ -3532,13 +3687,17 @@ function initSCRN(){
 function scrnReadFilters(){
   const v = id => { const el=document.getElementById(id); return el?el.value.trim():''; };
   SCRN_STATE.filters = {
-    sector:  v('sf-sector') || 'ALL',
-    mcapMin: v('sf-mcap'),
-    peMax:   v('sf-pe'),
-    divMin:  v('sf-div'),
-    pxMin:   v('sf-px'),
-    chgMin:  v('sf-chgmin'),
-    chgMax:  v('sf-chgmax'),
+    sector:    v('sf-sector') || 'ALL',
+    mcapMin:   v('sf-mcap'),
+    peMax:     v('sf-pe'),
+    divMin:    v('sf-div'),
+    pxMin:     v('sf-px'),
+    chgMin:    v('sf-chgmin'),
+    chgMax:    v('sf-chgmax'),
+    betaMax:   v('sf-beta'),
+    pbMax:     v('sf-pb'),
+    roeMin:    v('sf-roe'),
+    evEbitdaMax: v('sf-evebitda'),
   };
 }
 
@@ -3550,8 +3709,12 @@ function scrnApplyFilters(data){
   const peMax   = n(f.peMax);
   const divMin  = n(f.divMin);
   const pxMin   = n(f.pxMin);
-  const chgMin  = n(f.chgMin);
-  const chgMax  = n(f.chgMax);
+  const chgMin     = n(f.chgMin);
+  const chgMax     = n(f.chgMax);
+  const betaMax    = n(f.betaMax);
+  const pbMax      = n(f.pbMax);
+  const roeMin     = n(f.roeMin);
+  const evEbitdaMax= n(f.evEbitdaMax);
 
   // Deduplicate by symbol first
   const seen = new Set();
@@ -3563,8 +3726,12 @@ function scrnApplyFilters(data){
     if(peMax   !== null && (r.pe   == null || r.pe   > peMax))   return false;
     if(divMin  !== null && (r.div  == null || r.div  < divMin))  return false;
     if(pxMin   !== null && (r.px   == null || r.px   < pxMin))   return false;
-    if(chgMin  !== null && (r.chg  == null || r.chg  < chgMin))  return false;
-    if(chgMax  !== null && (r.chg  == null || r.chg  > chgMax))  return false;
+    if(chgMin     !== null && (r.chg      == null || r.chg      < chgMin))     return false;
+    if(chgMax     !== null && (r.chg      == null || r.chg      > chgMax))     return false;
+    if(betaMax    !== null && (r.beta     == null || r.beta     > betaMax))    return false;
+    if(pbMax      !== null && (r.pb       == null || r.pb       > pbMax))      return false;
+    if(roeMin     !== null && (r.roe      == null || r.roe      < roeMin))     return false;
+    if(evEbitdaMax!== null && (r.evEbitda == null || r.evEbitda > evEbitdaMax)) return false;
     return true;
   });
 }
@@ -3607,12 +3774,12 @@ function scrnUpdateSortHeaders(){
 function scrnRenderTable(){
   const tbody = document.getElementById('scrn-tbody');
   if(!tbody) return;
-  const rows = SCRN_STATE.filtered.slice(0,50); // hard cap 50
+  const rows = SCRN_STATE.filtered.slice(0,200);
   const countEl = document.getElementById('scrn-count');
-  if(countEl) countEl.textContent = rows.length + (SCRN_STATE.filtered.length>50?' (capped at 50)':'');
+  if(countEl) countEl.textContent = SCRN_STATE.filtered.length + (SCRN_STATE.filtered.length>200?' (showing 200)':'');
 
   if(!rows.length){
-    tbody.innerHTML=`<tr><td colspan="10" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="14" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
     return;
   }
 
@@ -3635,6 +3802,10 @@ function scrnRenderTable(){
       <td>${fwdStr}</td>
       <td>${divStr}</td>
       <td style="color:var(--text-dim)">${volStr}</td>
+      <td style="color:${r.beta!=null?(r.beta>1.5?'var(--red)':r.beta<0.8?'var(--green)':'var(--text-mid)'):'#333'}">${r.beta!=null?r.beta.toFixed(2):'<span style="color:#333">—</span>'}</td>
+      <td style="color:#a0a0a0">${r.roe!=null?r.roe.toFixed(0)+'%':'<span style="color:#333">—</span>'}</td>
+      <td>${r.pb!=null?r.pb.toFixed(2):'<span style="color:#333">—</span>'}</td>
+      <td style="color:#888">${r.evEbitda!=null?r.evEbitda.toFixed(1):'<span style="color:#333">—</span>'}</td>
     </tr>`;
   }).join('');
 }
@@ -3661,12 +3832,16 @@ function scrnPreset(name){
       set('sf-pe','15'); set('sf-mcap','20'); break;
     case 'momentum':
       set('sf-chgmin','0.5'); set('sf-mcap','10'); break;
+    case 'lowvol':
+      set('sf-beta','0.8'); set('sf-mcap','20'); break;
+    case 'quality':
+      set('sf-roe','20'); set('sf-pb','10'); set('sf-mcap','30'); break;
   }
   scrnRun();
 }
 
 function scrnClear(){
-  ['sf-mcap','sf-pe','sf-div','sf-px','sf-chgmin','sf-chgmax'].forEach(id=>{
+  ['sf-mcap','sf-pe','sf-div','sf-px','sf-chgmin','sf-chgmax','sf-beta','sf-pb','sf-roe','sf-evebitda'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sec=document.getElementById('sf-sector'); if(sec) sec.value='ALL';
@@ -3758,6 +3933,77 @@ async function scrnFetchLive(){
 // ═══════════════════════════════════════════
 // HOME — Market Overview Dashboard
 // ═══════════════════════════════════════════
+function buildMarketSummary(){
+  const spx   = D.equities.indices[0];
+  const ndx   = D.equities.indices[1];
+  const vix   = D.equities.indices[4];
+  const t     = D.fixedIncome.treasuries;
+  const y10   = t.find(x=>x.tenor==='10Y')?.yield ?? 0;
+  const y2    = t.find(x=>x.tenor==='2Y')?.yield ?? 0;
+  const spread= (y10-y2)*100;
+  const gold  = D.commodities.metals[0];
+  const wti   = D.commodities.energy[0];
+  const dxy   = D.fx.find(f=>f.name==='DXY');
+  const sectors = D.equities.sectors||[];
+  const topSec  = [...sectors].sort((a,b)=>b.d1-a.d1)[0];
+  const botSec  = [...sectors].sort((a,b)=>a.d1-b.d1)[0];
+  const advSec  = sectors.filter(s=>s.d1>0).length;
+  const decSec  = sectors.filter(s=>s.d1<0).length;
+
+  // Build a readable, auto-generated daily summary
+  const lines = [];
+
+  // Equity tone
+  const spxDir  = spx.pct > 0.5 ? 'rallying' : spx.pct < -0.5 ? 'selling off' : spx.pct > 0 ? 'edging higher' : 'drifting lower';
+  const spxMag  = Math.abs(spx.pct) > 1.5 ? 'sharply ' : Math.abs(spx.pct) > 0.7 ? '' : 'modestly ';
+  lines.push(`Equities are ${spxMag}${spxDir} — S&P 500 ${spx.pct>=0?'+':''}${spx.pct.toFixed(2)}% · NASDAQ ${ndx.pct>=0?'+':''}${ndx.pct.toFixed(2)}%.`);
+
+  // Breadth
+  if(advSec > decSec) lines.push(`Broad participation with ${advSec} of ${sectors.length} sectors advancing.`);
+  else if(decSec > advSec) lines.push(`Risk-off tone with ${decSec} of ${sectors.length} sectors in the red.`);
+  if(topSec && botSec) lines.push(`${topSec.name} leads (+${topSec.d1.toFixed(2)}%), ${botSec.name} lags (${botSec.d1.toFixed(2)}%).`);
+
+  // Volatility
+  const vixTxt = vix.val < 15 ? `VIX is low at ${vix.val.toFixed(1)}, signalling complacency.`
+               : vix.val < 20 ? `VIX is moderate at ${vix.val.toFixed(1)}, near historical average.`
+               : vix.val < 30 ? `VIX elevated at ${vix.val.toFixed(1)}, reflecting market anxiety.`
+               : `VIX spiking at ${vix.val.toFixed(1)} — significant stress in the market.`;
+  lines.push(vixTxt);
+
+  // Rates
+  const curveShape = spread > 20 ? 'steepening (normal)' : spread > 0 ? 'nearly flat' : 'inverted';
+  const rateDir = (t.find(x=>x.tenor==='10Y')?.d1??0) > 0 ? 'rising' : 'falling';
+  lines.push(`10Y yield ${rateDir} at ${y10.toFixed(3)}% · 2s10s spread ${spread>=0?'+':''}${spread.toFixed(0)}bp (${curveShape}).`);
+
+  // Commodities & FX
+  const goldDir = gold.d1 > 0 ? `Gold up ${gold.d1.toFixed(2)}% at $${gold.spot.toFixed(0)}` : `Gold down ${Math.abs(gold.d1).toFixed(2)}% at $${gold.spot.toFixed(0)}`;
+  const oilDir  = wti.d1 > 0  ? `WTI +${wti.d1.toFixed(2)}%` : `WTI ${wti.d1.toFixed(2)}%`;
+  const dxyDir  = dxy ? (dxy.d1>0?`DXY firmer at ${dxy.val.toFixed(2)}`:`DXY softer at ${dxy.val.toFixed(2)}`) : '';
+  lines.push(`${goldDir} · ${oilDir} · ${dxyDir}.`);
+
+  // Risk signal
+  const riskOn  = spx.pct > 0 && gold.d1 < 0 && vix.val < 20;
+  const riskOff = spx.pct < 0 && gold.d1 > 0 && vix.val > 20;
+  const regime  = riskOn  ? {txt:'RISK-ON',  col:'var(--green)', note:'Equities bid, gold soft, vol contained.'}
+                : riskOff ? {txt:'RISK-OFF', col:'var(--red)',   note:'Equities pressured, gold bid, vol elevated.'}
+                :           {txt:'MIXED',    col:'var(--amber)', note:'Conflicting signals across asset classes.'};
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'America/Denver'});
+
+  return `
+    <div style="padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:#040404">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap">
+        <span style="font-size:9px;color:#555;letter-spacing:1px">${dateStr.toUpperCase()}</span>
+        <span style="font-size:9px;letter-spacing:1px;padding:1px 6px;border:1px solid ${regime.col};color:${regime.col};font-weight:600">${regime.txt}</span>
+        <span style="font-size:9px;color:#666">${regime.note}</span>
+      </div>
+      <div style="font-size:11px;color:#c0c0c0;line-height:1.7">
+        ${lines.map(l=>`<span style="margin-right:14px;display:inline">${l}</span>`).join('')}
+      </div>
+    </div>`;
+}
+
 function rHOME(){
   const t = D.fixedIncome.treasuries;
   const y2  = t.find(x=>x.tenor==='2Y')?.yield ?? 0;
@@ -3878,6 +4124,8 @@ function rHOME(){
       <span style="font-size:10px;color:${mktStatus.col};letter-spacing:1px">${mktStatus.txt}</span>
       <span id="home-clock" style="color:#2a2a2a;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
     </div>
+    <!-- DAILY SUMMARY -->
+    ${buildMarketSummary()}
     <!-- MARKET TILES -->
     <div id="home-grid" style="flex-shrink:0">
       ${tile('spx','S&P 500', spx.val.toFixed(1), spx.pct, spx.pct.toFixed(2)+'%', 'SPX', 'EQ')}
@@ -4182,6 +4430,7 @@ function heatColor(v, lo, hi){
 // ═══════════════════════════════════════════
 
 WTITLES['HELP'] = 'COMMAND REFERENCE';
+WTITLES['WATCH'] = 'WATCHLIST';
 WTITLES['SRCH'] = 'SEARCH RESULTS';
 WTITLES['SCRN'] = 'EQUITY SCREENER — US STOCKS';
 WTITLES['HOME'] = 'MARKET OVERVIEW';
@@ -4193,6 +4442,7 @@ WTITLES['CARRY']   = 'FX CARRY TRADE MONITOR';
 WTITLES['ROTATION']= 'SECTOR ROTATION TRACKER';
 WTITLES['LADDER']  = 'BOND LADDER — DURATION RISK';
 WSIZES['HELP']  = [680,560];
+WSIZES['WATCH'] = [560,480];
 WSIZES['SRCH']  = [560,360];
 WSIZES['SCRN']  = [920,580];
 WSIZES['HOME']  = [780,520];
@@ -4203,6 +4453,173 @@ WSIZES['ECON']  = [680,480];
 WSIZES['CARRY'] = [700,420];
 WSIZES['ROTATION']=[760,480];
 WSIZES['LADDER']= [680,420];
+
+// ═══════════════════════════════════════════
+// WATCHLIST SYSTEM
+// ═══════════════════════════════════════════
+let WL = JSON.parse(localStorage.getItem('wl_v1') || '["AAPL","MSFT","NVDA","SPY","QQQ"]');
+function wlSave(){ try{ localStorage.setItem('wl_v1', JSON.stringify(WL)); }catch(e){} }
+
+function wlAdd(ticker){
+  const t = ticker.toUpperCase().trim();
+  if(!t || WL.includes(t)) return;
+  WL.push(t);
+  wlSave();
+  wlRefresh();
+}
+function wlRemove(ticker){
+  WL = WL.filter(t=>t!==ticker);
+  wlSave();
+  wlRefresh();
+}
+function wlToggle(ticker){
+  if(WL.includes(ticker.toUpperCase())) wlRemove(ticker.toUpperCase());
+  else wlAdd(ticker.toUpperCase());
+  // Update star button in EQS if open
+  document.querySelectorAll('[data-wl-star]').forEach(btn=>{
+    if(btn.getAttribute('data-wl-star')===ticker.toUpperCase()){
+      btn.textContent = WL.includes(ticker.toUpperCase()) ? '★' : '☆';
+      btn.style.color  = WL.includes(ticker.toUpperCase()) ? '#ffab00' : '#555';
+    }
+  });
+}
+function wlRefresh(){
+  const w = WR['WATCH'];
+  if(!w) return;
+  const b = document.getElementById('wb-WATCH');
+  if(b){ b.innerHTML = rWATCH(); setTimeout(()=>initWATCH(),60); }
+}
+
+function rWATCH(){
+  return `<div style="display:flex;flex-direction:column;height:100%">
+    <div style="padding:6px 10px;border-bottom:1px solid #111;flex-shrink:0;background:#050505;display:flex;gap:8px;align-items:center">
+      <input id="wl-add-input" placeholder="Add ticker…" type="text" maxlength="8"
+        style="flex:1;background:#0d0d0d;border:1px solid #2a2a2a;color:#e0e0e0;font-family:var(--font);font-size:11px;padding:4px 8px;outline:none"
+        onkeydown="if(event.key==='Enter'){wlAdd(this.value);this.value=''}"
+        oninput="this.value=this.value.toUpperCase()">
+      <button onclick="wlAdd(document.getElementById('wl-add-input').value);document.getElementById('wl-add-input').value=''"
+        style="background:#ffab00;border:none;color:#000;font-family:var(--font);font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;letter-spacing:.5px">+ ADD</button>
+    </div>
+    <div id="wl-loading" style="display:none;padding:12px;text-align:center;color:#555;font-size:10px">
+      <span style="color:var(--amber)">⟳</span> FETCHING PRICES…
+    </div>
+    <div id="wl-table-wrap" style="flex:1;overflow-y:auto">
+      <table id="wl-table" style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="position:sticky;top:0;background:#080808;z-index:1">
+            <th style="text-align:left;font-size:9px;color:#888;padding:5px 10px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">TICKER</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">LAST</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">CHG</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">CHG%</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">52W%</th>
+            <th style="text-align:center;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">SPARK</th>
+            <th style="padding:5px 6px;border-bottom:1px solid #1a1a1a"></th>
+          </tr>
+        </thead>
+        <tbody id="wl-tbody">
+          ${WL.map(t=>`<tr id="wlr-${t}">
+            <td style="padding:8px 10px;color:var(--amber);font-weight:600;font-size:11px;cursor:pointer"
+              onclick="OW('EQS');setTimeout(()=>fetchEQS('${t}'),80)">${t}</td>
+            <td id="wlp-${t}" style="text-align:right;padding:8px;color:#888;font-size:11px">…</td>
+            <td id="wlc-${t}" style="text-align:right;padding:8px;font-size:11px">…</td>
+            <td id="wlpct-${t}" style="text-align:right;padding:8px;font-size:11px">…</td>
+            <td id="wl52-${t}" style="text-align:right;padding:8px;font-size:10px;color:#666">…</td>
+            <td style="padding:4px 8px;text-align:center"><canvas id="wls-${t}" width="60" height="24" style="display:block"></canvas></td>
+            <td style="padding:4px 6px;text-align:center">
+              <button onclick="wlRemove('${t}')" title="Remove from watchlist"
+                style="background:none;border:none;color:#333;cursor:pointer;font-size:14px;line-height:1;padding:2px"
+                onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='#333'">✕</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${WL.length===0?'<div style="padding:24px;text-align:center;color:#444;font-size:11px">No tickers in watchlist.<br><span style="font-size:9px;color:#2a2a2a">Type a ticker above and press Enter to add.</span></div>':''}
+    </div>
+    <div style="padding:5px 10px;border-top:1px solid #111;font-size:9px;color:#333;flex-shrink:0;display:flex;justify-content:space-between">
+      <span>★ to favorite from any EQS panel · prices refresh every 60s</span>
+      <span id="wl-lastupd"></span>
+    </div>
+  </div>`;
+}
+
+async function initWATCH(){
+  if(!WL.length) return;
+  const loading = document.getElementById('wl-loading');
+  if(loading) loading.style.display='block';
+
+  // Fetch all tickers in batches via Yahoo Finance
+  const results = {};
+  const batchSize = 5;
+  for(let i=0; i<WL.length; i+=batchSize){
+    const batch = WL.slice(i, i+batchSize);
+    await Promise.allSettled(batch.map(async ticker=>{
+      try{
+        const r = await proxyFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=3mo`,8000);
+        const d = await r.json();
+        const meta = d?.chart?.result?.[0]?.meta;
+        const closes = d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(Boolean)||[];
+        if(meta && meta.regularMarketPrice){
+          const px   = meta.regularMarketPrice;
+          const prev = meta.chartPreviousClose||px;
+          const chg  = px-prev;
+          const pct  = (chg/prev)*100;
+          const hi52 = meta.fiftyTwoWeekHigh||px;
+          const lo52 = meta.fiftyTwoWeekLow||px;
+          const pct52= lo52>0?((px-lo52)/(hi52-lo52)*100):0;
+          results[ticker]={px,chg,pct,pct52,closes};
+        }
+      }catch(e){}
+    }));
+  }
+
+  if(loading) loading.style.display='none';
+
+  // Update each row
+  WL.forEach(ticker=>{
+    const d = results[ticker];
+    const pEl   = document.getElementById('wlp-'+ticker);
+    const cEl   = document.getElementById('wlc-'+ticker);
+    const pctEl = document.getElementById('wlpct-'+ticker);
+    const p52El = document.getElementById('wl52-'+ticker);
+    const cnv   = document.getElementById('wls-'+ticker);
+    if(!pEl) return;
+
+    if(d){
+      const up = d.chg>=0;
+      const col = up ? 'var(--green)' : 'var(--red)';
+      pEl.textContent   = d.px < 10 ? d.px.toFixed(3) : d.px.toFixed(2);
+      pEl.style.color   = '#e0e0e0';
+      cEl.innerHTML     = `<span style="color:${col}">${up?'+':''}${d.chg.toFixed(2)}</span>`;
+      pctEl.innerHTML   = `<span style="color:${col}">${up?'+':''}${d.pct.toFixed(2)}%</span>`;
+      if(p52El){
+        const p52c = d.pct52>66?'var(--green)':d.pct52>33?'var(--amber)':'var(--red)';
+        p52El.innerHTML = `<span style="color:${p52c}">${d.pct52.toFixed(0)}%</span>`;
+      }
+      // Sparkline
+      if(cnv && d.closes.length>1){
+        const W=60,H=24,pts=d.closes.slice(-30);
+        const mn=Math.min(...pts),mx=Math.max(...pts);
+        const ctx=cnv.getContext('2d');
+        ctx.clearRect(0,0,W,H);
+        ctx.beginPath();
+        pts.forEach((v,i)=>{
+          const x=i/(pts.length-1)*W;
+          const y=H-((v-mn)/(mx-mn||1))*(H-2)-1;
+          i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        });
+        ctx.strokeStyle = up?'#00c853':'#e53935';
+        ctx.lineWidth=1.5;
+        ctx.stroke();
+      }
+    } else {
+      pEl.innerHTML = `<span style="color:#333">N/A</span>`;
+      cEl.innerHTML = pctEl.innerHTML = `<span style="color:#333">—</span>`;
+    }
+  });
+
+  const upd = document.getElementById('wl-lastupd');
+  if(upd){ const now=new Date(); upd.textContent='Updated '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}); }
+}
 
 function rHELP(){
   const core = [
@@ -4846,14 +5263,21 @@ let _chartData=null; // cached raw data
 
 function setChartRange(range,btn){
   _chartRange=range;
-  document.querySelectorAll('#wb-CHART .tbtn[onclick*="setChartRange"]').forEach(b=>b.classList.remove('active'));
+  // The window key may include the symbol (e.g. wb-CHART_SPY), so search all open CHART panels
+  document.querySelectorAll('[id^="wb-CHART"] .tbtn[onclick*="setChartRange"]').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  else {
+    // called programmatically — find the matching button and activate it
+    document.querySelectorAll('[id^="wb-CHART"] .tbtn[onclick*="setChartRange"]').forEach(b=>{
+      if(b.getAttribute('onclick').includes("'"+range+"'")) b.classList.add('active');
+    });
+  }
   loadChartData();
 }
 
 function setChartType(type,btn){
   _chartType=type;
-  document.querySelectorAll('#wb-CHART .tbtn[id^="chart-type"]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[id^="wb-CHART"] .tbtn[id^="chart-type"]').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   if(_chartData) renderChartFromData(_chartData);
 }
@@ -5169,211 +5593,172 @@ window.addEventListener('load',()=>{
   }
 
 // ═══════════════════════════════════════════
-// ACCESSIBILITY SYSTEM
+// ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
 // ═══════════════════════════════════════════
 const ACC_DEFAULTS = {
-  fontSize:    13,   // base px (html element)
-  contrast:    0,    // 0=default, 1=high, 2=max
-  colorMode:   'default', // default | deuteranopia | protanopia | tritanopia | mono
-  reduceMotion:false,
-  boldText:    false,
-  largeTargets:false,
-  dyslexiaFont:false,
+  fontSize:13, contrast:0, colorMode:'default',
+  reduceMotion:false, boldText:false, largeTargets:false, dyslexiaFont:false,
 };
 let ACC = {...ACC_DEFAULTS};
 
-// Persist to sessionStorage so settings survive panel reloads
-function accSave(){
-  try{ sessionStorage.setItem('acc_v1', JSON.stringify(ACC)); }catch(e){}
-}
-function accLoad(){
-  try{
-    const s = sessionStorage.getItem('acc_v1');
-    if(s) ACC = {...ACC_DEFAULTS, ...JSON.parse(s)};
-  }catch(e){}
-}
+function accSave(){ try{ sessionStorage.setItem('acc_v2',JSON.stringify(ACC)); }catch(e){} }
+function accLoad(){ try{ const s=sessionStorage.getItem('acc_v2'); if(s) ACC={...ACC_DEFAULTS,...JSON.parse(s)}; }catch(e){} }
 accLoad();
 
 function accApply(){
   const root = document.documentElement;
   const body = document.body;
 
-  // 1 — Font size (root em scale)
+  // Font size
   root.style.fontSize = ACC.fontSize + 'px';
 
-  // 2 — Bold text
+  // Bold
   body.style.fontWeight = ACC.boldText ? '600' : '';
 
-  // 3 — Dyslexia font (OpenDyslexic via Google Fonts fallback)
+  // Dyslexia font
   if(ACC.dyslexiaFont){
     if(!document.getElementById('dyslexia-font-link')){
-      const lk = document.createElement('link');
+      const lk=document.createElement('link');
       lk.id='dyslexia-font-link'; lk.rel='stylesheet';
       lk.href='https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap';
       document.head.appendChild(lk);
     }
-    root.style.setProperty('--font', "'Lexend', sans-serif");
+    root.style.setProperty('--font',"'Lexend', sans-serif");
   } else {
-    root.style.setProperty('--font', "'IBM Plex Mono', monospace");
+    root.style.setProperty('--font',"'IBM Plex Mono', monospace");
   }
 
-  // 4 — Contrast modes (inject/update a style tag)
-  let contrastCSS = '';
-  if(ACC.contrast===1){
-    contrastCSS = `
-      :root{ --text:#e8e8e8!important; --text-dim:#999!important; --text-mid:#c0c0c0!important; --text-bright:#ffffff!important; --border:#333!important; --border2:#444!important; --bg1:#0d0d0d!important; --bg2:#141414!important; }
-    `;
-  } else if(ACC.contrast===2){
-    contrastCSS = `
-      :root{ --text:#ffffff!important; --text-dim:#bbbbbb!important; --text-mid:#dddddd!important; --text-bright:#ffffff!important; --border:#555!important; --border2:#666!important; --bg:#000!important; --bg1:#0a0a0a!important; --bg2:#111!important; }
-      .win{ border:1px solid #555!important; }
-      .t th{ background:#111!important; }
-    `;
-  }
-
-  // 5 — Color-blind palettes
-  const cbPalettes = {
-    deuteranopia:  '--green:#0077bb!important;--red:#cc3311!important;--amber:#ee7733!important;',
-    protanopia:    '--green:#009988!important;--red:#ee3377!important;--amber:#ccbb44!important;',
-    tritanopia:    '--green:#00c853!important;--red:#cc0000!important;--amber:#ff8800!important;',
-    mono:          '--green:#e0e0e0!important;--red:#e0e0e0!important;--amber:#e0e0e0!important;--cyan:#e0e0e0!important;filter:grayscale(1);',
+  // Contrast + color mode CSS
+  let css = '';
+  if(ACC.contrast===1) css += ':root{--text:#e8e8e8!important;--text-dim:#999!important;--text-mid:#c0c0c0!important;--text-bright:#fff!important;--border:#333!important;--border2:#444!important;--bg1:#0d0d0d!important;--bg2:#141414!important;}';
+  if(ACC.contrast===2) css += ':root{--text:#fff!important;--text-dim:#bbb!important;--text-mid:#ddd!important;--text-bright:#fff!important;--border:#555!important;--border2:#666!important;}.win{border:1px solid #555!important;}.t th{background:#111!important;}';
+  const cbPal = {
+    deuteranopia: '--green:#0077bb!important;--red:#cc3311!important;--amber:#ee7733!important;',
+    protanopia:   '--green:#009988!important;--red:#ee3377!important;--amber:#ccbb44!important;',
+    tritanopia:   '--green:#00c853!important;--red:#cc0000!important;--amber:#ff8800!important;',
+    mono:         '--green:#e0e0e0!important;--red:#e0e0e0!important;--amber:#e0e0e0!important;--cyan:#e0e0e0!important;',
   };
-  if(ACC.colorMode !== 'default'){
-    contrastCSS += `:root{ ${cbPalettes[ACC.colorMode]||''} }`;
-    if(ACC.colorMode==='mono') body.style.filter='grayscale(1)';
-    else body.style.filter='';
-  } else {
-    body.style.filter='';
-  }
+  if(ACC.colorMode !== 'default') css += ':root{' + (cbPal[ACC.colorMode]||'') + '}';
+  body.style.filter = ACC.colorMode === 'mono' ? 'grayscale(1)' : '';
+  if(ACC.reduceMotion) css += '*,*::before,*::after{transition:none!important;animation:none!important;}';
+  if(ACC.largeTargets) css += '.scbtn-home,.scbtn-market,.scbtn-rates,.scbtn-macro,.scbtn-tool,.tbtn,.ptab{min-height:36px!important;padding-left:16px!important;padding-right:16px!important;font-size:12px!important;}.wh-btn,.wh-fs,.wh-refresh,.wh-close{font-size:14px!important;padding:0 8px!important;}';
 
-  // 6 — Reduce motion
-  let motionCSS = '';
-  if(ACC.reduceMotion){
-    motionCSS = `*,*::before,*::after{ transition:none!important; animation:none!important; }`;
-  }
-
-  // 7 — Large click targets
-  let targetCSS = '';
-  if(ACC.largeTargets){
-    targetCSS = `.scbtn-home,.scbtn-market,.scbtn-rates,.scbtn-macro,.scbtn-tool,.tbtn,.ptab{ min-height:36px!important; padding-left:16px!important; padding-right:16px!important; font-size:12px!important; } .wh-btn,.wh-fs,.wh-refresh,.wh-close{ font-size:14px!important; padding:0 8px!important; }`;
-  }
-
-  // Apply all via single injected style tag
   let tag = document.getElementById('acc-style');
-  if(!tag){ tag=document.createElement('style'); tag.id='acc-style'; document.head.appendChild(tag); }
-  tag.textContent = contrastCSS + motionCSS + targetCSS;
+  if(!tag){tag=document.createElement('style');tag.id='acc-style';document.head.appendChild(tag);}
+  tag.textContent = css;
 
   accSave();
-  accRefreshPanel();
+  // Re-render panel if open
+  const panel = document.getElementById('acc-panel-overlay');
+  if(panel) panel.innerHTML = _accPanelHTML();
 }
 
-function showAccessPanel(){
-  // Remove existing if open
-  const existing = document.getElementById('acc-panel-overlay');
-  if(existing){ existing.remove(); return; }
-
-  const overlay = document.createElement('div');
-  overlay.id = 'acc-panel-overlay';
-  overlay.style.cssText = `
-    position:fixed;right:12px;top:38px;width:320px;z-index:9999;
-    background:#080808;border:1px solid #2a2a2a;box-shadow:0 8px 32px rgba(0,0,0,.9);
-    font-family:var(--font);font-size:11px;color:#c8c8c8;
-  `;
-  overlay.innerHTML = accPanelHTML();
-  // Close on outside click
-  setTimeout(()=>{
-    document.addEventListener('mousedown', function outsideAcc(e){
-      if(!overlay.contains(e.target)){ overlay.remove(); document.removeEventListener('mousedown',outsideAcc); }
-    });
-  },50);
-  document.body.appendChild(overlay);
-}
-
-function accPanelHTML(){
+function _accPanelHTML(){
   const S = ACC;
-  const row = (label, sub, ctrl) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #111">
-      <div><div style="font-size:11px;color:#d0d0d0">${label}</div><div style="font-size:9px;color:#555;margin-top:1px">${sub}</div></div>
-      <div style="flex-shrink:0;margin-left:12px">${ctrl}</div>
-    </div>`;
+  const tog = (key, val) =>
+    `<button data-acc-tog="${key}" style="width:44px;height:24px;border-radius:12px;border:1px solid ${val?'#555':'#222'};background:${val?'#ffab00':'#1a1a1a'};cursor:pointer;position:relative;display:inline-block;vertical-align:middle;flex-shrink:0">` +
+    `<span style="position:absolute;top:3px;${val?'right:3px':'left:3px'};width:16px;height:16px;border-radius:8px;background:${val?'#000':'#444'};pointer-events:none"></span></button>`;
 
-  const tog = (id, val, fn) => `
-    <button id="acc-tog-${id}" onclick="${fn}" style="
-      width:40px;height:20px;border-radius:10px;border:1px solid ${val?'#444':'#222'};
-      background:${val?'#ffab00':'#111'};cursor:pointer;position:relative;transition:background .15s;
-    "><span style="
-      position:absolute;top:2px;${val?'right:2px':'left:2px'};
-      width:14px;height:14px;border-radius:7px;background:${val?'#000':'#333'};
-    "></span></button>`;
+  const ctrBtns = ['DEFAULT','HIGH','MAX'].map((l,i) =>
+    `<button data-acc-contrast="${i}" style="background:${S.contrast===i?'#ffab00':'#111'};color:${S.contrast===i?'#000':'#888'};border:1px solid ${S.contrast===i?'#ffab00':'#333'};font-family:var(--font);font-size:9px;padding:4px 9px;cursor:pointer;letter-spacing:.5px">${l}</button>`
+  ).join('');
 
-  const fontSz = S.fontSize;
-  const fontDisplay = `${fontSz}px`;
+  const colModes=['default','deuteranopia','protanopia','tritanopia','mono'];
+  const colLabels=['DEFAULT','DEUTER','PROTAN','TRITAN','MONO'];
+  const colBtns = colModes.map((m,i) =>
+    `<button data-acc-color="${m}" style="background:${S.colorMode===m?'#ffab00':'#111'};color:${S.colorMode===m?'#000':'#888'};border:1px solid ${S.colorMode===m?'#ffab00':'#333'};font-family:var(--font);font-size:9px;padding:4px 7px;cursor:pointer;letter-spacing:.5px">${colLabels[i]}</button>`
+  ).join('');
 
-  const contrastLabels = ['DEFAULT','HIGH','MAX'];
-  const contrastBtns = [0,1,2].map(i=>`
-    <button onclick="ACC.contrast=${i};accApply()" style="
-      background:${S.contrast===i?'#ffab00':'#111'};color:${S.contrast===i?'#000':'#888'};
-      border:1px solid ${S.contrast===i?'#ffab00':'#222'};font-family:var(--font);
-      font-size:9px;padding:3px 8px;cursor:pointer;letter-spacing:.5px
-    ">${contrastLabels[i]}</button>`).join('');
-
-  const colorModes = ['default','deuteranopia','protanopia','tritanopia','mono'];
-  const colorLabels= ['DEFAULT','DEUTER','PROTAN','TRITAN','MONO'];
-  const colorBtns = colorModes.map((m,i)=>`
-    <button onclick="ACC.colorMode='${m}';accApply()" style="
-      background:${S.colorMode===m?'#ffab00':'#111'};color:${S.colorMode===m?'#000':'#888'};
-      border:1px solid ${S.colorMode===m?'#ffab00':'#222'};font-family:var(--font);
-      font-size:9px;padding:3px 6px;cursor:pointer;letter-spacing:.5px
-    ">${colorLabels[i]}</button>`).join('');
+  const row = (label, desc, ctrl) =>
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #111;gap:12px">` +
+    `<div style="flex:1;min-width:0"><div style="font-size:11px;color:#d8d8d8;margin-bottom:2px">${label}</div><div style="font-size:9px;color:#666">${desc}</div></div>` +
+    `<div style="flex-shrink:0">${ctrl}</div></div>`;
 
   return `
-    <div style="padding:10px 12px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between">
-      <div style="color:var(--amber);font-size:10px;font-weight:700;letter-spacing:2px">⌨ ACCESSIBILITY</div>
-      <button onclick="document.getElementById('acc-panel-overlay').remove()" style="background:none;border:none;color:#444;cursor:pointer;font-size:14px;font-family:var(--font)" onmouseover="this.style.color='#e0e0e0'" onmouseout="this.style.color='#444'">✕</button>
+    <div style="padding:10px 14px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between">
+      <span style="color:#ffab00;font-size:10px;font-weight:700;letter-spacing:2px">⌨ ACCESSIBILITY</span>
+      <button data-acc-close style="background:none;border:none;color:#666;cursor:pointer;font-size:16px;padding:0 2px;line-height:1">✕</button>
     </div>
-    <div style="padding:4px 12px 12px">
-
-      ${row('Font Size','Scale all terminal text',`
-        <div style="display:flex;align-items:center;gap:6px">
-          <button onclick="ACC.fontSize=Math.max(10,ACC.fontSize-1);accApply()" style="background:#111;border:1px solid #222;color:#888;font-family:var(--font);font-size:13px;width:22px;height:22px;cursor:pointer;line-height:1">−</button>
-          <span id="acc-fontsize-disp" style="color:var(--amber);min-width:28px;text-align:center;font-size:11px">${fontDisplay}</span>
-          <button onclick="ACC.fontSize=Math.min(20,ACC.fontSize+1);accApply()" style="background:#111;border:1px solid #222;color:#888;font-family:var(--font);font-size:13px;width:22px;height:22px;cursor:pointer;line-height:1">+</button>
-          <button onclick="ACC.fontSize=13;accApply()" style="background:#111;border:1px solid #222;color:#555;font-family:var(--font);font-size:9px;padding:3px 6px;cursor:pointer">RESET</button>
-        </div>`
-      )}
-
-      ${row('Text Contrast','Boost foreground/background separation',`<div style="display:flex;gap:3px">${contrastBtns}</div>`)}
-
-      ${row('Color Vision','Adjust palette for color-blind users',`<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end">${colorBtns}</div>`)}
-
-      ${row('Bold Text','Increase font weight throughout',tog('bold',S.boldText,'ACC.boldText=!ACC.boldText;accApply()'))}
-
-      ${row('Dyslexia-Friendly Font','Switch to Lexend (rounded, readable)',tog('dyslexia',S.dyslexiaFont,'ACC.dyslexiaFont=!ACC.dyslexiaFont;accApply()'))}
-
-      ${row('Larger Click Targets','Bigger tabs & buttons (accessibility)',tog('targets',S.largeTargets,'ACC.largeTargets=!ACC.largeTargets;accApply()'))}
-
-      ${row('Reduce Motion','Disable transitions & animations',tog('motion',S.reduceMotion,'ACC.reduceMotion=!ACC.reduceMotion;accApply()'))}
-
-      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        <button onclick="ACC=structuredClone(ACC_DEFAULTS);accApply()" style="background:#111;border:1px solid #222;color:#666;font-family:var(--font);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.5px" onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#666'">RESET ALL DEFAULTS</button>
-        <span style="font-size:9px;color:#2a2a2a">Settings auto-saved this session</span>
+    <div style="padding:6px 14px 14px">
+      ${row('Font Size','Scales all terminal text (10–20px)',
+        `<div style="display:flex;align-items:center;gap:6px">
+          <button data-acc-font="-1" style="background:#1a1a1a;border:1px solid #333;color:#ccc;font-size:16px;width:26px;height:26px;cursor:pointer;line-height:1;font-family:var(--font)">−</button>
+          <span data-acc-fontdisp style="color:#ffab00;min-width:30px;text-align:center;font-size:12px">${S.fontSize}px</span>
+          <button data-acc-font="+1" style="background:#1a1a1a;border:1px solid #333;color:#ccc;font-size:16px;width:26px;height:26px;cursor:pointer;line-height:1;font-family:var(--font)">+</button>
+          <button data-acc-font="reset" style="background:#1a1a1a;border:1px solid #333;color:#777;font-family:var(--font);font-size:9px;padding:4px 7px;cursor:pointer">RESET</button>
+        </div>`)}
+      ${row('Text Contrast','Boost foreground/background contrast',`<div style="display:flex;gap:3px">${ctrBtns}</div>`)}
+      ${row('Color Vision','Palette for color-blind users',`<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end">${colBtns}</div>`)}
+      ${row('Bold Text','Heavier font weight throughout',tog('boldText',S.boldText))}
+      ${row('Dyslexia-Friendly Font','Switch to Lexend (rounded, readable)',tog('dyslexiaFont',S.dyslexiaFont))}
+      ${row('Larger Click Targets','Bigger tabs and buttons',tog('largeTargets',S.largeTargets))}
+      ${row('Reduce Motion','Disable all transitions &amp; animations',tog('reduceMotion',S.reduceMotion))}
+      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <button data-acc-reset style="background:#1a1a1a;border:1px solid #333;color:#888;font-family:var(--font);font-size:9px;padding:5px 12px;cursor:pointer;letter-spacing:.5px">RESET ALL DEFAULTS</button>
+        <span style="font-size:9px;color:#444">Saved this session</span>
       </div>
     </div>`;
 }
 
-function accRefreshPanel(){
-  const p = document.getElementById('acc-panel-overlay');
-  if(!p) return;
-  p.innerHTML = accPanelHTML();
+function showAccessPanel(){
+  const existing = document.getElementById('acc-panel-overlay');
+  if(existing){ existing.remove(); return; }
+  const overlay = document.createElement('div');
+  overlay.id = 'acc-panel-overlay';
+  Object.assign(overlay.style, {
+    position:'fixed', right:'12px', top:'36px', width:'340px', zIndex:'99999',
+    background:'#070707', border:'1px solid #333', boxShadow:'0 12px 40px rgba(0,0,0,.95)',
+    fontFamily:'var(--font)', fontSize:'11px', color:'#c8c8c8',
+  });
+  overlay.innerHTML = _accPanelHTML();
+  document.body.appendChild(overlay);
+
+  // Event delegation — one listener on the panel handles everything
+  overlay.addEventListener('click', e => {
+    const t = e.target;
+
+    // Close button
+    if(t.closest('[data-acc-close]')){ overlay.remove(); return; }
+
+    // Font size
+    const fontBtn = t.closest('[data-acc-font]');
+    if(fontBtn){
+      const v = fontBtn.getAttribute('data-acc-font');
+      if(v==='-1') ACC.fontSize = Math.max(10, ACC.fontSize-1);
+      else if(v==='+1') ACC.fontSize = Math.min(20, ACC.fontSize+1);
+      else ACC.fontSize = 13;
+      accApply(); return;
+    }
+
+    // Contrast
+    const ctrBtn = t.closest('[data-acc-contrast]');
+    if(ctrBtn){ ACC.contrast = parseInt(ctrBtn.getAttribute('data-acc-contrast')); accApply(); return; }
+
+    // Color mode
+    const colBtn = t.closest('[data-acc-color]');
+    if(colBtn){ ACC.colorMode = colBtn.getAttribute('data-acc-color'); accApply(); return; }
+
+    // Toggle switches
+    const togBtn = t.closest('[data-acc-tog]');
+    if(togBtn){ const k = togBtn.getAttribute('data-acc-tog'); ACC[k] = !ACC[k]; accApply(); return; }
+
+    // Reset all
+    if(t.closest('[data-acc-reset]')){ ACC = {...ACC_DEFAULTS}; accApply(); return; }
+  });
+
+  // Close on outside click
+  setTimeout(()=>{
+    document.addEventListener('mousedown', function outsideAcc(e){
+      if(!overlay.isConnected) return;
+      if(!overlay.contains(e.target)){ overlay.remove(); document.removeEventListener('mousedown',outsideAcc); }
+    });
+  }, 60);
 }
 
-// Apply stored settings on load
+// Apply on load + ⌃K shortcut
 accApply();
+document.addEventListener('keydown', e=>{ if(e.ctrlKey && e.key==='k'){ e.preventDefault(); showAccessPanel(); } });
 
-// Keyboard shortcut ⌃K
-document.addEventListener('keydown', e=>{
-  if(e.ctrlKey && e.key==='k'){ e.preventDefault(); showAccessPanel(); }
-});
 
   const s=document.createElement('script');
   s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';

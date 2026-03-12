@@ -121,21 +121,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   position:relative;width:100%;height:calc(100vh - 70px);
   background:#000;
   background-image:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 2px,
-      rgba(0,0,0,0.28) 2px,
-      rgba(0,0,0,0.28) 3px
-    ),
-    radial-gradient(ellipse 120% 120% at 50% 50%, transparent 40%, rgba(0,0,0,0.55) 100%);
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%201000%20500%27%20preserveAspectRatio%3D%27xMidYMid%20slice%27%3E%0A%20%20%3Crect%20width%3D%271000%27%20height%3D%27500%27%20fill%3D%27none%27/%3E%0A%20%20%3Cpath%20d%3D%27M95%2C80%20L120%2C75%20L145%2C72%20L165%2C78%20L175%2C90%20L180%2C105%20L172%2C118%20L165%2C130%20L158%2C148%20L150%2C162%20L140%2C175%20L135%2C190%20L128%2C205%20L120%2C218%20L115%2C230%20L118%2C242%20L125%2C250%20L130%2C260%20L128%2C272%20L120%2C278%20L112%2C272%20L105%2C262%20L98%2C252%20L92%2C240%20L88%2C225%20L82%2C212%20L78%2C198%20L75%2C182%20L72%2C165%20L70%2C148%20L68%2C130%20L70%2C112%20L75%2C98%20L85%2C88%20Z%20M130%2C260%20L138%2C268%20L145%2C278%20L150%2C290%20L148%2C302%20L140%2C308%20L132%2C304%20L126%2C295%20L124%2C282%20L126%2C270%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.06%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M185%2C42%20L202%2C38%20L218%2C40%20L228%2C50%20L225%2C62%20L215%2C70%20L200%2C72%20L188%2C65%20L182%2C54%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.04%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.14%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M175%2C278%20L188%2C272%20L202%2C270%20L215%2C274%20L225%2C285%20L230%2C300%20L228%2C318%20L222%2C335%20L215%2C352%20L208%2C368%20L200%2C382%20L192%2C392%20L184%2C400%20L175%2C405%20L168%2C398%20L162%2C385%20L158%2C368%20L156%2C350%20L156%2C332%20L158%2C315%20L162%2C298%20L168%2C285%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.06%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M430%2C68%20L445%2C65%20L460%2C66%20L472%2C72%20L478%2C82%20L474%2C92%20L465%2C98%20L458%2C108%20L452%2C118%20L445%2C125%20L438%2C120%20L432%2C110%20L428%2C98%20L425%2C86%20L426%2C75%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.06%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.22%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M462%2C48%20L472%2C44%20L480%2C48%20L485%2C58%20L480%2C68%20L472%2C72%20L465%2C66%20L460%2C56%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M448%2C148%20L465%2C142%20L482%2C140%20L498%2C144%20L510%2C155%20L518%2C170%20L520%2C188%20L518%2C208%20L512%2C228%20L505%2C248%20L496%2C268%20L486%2C285%20L474%2C298%20L462%2C308%20L450%2C312%20L438%2C308%20L428%2C298%20L420%2C282%20L415%2C265%20L412%2C245%20L412%2C225%20L414%2C205%20L418%2C185%20L424%2C168%20L432%2C155%20Z%27%20fill%3D%27rgba%280%2C200%2C100%2C0.06%29%27%20stroke%3D%27rgba%280%2C200%2C100%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M495%2C68%20L520%2C60%20L548%2C55%20L578%2C52%20L608%2C54%20L635%2C58%20L658%2C65%20L675%2C75%20L685%2C88%20L688%2C102%20L682%2C116%20L670%2C126%20L655%2C132%20L640%2C138%20L622%2C142%20L605%2C145%20L588%2C148%20L572%2C150%20L556%2C148%20L540%2C144%20L525%2C138%20L512%2C130%20L502%2C118%20L496%2C105%20L492%2C90%20L493%2C78%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M640%2C138%20L658%2C144%20L672%2C155%20L678%2C170%20L672%2C184%20L658%2C190%20L644%2C186%20L636%2C172%20L636%2C158%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.16%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M572%2C150%20L588%2C148%20L602%2C152%20L612%2C162%20L615%2C178%20L610%2C195%20L600%2C210%20L588%2C220%20L576%2C215%20L568%2C200%20L565%2C184%20L566%2C168%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M680%2C295%20L700%2C288%20L722%2C285%20L742%2C288%20L758%2C298%20L765%2C312%20L762%2C328%20L752%2C340%20L736%2C348%20L718%2C350%20L700%2C346%20L686%2C336%20L678%2C322%20L676%2C308%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.05%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M720%2C90%20L728%2C86%20L736%2C88%20L740%2C96%20L736%2C104%20L728%2C106%20L720%2C102%20L717%2C95%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cline%20x1%3D%270%27%20y1%3D%27250%27%20x2%3D%271000%27%20y2%3D%27250%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.06%29%27%20stroke-width%3D%270.6%27%20stroke-dasharray%3D%276%2C10%27/%3E%0A%20%20%3Cline%20x1%3D%270%27%20y1%3D%27195%27%20x2%3D%271000%27%20y2%3D%27195%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%270%27%20y1%3D%27305%27%20x2%3D%271000%27%20y2%3D%27305%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%27250%27%20y1%3D%270%27%20x2%3D%27250%27%20y2%3D%27500%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%27500%27%20y1%3D%270%27%20x2%3D%27500%27%20y2%3D%27500%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%27750%27%20y1%3D%270%27%20x2%3D%27750%27%20y2%3D%27500%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%3C/svg%3E"),
+    radial-gradient(ellipse 110% 110% at 50% 50%, transparent 35%, rgba(0,0,0,0.72) 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
   overflow:hidden;
 }
 #workspace::before{
   content:'';
   position:absolute;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(255,171,0,0.018) 0%, transparent 70%);
+    repeating-linear-gradient(to bottom,transparent 0px,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 3px);
 }
 
 /* ── WELCOME ── */
@@ -520,7 +517,7 @@ canvas{display:block}
   <button class="scbtn-tool" onclick="OW('SCRN')" title="Screener">SCRN</button>
   <div id="sc-right"><span title="Ctrl+F">⌃F</span> FULL &nbsp;·&nbsp; <span title="Ctrl+A">⌃A</span> LAYOUT &nbsp;·&nbsp; <span title="Ctrl+K">⌃K</span> ACCESS &nbsp;·&nbsp; <span title="Ctrl+Backspace">⌃⌫</span> CLOSE</div>
 </div>
-<button onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (⌃K)" style="position:fixed;top:0;right:0;height:32px;z-index:2100;background:#060606;border:none;border-left:1px solid #1a1a1a;color:#3a3a3a;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:0 12px;cursor:pointer;white-space:nowrap;letter-spacing:.5px" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#3a3a3a'">⌨ ACCESS</button>
+<button onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (⌃K)" style="position:fixed;top:50px;right:0;height:32px;z-index:2100;background:#060606;border:none;border-left:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;color:#3a3a3a;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:0 12px;cursor:pointer;white-space:nowrap;letter-spacing:.5px" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#3a3a3a'">⌨ ACCESS</button>
 
 <!-- STATUS BAR -->
 <div id="status-bar" style="height:16px;background:#050505;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.5px;overflow:hidden;white-space:nowrap;color:#2a2a2a"></div>
@@ -5921,8 +5918,16 @@ function accApply(){
   const root = document.documentElement;
   const body = document.body;
 
-  // Font size
-  root.style.fontSize = ACC.fontSize + 'px';
+  // Font size — use zoom so px-based layouts scale correctly
+  const zoomMap = {10:0.77, 11:0.85, 12:0.92, 13:1.0, 14:1.08, 15:1.15, 16:1.23, 17:1.31, 18:1.38, 19:1.46, 20:1.54};
+  const z = zoomMap[ACC.fontSize] || 1.0;
+  body.style.zoom = z.toString();
+  // Counter-zoom the acc panel and fixed btn so they stay crisp at viewport scale
+  const counterZ = (1 / z).toFixed(4);
+  const panel = document.getElementById('acc-panel-overlay');
+  if(panel) panel.style.zoom = counterZ;
+  const btn = document.getElementById('acc-btn');
+  if(btn){ btn.style.zoom = counterZ; btn.style.top = (50 * z) + 'px'; btn.style.right = '0px'; }
 
   // Bold
   body.style.fontWeight = ACC.boldText ? '600' : '';
@@ -5961,8 +5966,8 @@ function accApply(){
 
   accSave();
   // Re-render panel if open
-  const panel = document.getElementById('acc-panel-overlay');
-  if(panel) panel.innerHTML = _accPanelHTML();
+  const _panelEl = document.getElementById('acc-panel-overlay');
+  if(_panelEl){ _panelEl.innerHTML = _accPanelHTML(); _panelEl.style.zoom = (1/(parseFloat(body.style.zoom)||1)).toFixed(4); }
 }
 
 function _accPanelHTML(){
@@ -6024,6 +6029,9 @@ function showAccessPanel(){
   });
   overlay.innerHTML = _accPanelHTML();
   document.body.appendChild(overlay);
+  // Counter-zoom so panel appears at true viewport scale regardless of body zoom
+  const bz = parseFloat(document.body.style.zoom) || 1;
+  overlay.style.zoom = (1/bz).toFixed(4);
 
   // Event delegation — one listener on the panel handles everything
   overlay.addEventListener('click', e => {

@@ -2578,14 +2578,23 @@ async function proxyFetch(url, timeoutMs=10000){
   const proxies = [
     `https://corsproxy.io/?${encodeURIComponent(url)}`,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://thingproxy.freeboard.io/fetch/${url}`,
     `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+    `https://cors.eu.org/${url}`,
   ];
   let lastErr;
   for(const proxied of proxies){
     try{
       const r = await fetch(proxied, {signal: AbortSignal.timeout(timeoutMs)});
       if(!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r;
+      // Peek at first bytes — if it starts with "Edge" or "Too Many" it's a proxy error page
+      const clone = r.clone();
+      const peek = await clone.text();
+      if(peek.startsWith('Edge') || peek.startsWith('Too Many') || peek.startsWith('error') || peek.startsWith('<!DOCTYPE') || peek.startsWith('<html')){
+        throw new Error(`Proxy error: ${peek.slice(0,40)}`);
+      }
+      // Return a Response from the text so callers can still .json() or .text() it
+      return new Response(peek, {status:200, headers:{'Content-Type': r.headers.get('Content-Type')||'application/json'}});
     }catch(e){ lastErr=e; continue; }
   }
   throw lastErr;
@@ -2629,22 +2638,25 @@ async function fetchTreasuryYields(){
   ];
   let anyOk = false;
   const seen = new Set();
-  await Promise.allSettled(allSyms.map(async ({sym, tenor}) => {
-    if(seen.has(tenor)) return; // skip if already got this tenor
+  for(const {sym, tenor} of allSyms){
+    if(seen.has(tenor)) continue;
     try{
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d`;
       const r = await proxyFetch(url, 7000);
       const d = await r.json();
       const m = d?.chart?.result?.[0]?.meta;
-      if(!m?.regularMarketPrice) return;
-      const row = D.fixedIncome.treasuries.find(t => t.tenor === tenor);
-      if(!row) return;
-      row.yield = m.regularMarketPrice;
-      row.d1    = +((m.regularMarketPrice - (m.chartPreviousClose||m.regularMarketPrice))).toFixed(3);
-      seen.add(tenor);
-      anyOk = true;
+      if(!m) throw new Error('no meta for '+sym);
+      if(!seen.has(tenor)){
+        seen.add(tenor);
+        const price = m.regularMarketPrice;
+        const prev  = m.chartPreviousClose || price;
+        const d1    = +((price-prev)/prev*100).toFixed(3);
+        const t = D.fixedIncome.treasuries.find(x=>x.tenor===tenor);
+        if(t){ t.yield=+price.toFixed(3); t.d1=d1; anyOk=true; }
+      }
     }catch(e){}
-  }));
+    await new Promise(r=>setTimeout(r,280));
+  }
   if(anyOk) markFresh('TREAS');
   else markStale('TREAS', 'all yield tickers failed');
 }
@@ -2777,14 +2789,23 @@ async function fetchFXRates(){
 const INDEX_SYMS = ['^GSPC','^IXIC','^DJI','^RUT','^VIX'];
 async function fetchEquityIndices(){
   markPending('EQ');
-  const results = await Promise.allSettled(INDEX_SYMS.map(async sym => {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d`;
-    const r = await proxyFetch(url, 9000);
-    const d = await r.json();
-    const m = d?.chart?.result?.[0]?.meta;
-    if(!m) throw new Error('no meta');
-    return { sym, price: m.regularMarketPrice, prev: m.chartPreviousClose };
-  }));
+  // Stagger fetches 300ms apart to reduce proxy rate-limit hits
+  const allResults = [];
+  for(const sym of INDEX_SYMS){
+    const result = await Promise.race([
+      (async()=>{
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d`;
+        const r = await proxyFetch(url, 9000);
+        const d = await r.json();
+        const m = d?.chart?.result?.[0]?.meta;
+        if(!m) throw new Error('no meta');
+        return {status:'fulfilled', value:{ sym, price: m.regularMarketPrice, prev: m.chartPreviousClose }};
+      })().catch(e=>({status:'rejected',reason:e})),
+    ]);
+    allResults.push(result);
+    await new Promise(r=>setTimeout(r,350));
+  }
+  const results = allResults;
   let anyOk = false;
   results.forEach((r, i) => {
     if(r.status !== 'fulfilled') return;
@@ -2940,7 +2961,8 @@ async function fetchFREDData(){
   for(const s of series){
     try{
       const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${s.id}&api_key=${API_KEYS.FRED}&sort_order=desc&limit=2&file_type=json`;
-      const r = await proxyFetch(url, 10000);
+      const r = await fetch(url, {signal: AbortSignal.timeout(10000)});
+      if(!r.ok) throw new Error(`FRED HTTP ${r.status}`);
       const data = await r.json();
       const obs = data?.observations?.filter(o=>o.value!='.');
       if(obs && obs.length){
@@ -4146,13 +4168,14 @@ function rHOME(){
   const _n = (v,d=2,pre='',suf='') => v!=null ? pre+v.toFixed(d)+suf : '<span style="color:#2a2a2a">—</span>';
   const _nc = (v,d=2) => v!=null ? (v>0?'+':'')+v.toFixed(d) : '—';
   function tile(id,label,valFmt,chg,chgFmt,meta,cmd,extra){
-    const chgCol = chg>0?'var(--green)':chg<0?'var(--red)':'#444';
-    const chgSign = chg>0?'+':'';
+    const _chg = chg ?? 0;
+    const chgCol = _chg>0?'var(--green)':_chg<0?'var(--red)':'#444';
+    const chgSign = _chg>0?'+':'';
     return `<div class="home-tile" onclick="OW('${cmd}'${extra?`,'${extra}'`:''})" id="ht-${id}">
       <span class="home-tile-label">${label}</span>
       <span class="home-tile-val" id="htv-${id}">${valFmt}</span>
       <div class="home-tile-sub">
-        <span class="home-tile-chg" style="color:${chgCol}">${chgSign}${chgFmt}</span>
+        <span class="home-tile-chg" style="color:${chgCol}">${_chg!=0||chgFmt?chgSign+(chgFmt??""):'—'}</span>
         <span class="home-tile-meta">${meta}</span>
       </div>
       <div class="home-sparkwrap"><canvas id="hts-${id}" height="28"></canvas></div>
@@ -4276,10 +4299,10 @@ function rHOME(){
 function initHOME(){
   const t = D.fixedIncome.treasuries;
   const sparkDefs = [
-    {id:'spx',   base: D.equities.indices[0].val,   vol:.006},
-    {id:'ndx',   base: D.equities.indices[1].val,   vol:.008},
-    {id:'dow',   base: D.equities.indices[2]?.val||35000, vol:.005},
-    {id:'vix',   base: D.equities.indices[4].val,   vol:.025},
+    {id:'spx',   base: D.equities.indices[0]?.val||5000,  vol:.006},
+    {id:'ndx',   base: D.equities.indices[1]?.val||17000, vol:.008},
+    {id:'dow',   base: D.equities.indices[2]?.val||40000, vol:.005},
+    {id:'vix',   base: D.equities.indices[4]?.val||18,    vol:.025},
     {id:'ust10', base: t.find(x=>x.tenor==='10Y')?.yield??4.5, vol:.003},
     {id:'dxy',   base: D.fx.find(f=>f.name==='DXY')?.val??103, vol:.003},
     {id:'eur',   base: D.fx.find(f=>f.name==='EURUSD')?.val??1.08, vol:.003},
@@ -5630,17 +5653,31 @@ function drawVolumeChart(volumes, timestamps, labels, up){
 async function pollAllUpgraded(){
   FETCH_STATE.lastAttempt=new Date().toISOString();
   updateStatusBar();
-  await Promise.allSettled([
-    fetchTreasuryYields(),
-    fetchTreasuryAuctions(),
-    fetchSectorETFs(),
-    fetchFXRates(),
-    fetchEquityIndices(),
-    fetchCommodities(),
-    fetchRSSNews(),
-    fetchYahooStrip(),
-    fetchFREDData(),
+  // Fire non-proxy fetches immediately (they have CORS support)
+  const directFetches = Promise.allSettled([
+    fetchFXRates(),        // open.er-api.com — direct CORS
+    fetchTreasuryAuctions(), // fiscaldata.treasury.gov — direct CORS
+    fetchFREDData(),       // api.stlouisfed.org — direct CORS
+    fetchRSSNews(),        // RSS via allorigins
   ]);
+
+  // Stagger Yahoo proxy fetches to avoid rate limiting
+  await new Promise(r=>setTimeout(r,200));
+  await fetchTreasuryYields();
+
+  await new Promise(r=>setTimeout(r,400));
+  await fetchEquityIndices();
+
+  await new Promise(r=>setTimeout(r,400));
+  await fetchSectorETFs();
+
+  await new Promise(r=>setTimeout(r,400));
+  await fetchCommodities();
+
+  await new Promise(r=>setTimeout(r,200));
+  await fetchYahooStrip();
+
+  await directFetches;
   refreshOpenWindows();
 }
 

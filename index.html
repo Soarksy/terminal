@@ -466,7 +466,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 canvas{display:block}
 </style>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -509,8 +508,7 @@ canvas{display:block}
   <div class="sc-div"></div>
   <button class="scbtn-macro" onclick="OW('MACRO')" title="Macro Calendar">MACRO</button>
   <button class="scbtn-macro" onclick="OW('NEWS')" title="News">NEWS</button>
-  <button class="scbtn-macro" onclick="OW('MAP')" title="Global Map">MAP</button>
-  <div class="sc-div"></div>
+    <div class="sc-div"></div>
   <button class="scbtn-tool" onclick="OW('EQS')" title="Equity Search">EQS</button>
   <button class="scbtn-tool" onclick="OW('WATCH')" title="Watchlist">WATCH</button>
   <button class="scbtn-tool" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)" title="Chart">CHART</button>
@@ -693,10 +691,6 @@ const D = {
 
   companies:{},  // populated by fetchEQS live data
 
-  geospatial:{
-    sovereigns:[]  // populated live by fetchSovereignYields()
-  },
-
   // ── Extended sub-objects (populated by API polling) ──
   screener:  {},   // equity screener results (future)
   filings:   {},   // reserved
@@ -767,7 +761,7 @@ const WTITLES={
   VOL:'VOLATILITY & RISK',EQS:'EQUITY SEARCH',CHART:'PRICE CHART'
 };
 const WSIZES={
-  FI:[680,400],EQ:[700,440],FX:[580,360],CMDTY:[600,380],MAP:[940,580],
+  FI:[680,400],EQ:[700,440],FX:[580,360],CMDTY:[600,380],
   MACRO:[720,420],NEWS:[560,460],SPREAD:[620,400],INFL:[580,380],AUCTION:[780,260],
   VOL:[460,300],EQS:[620,560],CHART:[680,420]
 };
@@ -878,7 +872,6 @@ function renderW(cmd,key,extra){
     case'EQ':     b.innerHTML=rEQ();setTimeout(()=>drawEQ(),30);break;
     case'FX':     b.innerHTML=rFX();break;
     case'CMDTY':  b.innerHTML=rCMDTY();break;
-    case'MAP':    b.innerHTML=rMAP();setTimeout(()=>initMap(),30);break;
     case'MACRO':  b.innerHTML=rMACRO();break;
     case'NEWS':   b.innerHTML=rNEWS();break;
     case'INFL':   b.innerHTML=rINFL();setTimeout(()=>drawInfl(),30);break;
@@ -1340,7 +1333,8 @@ function rFX(){
         <td>${vol}</td></tr>`;
     }).join('');
     return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>LAST</th><th>1D</th><th>1W</th><th>1M</th><th>VOL</th></tr></thead><tbody>${rows}</tbody></table>`;
+      <table class="t"><thead><tr><th>PAIR</th><th>LAST</th><th>1D ●</th><th style="color:#383838">1W</th><th style="color:#383838">1M</th><th>VOL</th></tr></thead><tbody>${rows}</tbody></table>
+      <div style="font-size:8px;color:#2a2a2a;padding:2px 4px">● 1D live · 1W/1M reference values</div>`;
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
   const em=D.fx.filter(f=>f.type==='em');
@@ -1622,8 +1616,8 @@ function rVOL(){
       <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
         <tr><td style="color:var(--amber)">VIX</td><td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td><td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td><td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td><td style="color:#333;font-size:9px">S&P 500 30D implied</td></tr>
         <tr><td style="color:var(--amber)">VVIX</td><td>${(vix*5.8+3).toFixed(1)}</td><td class="neu">—</td><td class="${vix<20?'up':'dn'}">${vix<20?'NORMAL':'ELEVATED'}</td><td style="color:#707070;font-size:9px">Vol-of-vol</td></tr>
-        <tr><td style="color:var(--amber)">MOVE</td><td>${(90+vix*1.4).toFixed(1)}</td><td class="neu">—</td><td class="${vix<18?'up':'dn'}">${vix<18?'MODERATE':'ELEVATED'}</td><td style="color:#707070;font-size:9px">Treasury implied vol</td></tr>
-        <tr><td style="color:var(--amber)">SKEW</td><td>${(128+vix*0.8).toFixed(1)}</td><td class="neu">—</td><td class="w">MODERATE</td><td style="color:#707070;font-size:9px">Tail risk / put skew</td></tr>
+        <tr><td style="color:var(--amber)">MOVE</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">ICE BofA Treasury vol index</td></tr>
+        <tr><td style="color:var(--amber)">SKEW</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">CBOE tail risk index</td></tr>
       </tbody></table>
       <div class="sl" style="margin-top:6px">1Y VIX HISTORY</div>
       <canvas id="vol-hist-c" height="80" style="width:100%">
@@ -1679,7 +1673,7 @@ function rOPTIONS(){
     <div class="sl">SENTIMENT INDICATORS</div>
     <div class="sf" style="margin-bottom:8px">
       <div class="si"><span class="sil">VIX</span><span class="siv" style="color:${vixLevel.c}">${vix.toFixed(2)} — ${vixLevel.l}</span></div>
-      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:${parseFloat(pcRatio)>1?'var(--red)':'var(--green)'}">${pcRatio}</span></div>
+      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:#444">—</span></div>
       <div class="si"><span class="sil">CALL PREM</span><span class="siv up">$${bullPrem.toFixed(1)}M</span></div>
       <div class="si"><span class="sil">PUT PREM</span><span class="siv dn">$${bearPrem.toFixed(1)}M</span></div>
       <div class="si"><span class="sil">FLOW BIAS</span><span class="siv" style="color:${bullCount>=bearCount?'var(--green)':'var(--red)'}">${bullCount>=bearCount?'BULLISH':'BEARISH'}</span></div>
@@ -1808,6 +1802,7 @@ function rECON(){
     <div class="sf" style="margin-bottom:6px">
       <div class="si"><span class="sil">DATA SOURCE</span><span class="siv" style="color:${hasData?'var(--green)':'var(--red)'}">${hasData?'FRED LIVE':'FRED PENDING'}</span></div>
       <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">Mar 19, 2026</span></div>
+      <div class="si"><span class="sil">CB DATA</span><span class="siv" style="color:#444;font-size:9px">Manually maintained</span></div>
       <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
     </div>
     <div class="sl">KEY ECONOMIC RELEASES — LIVE FRED DATA</div>
@@ -2525,124 +2520,6 @@ function drawEQSCanvas(canvasId, pts, up){
 let leafletMap = null;
 
 // ── Geopolitical hotspots with market relevance ──
-const GEO_EVENTS = [
-  {id:'ukr',  lat:49.0, lng:31.5,  label:'Ukraine War',        sev:'high',  summary:'Active conflict. Energy/grain disruption, EU defense spend up. Watch EUR, natgas, wheat.'},
-  {id:'mid',  lat:31.5, lng:34.8,  label:'Middle East',        sev:'high',  summary:'Israel-Hamas ceasefire fragile. Houthi Red Sea attacks ongoing — shipping +15% cost. Watch oil, tanker stocks.'},
-  {id:'twn',  lat:23.7, lng:121.0, label:'Taiwan Strait',      sev:'med',   summary:'PLA air incursions elevated. Semiconductor supply chain risk. Watch TSMC, NVDA, AMAT.'},
-  {id:'chn',  lat:35.0, lng:105.0, label:'China Economy',      sev:'med',   summary:'Deflation risk, property sector stress. Stimulus ongoing. Watch copper, AUD, MCHI.'},
-  {id:'kor',  lat:37.5, lng:127.0, label:'Korea Political',    sev:'low',   summary:'Martial law episode resolved. Markets stabilized. Monitor KRW, KOSPI.'},
-  {id:'rus',  lat:55.7, lng:37.6,  label:'Russia Sanctions',   sev:'med',   summary:'Oil price cap enforcement. Shadow fleet active. Rouble peg pressure. Watch Brent-Urals spread.'},
-  {id:'irn',  lat:32.4, lng:53.7,  label:'Iran Nuclear',       sev:'med',   summary:'JCPOA talks stalled. Enrichment at 60%. Strait of Hormuz risk premium in oil. Watch Brent.'},
-  {id:'trk',  lat:39.9, lng:32.9,  label:'Turkey Macro',       sev:'med',   summary:'Inflation >65%, lira depreciation. CBRT hiking. Watch TRY, Turkish banks.'},
-  {id:'ven',  lat:6.4,  lng:-66.6, label:'Venezuela Oil',      sev:'low',   summary:'US sanctions partially lifted. PDVSA production recovering slowly.'},
-  {id:'nig',  lat:9.1,  lng:8.7,   label:'Nigeria/W.Africa',   sev:'low',   summary:'Naira devaluation, fuel subsidy removal. Brent Bonny Light spread widened.'},
-  {id:'arg',  lat:-34.6,lng:-58.4, label:'Argentina Reform',   sev:'med',   summary:'Milei austerity program. Peso stabilized post-devaluation. Sovereign spreads tightening.'},
-  {id:'usg',  lat:38.9, lng:-77.0, label:'US Fiscal / Tariffs',sev:'high',  summary:'Debt ceiling suspension extended. Tariff escalation ongoing vs China/EU/Canada. Watch USD, Treasuries, DXY.'},
-];
-
-const SEV_COLOR = {high:'#ff4444', med:'#ffab00', low:'#44aa44'};
-
-function rMAP(){
-  // Sidebar: tabs — Sovereign Yields | Hotspots | CDS Spreads
-  const sovRows = D.geospatial.sovereigns.slice().sort((a,b)=>b.y10-a.y10).map(s=>{
-    const rCol = s.rating.startsWith('AA')?'var(--green)':s.rating.startsWith('A')?'var(--amber)':s.rating.startsWith('B')?'#ff8800':'var(--red)';
-    return `<tr>
-      <td style="color:var(--amber);font-weight:600">${s.code}</td>
-      <td class="hl">${s.y10.toFixed(2)}</td>
-      <td>${fmtC(s.d1,2)}</td>
-      <td style="color:${rCol}">${s.rating}</td>
-      <td style="color:${s.cds>100?'var(--red)':s.cds>40?'var(--amber)':'#444'}">${s.cds}</td>
-    </tr>`;}).join('');
-
-  const hotRows = GEO_EVENTS.map(e=>`
-    <div style="border-bottom:1px solid #0f0f0f;padding:5px 4px;cursor:pointer"
-      onclick="if(leafletMap){leafletMap.setView([${e.lat},${e.lng}],5);}"
-      onmouseover="this.style.background='#111'" onmouseout="this.style.background=''">
-      <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
-        <span style="color:${SEV_COLOR[e.sev]};font-size:10px">●</span>
-        <span style="color:#c0c0c0;font-size:9px;font-weight:600">${e.label}</span>
-      </div>
-      <div style="font-size:8px;color:#555;line-height:1.4;padding-left:15px">${e.summary}</div>
-    </div>`).join('');
-
-  return `
-    <div style="display:flex;gap:0;height:100%;min-height:0">
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
-        <div style="flex-shrink:0;padding:3px 8px;font-size:8px;color:#555;letter-spacing:1px;border-bottom:1px solid var(--border);display:flex;gap:12px">
-          <span>● <span style="color:${SEV_COLOR.high}">HIGH RISK</span></span>
-          <span>● <span style="color:${SEV_COLOR.med}">MED RISK</span></span>
-          <span>● <span style="color:${SEV_COLOR.low}">MONITOR</span></span>
-          <span style="color:#333;margin-left:auto">SCROLL=ZOOM · DRAG=PAN · CLICK PIN=DETAIL</span>
-        </div>
-        <div id="leaflet-map-container" style="flex:1;min-height:0;border:1px solid var(--border)"></div>
-      </div>
-      <div style="width:210px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid #1a1a1a">
-        ${buildTabs('map-tabs',[
-          {id:'map-hotspots', label:'HOTSPOTS', content:`<div style="overflow-y:auto;flex:1;font-size:9px">${hotRows}</div>`},
-          {id:'map-sovereign', label:'SOVEREIGN', content:`<div style="overflow-y:auto;padding:4px"><table class="t"><thead><tr><th>CTY</th><th>10Y</th><th>1D</th><th>RTG</th><th>CDS</th></tr></thead><tbody>${sovRows}</tbody></table></div>`},
-        ])}
-      </div>
-    </div>`;
-}
-
-function initMap(){
-  if(typeof L === 'undefined'){ setTimeout(initMap, 120); return; }
-  const container = document.getElementById('leaflet-map-container');
-  if(!container) return;
-  if(leafletMap){ leafletMap.remove(); leafletMap = null; }
-
-  leafletMap = L.map('leaflet-map-container', {
-    center: [25, 15], zoom: 2,
-    zoomControl: false, attributionControl: false,
-    minZoom: 2, maxZoom: 12,
-  });
-
-  // Dark map tiles (CartoDB dark matter)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom:19, subdomains:'abcd'
-  }).addTo(leafletMap);
-
-  L.control.zoom({position:'topright'}).addTo(leafletMap);
-
-  // Add geopolitical risk markers
-  GEO_EVENTS.forEach(ev=>{
-    const col = SEV_COLOR[ev.sev];
-    const icon = L.divIcon({
-      className:'',
-      html:`<div style="width:12px;height:12px;border-radius:50%;background:${col};border:2px solid rgba(255,255,255,0.3);box-shadow:0 0 8px ${col};cursor:pointer"></div>`,
-      iconSize:[12,12], iconAnchor:[6,6],
-    });
-    L.marker([ev.lat, ev.lng], {icon})
-      .bindPopup(`<b style="color:${col}">${ev.label}</b><br><span style="font-size:10px;color:#aaa">${ev.summary}</span>`,
-        {className:'term-popup', maxWidth:260})
-      .addTo(leafletMap);
-  });
-
-  // Annotate key shipping chokepoints
-  const chokes = [
-    {lat:27.5,  lng:34.0,  name:'Red Sea / Bab-el-Mandeb', note:'Houthi disruption — rerouting via Cape'},
-    {lat:26.5,  lng:56.3,  name:'Strait of Hormuz',        note:'~20% global oil transit'},
-    {lat:1.3,   lng:103.8, name:'Strait of Malacca',       note:'~25% global trade, ~80% China oil imports'},
-    {lat:30.9,  lng:32.3,  name:'Suez Canal',              note:'~12% global trade'},
-    {lat:8.8,   lng:-79.5, name:'Panama Canal',            note:'Capacity normalized post-2024 drought. Normal throughput resumed.'},
-  ];
-  chokes.forEach(ch=>{
-    const icon = L.divIcon({
-      className:'',
-      html:`<div style="font-size:9px;color:#ffab00;white-space:nowrap;text-shadow:0 0 4px #000;pointer-events:none">⬡</div>`,
-      iconSize:[10,10], iconAnchor:[5,5],
-    });
-    L.marker([ch.lat, ch.lng], {icon})
-      .bindPopup(`<b style="color:#ffab00">${ch.name}</b><br><span style="font-size:10px;color:#aaa">${ch.note}</span>`,
-        {className:'term-popup', maxWidth:220})
-      .addTo(leafletMap);
-  });
-}
-
-
-// ═══════════════════════════════════════════
-// CLOCK + TOP STRIP
-// ═══════════════════════════════════════════
 function updateClock(){
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})+' ET';
 }
@@ -3060,53 +2937,6 @@ async function fetchSectorETFs(){
 // ═══════════════════════════════════════════
 // SOVEREIGN YIELDS — Yahoo Finance 10Y proxies
 // ═══════════════════════════════════════════
-const SOVEREIGN_MAP = [
-  {code:'US', name:'United States',  sym:'^TNX',   rating:'AAA', cds:22},
-  {code:'DE', name:'Germany',        sym:'GDBR10Y', rating:'AAA', cds:15},
-  {code:'GB', name:'United Kingdom', sym:'^TNX',   rating:'AA',  cds:24, override:4.62},
-  {code:'JP', name:'Japan',          sym:'^TNX',   rating:'A+',  cds:26, override:1.52},
-  {code:'FR', name:'France',         sym:'^TNX',   rating:'AA-', cds:38, override:3.22},
-  {code:'IT', name:'Italy',          sym:'^TNX',   rating:'BBB+',cds:82, override:3.88},
-  {code:'CN', name:'China',          sym:'^TNX',   rating:'A+',  cds:64, override:1.84},
-  {code:'AU', name:'Australia',      sym:'^TNX',   rating:'AAA', cds:17, override:4.44},
-  {code:'CA', name:'Canada',         sym:'^TNX',   rating:'AAA', cds:18, override:3.22},
-  {code:'KR', name:'South Korea',    sym:'^TNX',   rating:'AA',  cds:22, override:2.88},
-  {code:'BR', name:'Brazil',         sym:'^TNX',   rating:'BB',  cds:214,override:14.88},
-  {code:'TR', name:'Turkey',         sym:'^TNX',   rating:'B+',  cds:388,override:28.4},
-  {code:'IN', name:'India',          sym:'^TNX',   rating:'BBB-',cds:82, override:6.72},
-  {code:'ZA', name:'South Africa',   sym:'^TNX',   rating:'BB-', cds:222,override:10.88},
-  {code:'MX', name:'Mexico',         sym:'^TNX',   rating:'BBB-',cds:188,override:9.88},
-  {code:'NO', name:'Norway',         sym:'^TNX',   rating:'AAA', cds:11, override:3.44},
-  {code:'SE', name:'Sweden',         sym:'^TNX',   rating:'AAA', cds:11, override:2.88},
-  {code:'CH', name:'Switzerland',    sym:'^TNX',   rating:'AAA', cds:9,  override:0.44},
-  {code:'ES', name:'Spain',          sym:'^TNX',   rating:'A',   cds:42, override:3.44},
-  {code:'SG', name:'Singapore',      sym:'^TNX',   rating:'AAA', cds:9,  override:3.04},
-];
-async function fetchSovereignYields(){
-  // Fetch US 10Y live; use it as anchor, apply known spreads for others
-  let us10y = null;
-  try{
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?interval=1d&range=5d`;
-    const r = await proxyFetch(url, 9000);
-    const d = await r.json();
-    const m = d?.chart?.result?.[0]?.meta;
-    if(m) us10y = { y10: m.regularMarketPrice, d1: +((m.regularMarketPrice - m.chartPreviousClose)).toFixed(3) };
-  }catch(e){}
-
-  const usY10 = us10y?.y10 ?? 4.32;
-  const usD1  = us10y?.d1  ?? 0;
-
-  D.geospatial.sovereigns = SOVEREIGN_MAP.map(s => {
-    const y10    = s.code==='US' ? usY10 : (s.override ?? usY10);
-    const spread = Math.round((y10 - usY10)*100);
-    const d1     = s.code==='US' ? usD1 : +(usD1 * (0.3 + Math.random()*0.4)).toFixed(3);
-    return { code:s.code, name:s.name, y10, d1, spread, rating:s.rating, cds:s.cds, eqPerf:0, fxPerf:0 };
-  });
-  console.log('[SOVEREIGNS] Updated', D.geospatial.sovereigns.length, 'sovereign yields');
-}
-
-
-// ═══════════════════════════════════════════
 // NEWS — RSS via allorigins raw XML (no key, no rate limit)
 // ═══════════════════════════════════════════
 function classifyNewsTag(title){
@@ -3493,7 +3323,7 @@ function resolveQuery(raw) {
   }
 
   // 3. Known equity ticker — open EQS
-  if(/^[A-Z]{1,5}$/.test(q) && !['MAP','FX','FI','EQ','CB','US','UK','EU','DE','JP','CN','AU','CA'].includes(q)){
+  if(/^[A-Z]{1,5}$/.test(q) && !['FX','FI','EQ','CB','US','UK','EU','DE','JP','CN','AU','CA'].includes(q)){
     return {type:'equity', target:q,
       entry:{key:q, label:`${q} — Equity Search`, meta:API_KEYS.FMP?'FMP live data':'add FMP key', type:'equity', action:()=>OW('EQS',q)},
       matches:[]};
@@ -3506,7 +3336,7 @@ function resolveQuery(raw) {
     matches:[]};
 
   // 6. Panel command pass-through
-  const panelCmds = ['FI','EQ','FX','CMDTY','MAP','MACRO','NEWS','SPREAD','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB'];
+  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','SPREAD','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB'];
   if(panelCmds.includes(first)){
     return {type:'command', target:first, extra:rest||null,
       entry:{key:first, label:first, meta:'', type:'command', action:()=>OW(first, rest||null)},
@@ -4170,7 +4000,7 @@ async function scrnFetchLive(){
   const src = document.getElementById('scrn-source');
 
   if(true){  // live screener enrichment disabled — using static data
-    if(src) src.textContent = 'STATIC SCREENER DATA';
+    if(src) src.textContent = 'REFERENCE DATA — fundamentals as of Q4 2025 · px/chg are indicative';
     return;
   }
 
@@ -4382,26 +4212,7 @@ function rHOME(){
     {label:'S2', val:(spxVal*0.982).toFixed(0), col:'var(--green)'},
   ];
 
-  // Options flow (static indicative data — replace with live when API available)
-  const optionsFlow = D.optionsFlow || [
-    {ticker:'SPY', type:'CALL', strike:'580C', exp:'Mar-21', size:'25K', premium:'$4.2M', sentiment:'BULL'},
-    {ticker:'QQQ', type:'PUT',  strike:'480P', exp:'Mar-21', size:'18K', premium:'$2.8M', sentiment:'BEAR'},
-    {ticker:'NVDA',type:'CALL', strike:'950C', exp:'Apr-18', size:'12K', premium:'$6.1M', sentiment:'BULL'},
-    {ticker:'SPY', type:'PUT',  strike:'550P', exp:'Mar-28', size:'31K', premium:'$3.4M', sentiment:'BEAR'},
-    {ticker:'TLT', type:'CALL', strike:'96C',  exp:'Mar-21', size:'8K',  premium:'$1.1M', sentiment:'BULL'},
-    {ticker:'IWM', type:'PUT',  strike:'205P', exp:'Mar-21', size:'14K', premium:'$1.9M', sentiment:'BEAR'},
-  ];
-  const optRows = optionsFlow.map(o=>{
-    const col = o.sentiment==='BULL'?'var(--green)':'var(--red)';
-    return `<div style="display:flex;gap:4px;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px;align-items:center">
-      <span style="color:var(--amber);width:40px;flex-shrink:0;font-weight:600">${o.ticker}</span>
-      <span style="color:${col};width:36px;flex-shrink:0;font-size:9px">${o.type}</span>
-      <span style="color:#555;width:48px;flex-shrink:0">${o.strike}</span>
-      <span style="color:#444;width:48px;flex-shrink:0;font-size:9px">${o.exp}</span>
-      <span style="color:#555;flex:1;font-size:9px">${o.size} contracts</span>
-      <span style="color:${col};font-size:9px;font-weight:600">${o.premium}</span>
-    </div>`;
-  }).join('');
+
 
   const newsHtml = D.news.slice(0,10).map((n,i)=>`
     <div class="home-news-row" onclick="openNewsDetail(${i})">
@@ -4467,10 +4278,7 @@ function rHOME(){
         ${upcomingEvents || '<div style="color:#2a2a2a;font-size:9px;padding:6px 8px">NO UPCOMING EVENTS</div>'}
         <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;margin-top:4px">EARNINGS CALENDAR</div>
         ${earningsRows}
-        <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;margin-top:4px;display:flex;justify-content:space-between">
-          <span>OPTIONS FLOW — UNUSUAL ACTIVITY</span><span style="color:#2a2a2a;font-size:8px">INDICATIVE</span>
-        </div>
-        ${optRows}
+
       </div>
       <!-- COL 3: CB + QUICK OPEN -->
       <div style="display:flex;flex-direction:column;overflow-y:auto">
@@ -4483,7 +4291,7 @@ function rHOME(){
           </div>`).join('')}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
-          ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','MAP','VOL'].map(p=>`
+          ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','VOL'].map(p=>`
           <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid var(--border);color:#444;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#333'" onmouseout="this.style.color='#444';this.style.borderColor='var(--border)'">${p}</div>`).join('')}
         </div>
       </div>
@@ -5854,7 +5662,6 @@ async function pollAllUpgraded(){
     fetchTreasuryYields(),
     fetchTreasuryAuctions(),
     fetchSectorETFs(),
-    fetchSovereignYields(),
     fetchFXRates(),
     fetchEquityIndices(),
     fetchCommodities(),

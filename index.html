@@ -9,8 +9,8 @@
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#010d1f;--bg1:#051525;--bg2:#081c2e;--bg3:#0d2340;--bg4:#122a4a;
-  --border:#0e2035;--border2:#152840;--border3:#1e3652;
+  --bg:#000;--bg1:#0a0a0a;--bg2:#0f0f0f;--bg3:#141414;--bg4:#1a1a1a;
+  --border:#1e1e1e;--border2:#262626;--border3:#2e2e2e;
   --text:#cccccc;--text-dim:#707070;--text-mid:#a0a0a0;--text-bright:#f0f0f0;
   --green:#00c853;--red:#e53935;--amber:#ffab00;--blue:#1565c0;--cyan:#00acc1;
   --purple:#7b1fa2;--orange:#e65100;
@@ -64,7 +64,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* ── SHORTCUT BAR ── */
 #shortcuts{
   height:32px;background:#060606;border-bottom:1px solid #1a1a1a;
-  display:flex;align-items:stretch;padding:0 6px 0 0;gap:0;z-index:1999;overflow:hidden;
+  display:flex;align-items:stretch;padding:0;gap:0;z-index:1999;overflow:visible;
 }
 /* HOME — amber/gold, separated by a gap */
 .scbtn-home{
@@ -119,12 +119,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* ── WORKSPACE ── */
 #workspace{
   position:relative;width:100%;height:calc(100vh - 70px);
-  background-color:#020b18;
+  background-color:#050608;
   background-image:
-    linear-gradient(rgba(100,180,255,0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100,180,255,0.14) 1px, transparent 1px),
-    linear-gradient(rgba(100,180,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100,180,255,0.05) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.048) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.048) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
   background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
   background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
   overflow:hidden;
@@ -510,9 +510,11 @@ canvas{display:block}
   <button class="scbtn-tool" onclick="OW('WATCH')" title="Watchlist">WATCH</button>
   <button class="scbtn-tool" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)" title="Chart">CHART</button>
   <button class="scbtn-tool" onclick="OW('SCRN')" title="Screener">SCRN</button>
-  <div id="sc-right"><span title="Ctrl+F">⌃F</span> FULL &nbsp;·&nbsp; <span title="Ctrl+A">⌃A</span> LAYOUT &nbsp;·&nbsp; <span title="Ctrl+K">⌃K</span> ACCESS &nbsp;·&nbsp; <span title="Ctrl+Backspace">⌃⌫</span> CLOSE</div>
+  <div id="sc-right" style="display:flex;align-items:center;gap:0;margin-left:auto">
+    <button class="scbtn" onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (Ctrl+K)" style="color:#4a4a4a;border-left:1px solid #1a1a1a;height:32px">⌨ ACCESS</button>
+  </div>
 </div>
-<button onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (⌃K)" style="position:fixed;top:50px;right:0;height:32px;z-index:2100;background:#060606;border:none;border-left:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;color:#3a3a3a;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:0 12px;cursor:pointer;white-space:nowrap;letter-spacing:.5px" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#3a3a3a'">⌨ ACCESS</button>
+
 
 <!-- STATUS BAR -->
 <div id="status-bar" style="height:16px;background:#050505;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.5px;overflow:hidden;white-space:nowrap;color:#2a2a2a"></div>
@@ -522,55 +524,7 @@ canvas{display:block}
 
 <!-- WORKSPACE -->
 <div id="workspace">
-<svg id="bg-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500"
-  preserveAspectRatio="xMidYMid slice"
-  style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0">
-  <defs>
-    <radialGradient id="vig" cx="50%" cy="50%" r="65%">
-      <stop offset="30%" stop-color="transparent"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.60)"/>
-    </radialGradient>
-  </defs>
 
-  <!-- Geographic lines -->
-  <!-- Equator -->
-  <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(255,255,255,0.10)" stroke-width="0.7" stroke-dasharray="10,8"/>
-  <!-- Tropics -->
-  <line x1="0" y1="185" x2="1000" y2="185" stroke="rgba(255,255,255,0.045)" stroke-width="0.5" stroke-dasharray="5,12"/>
-  <line x1="0" y1="315" x2="1000" y2="315" stroke="rgba(255,255,255,0.045)" stroke-width="0.5" stroke-dasharray="5,12"/>
-  <!-- Prime meridian -->
-  <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="8,10"/>
-  <!-- 90°W / 90°E -->
-  <line x1="250" y1="0" x2="250" y2="500" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,14"/>
-  <line x1="750" y1="0" x2="750" y2="500" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,14"/>
-
-  <!-- Continents -->
-  <path d="M33.3,52.8 L111.1,55.6 L166.7,44.4 L236.1,50.0 L272.2,66.7 L319.4,75.0 L333.3,119.4 L319.4,127.8 L305.6,130.6 L291.7,152.8 L275.0,180.6 L255.6,208.3 L244.4,205.6 L236.1,197.2 L230.6,177.8 L230.6,161.1 L175.0,161.1 L155.6,147.2 L155.6,113.9 L138.9,97.2 L111.1,83.3 L77.8,83.3 L41.7,77.8 L33.3,66.7 Z" fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.50)" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M33.3,100.0 L50.0,97.2 L61.1,88.9 L77.8,88.9 L88.9,83.3 L77.8,77.8 L61.1,77.8 L50.0,83.3 L33.3,91.7 Z" fill="rgba(255,171,0,0.06)" stroke="rgba(255,171,0,0.40)" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M377.8,83.3 L450.0,55.6 L452.8,38.9 L430.6,19.4 L375.0,19.4 L338.9,36.1 L333.3,55.6 L352.8,69.4 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.35)" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M263.9,188.9 L272.2,186.1 L286.1,194.4 L291.7,194.4 L286.1,194.4 L272.2,188.9 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.28)" stroke-width="0.7" stroke-linejoin="round"/>
-  <path d="M275.0,227.8 L286.1,227.8 L291.7,250.0 L300.0,272.2 L311.1,300.0 L319.4,311.1 L325.0,355.6 L319.4,366.7 L311.1,400.0 L300.0,388.9 L305.6,366.7 L300.0,361.1 L311.1,344.4 L305.6,327.8 L300.0,300.0 L311.1,283.3 L333.3,261.1 L347.2,250.0 L361.1,238.9 L333.3,236.1 L325.0,227.8 L300.0,219.4 L291.7,222.2 L286.1,230.6 Z" fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.50)" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M475.0,150.0 L494.4,150.0 L508.3,138.9 L508.3,130.6 L494.4,127.8 L477.8,127.8 L475.0,133.3 L475.0,150.0 Z" fill="rgba(80,160,255,0.08)" stroke="rgba(80,160,255,0.45)" stroke-width="1.0" stroke-linejoin="round"/>
-  <path d="M494.4,127.8 L522.2,127.8 L544.4,122.2 L577.8,127.8 L583.3,133.3 L600.0,144.4 L605.6,138.9 L600.0,133.3 L577.8,122.2 L561.1,116.7 L550.0,111.1 L538.9,100.0 L522.2,94.4 L513.9,88.9 L513.9,77.8 L527.8,75.0 L538.9,69.4 L555.6,61.1 L577.8,55.6 L555.6,61.1 L538.9,69.4 L527.8,77.8 L513.9,88.9 L505.6,105.6 L500.0,111.1 L486.1,116.7 L494.4,127.8 Z" fill="rgba(80,160,255,0.08)" stroke="rgba(80,160,255,0.45)" stroke-width="1.0" stroke-linejoin="round"/>
-  <path d="M513.9,88.9 L513.9,77.8 L527.8,75.0 L538.9,69.4 L555.6,61.1 L577.8,55.6 L583.3,61.1 L569.4,69.4 L555.6,75.0 L550.0,83.3 L550.0,91.7 L533.3,94.4 L522.2,91.7 L513.9,91.7 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.38)" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M486.1,111.1 L491.7,111.1 L500.0,108.3 L502.8,105.6 L500.0,102.8 L494.4,97.2 L491.7,88.9 L488.9,94.4 L486.1,100.0 L486.1,105.6 L491.7,108.3 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.38)" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M516.7,127.8 L522.2,127.8 L544.4,144.4 L550.0,138.9 L544.4,138.9 L538.9,144.4 L533.3,138.9 L527.8,127.8 L516.7,127.8 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.35)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M450.0,211.1 L458.3,222.2 L477.8,236.1 L502.8,233.3 L522.2,238.9 L541.7,244.4 L583.3,250.0 L611.1,250.0 L616.7,216.7 L622.2,216.7 L638.9,216.7 L622.2,238.9 L611.1,238.9 L605.6,227.8 L616.7,211.1 L622.2,216.7 L638.9,216.7 L611.1,216.7 L600.0,188.9 L594.4,172.2 L588.9,166.7 L588.9,161.1 L577.8,161.1 L566.7,161.1 L561.1,150.0 L538.9,150.0 L527.8,144.4 L522.2,144.4 L505.6,144.4 L494.4,155.6 L483.3,161.1 L461.1,177.8 L452.8,191.7 L450.0,211.1 Z" fill="rgba(0,200,100,0.07)" stroke="rgba(0,200,100,0.45)" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M611.1,216.7 L622.2,216.7 L638.9,216.7 L644.4,219.4 L622.2,238.9 L611.1,238.9 L605.6,227.8 Z" fill="rgba(0,200,100,0.06)" stroke="rgba(0,200,100,0.35)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M622.2,283.3 L638.9,288.9 L638.9,322.2 L622.2,319.4 Z" fill="rgba(0,200,100,0.05)" stroke="rgba(0,200,100,0.30)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M572.2,133.3 L600.0,144.4 L616.7,144.4 L633.3,166.7 L655.6,183.3 L666.7,188.9 L688.9,183.3 L700.0,194.4 L722.2,216.7 L744.4,188.9 L755.6,188.9 L766.7,180.6 L777.8,188.9 L794.4,216.7 L800.0,222.2 L805.6,238.9 L819.4,238.9 L833.3,183.3 L838.9,166.7 L850.0,155.6 L861.1,155.6 L875.0,155.6 L888.9,138.9 L888.9,125.0 L877.8,122.2 L866.7,122.2 L855.6,105.6 L847.2,105.6 L833.3,88.9 L819.4,83.3 L805.6,69.4 L791.7,61.1 L777.8,61.1 L766.7,55.6 L722.2,50.0 L688.9,50.0 L666.7,55.6 L644.4,61.1 L638.9,83.3 L644.4,105.6 L652.8,116.7 L652.8,133.3 L638.9,133.3 L627.8,133.3 L616.7,133.3 L600.0,133.3 L583.3,133.3 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.40)" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M688.9,183.3 L700.0,194.4 L700.0,211.1 L711.1,227.8 L722.2,227.8 L722.2,216.7 L733.3,216.7 L744.4,188.9 L722.2,183.3 L711.1,188.9 L700.0,188.9 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.38)" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M600.0,166.7 L622.2,166.7 L655.6,183.3 L633.3,188.9 L622.2,188.9 L616.7,211.1 L605.6,205.6 L600.0,188.9 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.35)" stroke-width="0.9" stroke-linejoin="round"/>
-  <path d="M861.1,155.6 L872.2,155.6 L883.3,150.0 L888.9,138.9 L883.3,138.9 L872.2,144.4 L861.1,150.0 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.35)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M777.8,188.9 L788.9,188.9 L794.4,216.7 L800.0,222.2 L777.8,238.9 L777.8,222.2 L777.8,188.9 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.33)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M944.4,83.3 L966.7,77.8 L966.7,100.0 L950.0,105.6 L938.9,105.6 L944.4,94.4 L944.4,83.3 Z" fill="rgba(80,160,255,0.05)" stroke="rgba(80,160,255,0.28)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M816.7,311.1 L816.7,322.2 L822.2,344.4 L833.3,344.4 L855.6,344.4 L877.8,344.4 L883.3,350.0 L888.9,355.6 L900.0,355.6 L911.1,361.1 L922.2,316.7 L916.7,316.7 L911.1,305.6 L905.6,300.0 L888.9,300.0 L875.0,288.9 L861.1,283.3 L850.0,288.9 L838.9,300.0 Z" fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.45)" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="M972.2,372.2 L983.3,350.0 L994.4,355.6 L994.4,366.7 L983.3,377.8 L972.2,372.2 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.32)" stroke-width="0.8" stroke-linejoin="round"/>
-  <path d="M888.9,272.2 L900.0,261.1 L911.1,261.1 L916.7,266.7 L905.6,272.2 L894.4,272.2 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.30)" stroke-width="0.8" stroke-linejoin="round"/>
-
-  <!-- Vignette -->
-  <rect width="1000" height="500" fill="url(#vig)"/>
-</svg>
 </div>
 
 <script>

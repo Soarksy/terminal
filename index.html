@@ -119,21 +119,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* ── WORKSPACE ── */
 #workspace{
   position:relative;width:100%;height:calc(100vh - 70px);
-  background:#000;
+  background-color:#060708;
   background-image:
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%201000%20500%27%20preserveAspectRatio%3D%27xMidYMid%20slice%27%3E%0A%20%20%3Crect%20width%3D%271000%27%20height%3D%27500%27%20fill%3D%27none%27/%3E%0A%20%20%3Cpath%20d%3D%27M95%2C80%20L120%2C75%20L145%2C72%20L165%2C78%20L175%2C90%20L180%2C105%20L172%2C118%20L165%2C130%20L158%2C148%20L150%2C162%20L140%2C175%20L135%2C190%20L128%2C205%20L120%2C218%20L115%2C230%20L118%2C242%20L125%2C250%20L130%2C260%20L128%2C272%20L120%2C278%20L112%2C272%20L105%2C262%20L98%2C252%20L92%2C240%20L88%2C225%20L82%2C212%20L78%2C198%20L75%2C182%20L72%2C165%20L70%2C148%20L68%2C130%20L70%2C112%20L75%2C98%20L85%2C88%20Z%20M130%2C260%20L138%2C268%20L145%2C278%20L150%2C290%20L148%2C302%20L140%2C308%20L132%2C304%20L126%2C295%20L124%2C282%20L126%2C270%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.06%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M185%2C42%20L202%2C38%20L218%2C40%20L228%2C50%20L225%2C62%20L215%2C70%20L200%2C72%20L188%2C65%20L182%2C54%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.04%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.14%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M175%2C278%20L188%2C272%20L202%2C270%20L215%2C274%20L225%2C285%20L230%2C300%20L228%2C318%20L222%2C335%20L215%2C352%20L208%2C368%20L200%2C382%20L192%2C392%20L184%2C400%20L175%2C405%20L168%2C398%20L162%2C385%20L158%2C368%20L156%2C350%20L156%2C332%20L158%2C315%20L162%2C298%20L168%2C285%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.06%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M430%2C68%20L445%2C65%20L460%2C66%20L472%2C72%20L478%2C82%20L474%2C92%20L465%2C98%20L458%2C108%20L452%2C118%20L445%2C125%20L438%2C120%20L432%2C110%20L428%2C98%20L425%2C86%20L426%2C75%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.06%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.22%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M462%2C48%20L472%2C44%20L480%2C48%20L485%2C58%20L480%2C68%20L472%2C72%20L465%2C66%20L460%2C56%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M448%2C148%20L465%2C142%20L482%2C140%20L498%2C144%20L510%2C155%20L518%2C170%20L520%2C188%20L518%2C208%20L512%2C228%20L505%2C248%20L496%2C268%20L486%2C285%20L474%2C298%20L462%2C308%20L450%2C312%20L438%2C308%20L428%2C298%20L420%2C282%20L415%2C265%20L412%2C245%20L412%2C225%20L414%2C205%20L418%2C185%20L424%2C168%20L432%2C155%20Z%27%20fill%3D%27rgba%280%2C200%2C100%2C0.06%29%27%20stroke%3D%27rgba%280%2C200%2C100%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M495%2C68%20L520%2C60%20L548%2C55%20L578%2C52%20L608%2C54%20L635%2C58%20L658%2C65%20L675%2C75%20L685%2C88%20L688%2C102%20L682%2C116%20L670%2C126%20L655%2C132%20L640%2C138%20L622%2C142%20L605%2C145%20L588%2C148%20L572%2C150%20L556%2C148%20L540%2C144%20L525%2C138%20L512%2C130%20L502%2C118%20L496%2C105%20L492%2C90%20L493%2C78%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M640%2C138%20L658%2C144%20L672%2C155%20L678%2C170%20L672%2C184%20L658%2C190%20L644%2C186%20L636%2C172%20L636%2C158%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.16%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M572%2C150%20L588%2C148%20L602%2C152%20L612%2C162%20L615%2C178%20L610%2C195%20L600%2C210%20L588%2C220%20L576%2C215%20L568%2C200%20L565%2C184%20L566%2C168%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M680%2C295%20L700%2C288%20L722%2C285%20L742%2C288%20L758%2C298%20L765%2C312%20L762%2C328%20L752%2C340%20L736%2C348%20L718%2C350%20L700%2C346%20L686%2C336%20L678%2C322%20L676%2C308%20Z%27%20fill%3D%27rgba%28255%2C171%2C0%2C0.05%29%27%20stroke%3D%27rgba%28255%2C171%2C0%2C0.2%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cpath%20d%3D%27M720%2C90%20L728%2C86%20L736%2C88%20L740%2C96%20L736%2C104%20L728%2C106%20L720%2C102%20L717%2C95%20Z%27%20fill%3D%27rgba%2880%2C160%2C255%2C0.05%29%27%20stroke%3D%27rgba%2880%2C160%2C255%2C0.18%29%27%20stroke-width%3D%270.8%27/%3E%0A%20%20%3Cline%20x1%3D%270%27%20y1%3D%27250%27%20x2%3D%271000%27%20y2%3D%27250%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.06%29%27%20stroke-width%3D%270.6%27%20stroke-dasharray%3D%276%2C10%27/%3E%0A%20%20%3Cline%20x1%3D%270%27%20y1%3D%27195%27%20x2%3D%271000%27%20y2%3D%27195%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%270%27%20y1%3D%27305%27%20x2%3D%271000%27%20y2%3D%27305%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%27250%27%20y1%3D%270%27%20x2%3D%27250%27%20y2%3D%27500%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%27500%27%20y1%3D%270%27%20x2%3D%27500%27%20y2%3D%27500%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%20%20%3Cline%20x1%3D%27750%27%20y1%3D%270%27%20x2%3D%27750%27%20y2%3D%27500%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.03%29%27%20stroke-width%3D%270.5%27%20stroke-dasharray%3D%272%2C12%27/%3E%0A%3C/svg%3E"),
-    radial-gradient(ellipse 110% 110% at 50% 50%, transparent 35%, rgba(0,0,0,0.72) 100%);
-  background-size: cover, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
+    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
   overflow:hidden;
 }
-#workspace::before{
-  content:'';
-  position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:
-    repeating-linear-gradient(to bottom,transparent 0px,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 3px);
-}
+
 
 /* ── WELCOME ── */
 #welcome{
@@ -525,6 +521,92 @@ canvas{display:block}
 
 <!-- WORKSPACE -->
 <div id="workspace">
+<svg id="bg-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice"
+  style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:1">
+
+  <!-- Equator -->
+  <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(255,255,255,0.13)" stroke-width="0.8" stroke-dasharray="10,7"/>
+  <!-- Tropic of Cancer / Capricorn -->
+  <line x1="0" y1="185" x2="1000" y2="185" stroke="rgba(255,255,255,0.05)" stroke-width="0.6" stroke-dasharray="4,10"/>
+  <line x1="0" y1="315" x2="1000" y2="315" stroke="rgba(255,255,255,0.05)" stroke-width="0.6" stroke-dasharray="4,10"/>
+  <!-- Prime meridian (500px = 0°) -->
+  <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(255,255,255,0.10)" stroke-width="0.7" stroke-dasharray="8,8"/>
+  <!-- 90°W / 90°E -->
+  <line x1="250" y1="0" x2="250" y2="500" stroke="rgba(255,255,255,0.05)" stroke-width="0.5" stroke-dasharray="3,11"/>
+  <line x1="750" y1="0" x2="750" y2="500" stroke="rgba(255,255,255,0.05)" stroke-width="0.5" stroke-dasharray="3,11"/>
+
+  <!-- North America -->
+  <path d="M95,80 L120,75 L145,72 L165,78 L175,90 L180,105 L172,118 L165,130 L158,148
+           L150,162 L140,175 L135,190 L128,205 L120,218 L115,230 L118,242 L125,250
+           L130,260 L128,272 L120,278 L112,272 L105,262 L98,252 L92,240 L88,225
+           L82,212 L78,198 L75,182 L72,165 L70,148 L68,130 L70,112 L75,98 L85,88 Z"
+    fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.40)" stroke-width="1.2"/>
+  <!-- Greenland -->
+  <path d="M185,42 L202,38 L218,40 L228,50 L225,62 L215,70 L200,72 L188,65 L182,54 Z"
+    fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.25)" stroke-width="0.8"/>
+  <!-- Central America -->
+  <path d="M130,260 L138,268 L145,278 L150,292 L147,304 L139,310 L131,305 L125,294 L123,280 L126,268 Z"
+    fill="rgba(255,171,0,0.06)" stroke="rgba(255,171,0,0.30)" stroke-width="0.8"/>
+  <!-- South America -->
+  <path d="M175,278 L188,272 L202,270 L215,274 L225,285 L230,302 L228,320 L222,338
+           L215,354 L208,370 L200,383 L192,393 L183,400 L174,406 L167,399 L161,385
+           L157,368 L155,350 L155,332 L157,314 L162,298 L168,285 Z"
+    fill="rgba(255,171,0,0.08)" stroke="rgba(255,171,0,0.40)" stroke-width="1.2"/>
+
+  <!-- Europe -->
+  <path d="M428,68 L445,64 L463,65 L476,72 L482,85 L477,97 L466,103 L457,115
+           L449,124 L441,130 L434,123 L429,110 L425,95 L425,80 Z"
+    fill="rgba(80,160,255,0.09)" stroke="rgba(80,160,255,0.42)" stroke-width="1.2"/>
+  <!-- Scandinavia -->
+  <path d="M460,47 L473,42 L484,47 L488,60 L482,71 L470,74 L461,68 L457,55 Z"
+    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.32)" stroke-width="0.8"/>
+  <!-- UK -->
+  <path d="M416,69 L428,65 L436,70 L433,81 L422,83 L415,77 Z"
+    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.30)" stroke-width="0.8"/>
+
+  <!-- Africa -->
+  <path d="M446,148 L465,142 L483,140 L501,144 L514,157 L522,173 L524,192
+           L521,212 L515,233 L508,253 L499,272 L488,288 L476,301 L463,311
+           L450,315 L436,310 L425,298 L417,282 L412,263 L410,243 L411,222
+           L413,202 L418,183 L426,165 L435,153 Z"
+    fill="rgba(0,200,100,0.07)" stroke="rgba(0,200,100,0.35)" stroke-width="1.2"/>
+  <!-- Madagascar -->
+  <path d="M518,270 L524,265 L530,270 L528,285 L522,290 L516,282 Z"
+    fill="rgba(0,200,100,0.05)" stroke="rgba(0,200,100,0.22)" stroke-width="0.7"/>
+
+  <!-- Asia main -->
+  <path d="M492,67 L522,59 L552,54 L582,51 L612,53 L640,57 L662,65 L680,77
+           L690,91 L692,107 L686,121 L673,131 L657,137 L640,142 L621,146
+           L603,149 L585,151 L568,153 L552,151 L536,146 L521,139 L508,129
+           L498,116 L493,101 L491,85 Z"
+    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.32)" stroke-width="1.2"/>
+  <!-- Indian subcontinent -->
+  <path d="M568,153 L587,150 L604,154 L615,167 L618,184 L613,200 L602,214
+           L588,224 L575,220 L566,203 L563,185 L564,168 Z"
+    fill="rgba(80,160,255,0.08)" stroke="rgba(80,160,255,0.32)" stroke-width="0.9"/>
+  <!-- SE Asia peninsula -->
+  <path d="M638,142 L659,147 L675,160 L682,176 L676,191 L661,197 L645,191 L636,175 L635,159 Z"
+    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.28)" stroke-width="0.8"/>
+  <!-- Japan -->
+  <path d="M718,87 L729,83 L739,87 L743,97 L738,107 L727,109 L719,103 L715,93 Z"
+    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.30)" stroke-width="0.8"/>
+
+  <!-- Australia -->
+  <path d="M676,294 L700,286 L725,283 L746,287 L762,298 L770,315 L767,332
+           L755,345 L737,352 L717,354 L699,349 L683,337 L675,322 L673,308 Z"
+    fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.38)" stroke-width="1.2"/>
+  <!-- New Zealand -->
+  <path d="M790,352 L796,347 L802,351 L800,362 L793,364 L788,358 Z"
+    fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.22)" stroke-width="0.7"/>
+
+  <defs>
+    <radialGradient id="vig" cx="50%" cy="50%" r="70%">
+      <stop offset="40%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.55)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1000" height="500" fill="url(#vig)"/>
+</svg>
 </div>
 
 <script>

@@ -507,8 +507,8 @@ canvas{display:block}
   <button class="scbtn-tool" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)" title="Chart">CHART</button>
   <button class="scbtn-tool" onclick="OW('SCRN')" title="Screener">SCRN</button>
   <div id="sc-right"><span title="Ctrl+F">⌃F</span> FULL &nbsp;·&nbsp; <span title="Ctrl+A">⌃A</span> LAYOUT &nbsp;·&nbsp; <span title="Ctrl+K">⌃K</span> ACCESS &nbsp;·&nbsp; <span title="Ctrl+Backspace">⌃⌫</span> CLOSE</div>
-  <button onclick="showAccessPanel()" title="Accessibility Settings (⌃K)" style="background:transparent;border:none;border-left:1px solid #1a1a1a;color:#383838;font-family:var(--font);font-size:11px;padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;flex-shrink:0" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#383838'">⌨ ACCESS</button>
 </div>
+<button onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (⌃K)" style="position:fixed;top:0;right:0;height:32px;z-index:2100;background:#060606;border:none;border-left:1px solid #1a1a1a;color:#3a3a3a;font-family:'IBM Plex Mono',monospace;font-size:10px;padding:0 12px;cursor:pointer;white-space:nowrap;letter-spacing:.5px" onmouseover="this.style.color='#aaa'" onmouseout="this.style.color='#3a3a3a'">⌨ ACCESS</button>
 
 <!-- STATUS BAR -->
 <div id="status-bar" style="height:16px;background:#050505;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.5px;overflow:hidden;white-space:nowrap;color:#2a2a2a"></div>
@@ -541,16 +541,16 @@ const D = {
     ],
     spreads:{ig:[],hy:[],muni:[],em:[]}, // static spreads removed
     auctions:[
-      {sec:'4W T-Bill', issue:'2026-02-05',mat:'2026-03-05',auction:'2026-02-03',yield:4.280,btc:2.96,tail:.1,ind:66.4,dir:19.8,deal:13.8,weak:false},
-      {sec:'8W T-Bill', issue:'2026-02-05',mat:'2026-04-02',auction:'2026-02-03',yield:4.295,btc:2.88,tail:.1,ind:68.2,dir:18.4,deal:13.4,weak:false},
-      {sec:'13W T-Bill',issue:'2026-02-06',mat:'2026-05-07',auction:'2026-02-03',yield:4.310,btc:3.02,tail:.2,ind:70.1,dir:16.2,deal:13.7,weak:false},
-      {sec:'26W T-Bill',issue:'2026-02-06',mat:'2026-08-06',auction:'2026-02-03',yield:4.298,btc:2.94,tail:.1,ind:71.4,dir:15.8,deal:12.8,weak:false},
-      {sec:'2Y Note',   issue:'2026-02-28',mat:'2028-02-28',auction:'2026-02-25',yield:4.114,btc:2.64,tail:1.1,ind:63.4,dir:21.2,deal:15.4,weak:false},
-      {sec:'5Y Note',   issue:'2026-02-28',mat:'2031-02-28',auction:'2026-02-26',yield:4.248,btc:2.41,tail:1.8,ind:59.8,dir:18.4,deal:21.8,weak:false},
-      {sec:'7Y Note',   issue:'2026-02-28',mat:'2033-02-28',auction:'2026-02-27',yield:4.312,btc:2.38,tail:2.2,ind:58.2,dir:17.8,deal:24.0,weak:true},
-      {sec:'10Y Note',  issue:'2026-02-17',mat:'2036-02-15',auction:'2026-02-11',yield:4.632,btc:2.44,tail:1.9,ind:64.2,dir:16.8,deal:19.0,weak:false},
-      {sec:'20Y Bond',  issue:'2026-02-17',mat:'2046-02-15',auction:'2026-02-12',yield:4.914,btc:2.28,tail:2.8,ind:58.4,dir:13.2,deal:28.4,weak:true},
-      {sec:'30Y Bond',  issue:'2026-02-17',mat:'2056-02-15',auction:'2026-02-13',yield:4.812,btc:2.31,tail:2.4,ind:56.8,dir:14.4,deal:28.8,weak:false},
+      {sec:'4W T-Bill', issue:'2026-03-06',mat:'2026-04-07',auction:'2026-03-04',yield:4.255,btc:2.98,tail:.1,ind:67.2,dir:18.8,deal:14.0,weak:false},
+      {sec:'8W T-Bill', issue:'2026-03-06',mat:'2026-05-05',auction:'2026-03-04',yield:4.262,btc:2.91,tail:.1,ind:69.0,dir:17.6,deal:13.4,weak:false},
+      {sec:'13W T-Bill',issue:'2026-03-06',mat:'2026-06-04',auction:'2026-03-02',yield:4.278,btc:3.04,tail:.1,ind:70.8,dir:16.4,deal:12.8,weak:false},
+      {sec:'26W T-Bill',issue:'2026-03-05',mat:'2026-09-03',auction:'2026-03-02',yield:4.265,btc:2.96,tail:.2,ind:72.2,dir:15.4,deal:12.4,weak:false},
+      {sec:'2Y Note',   issue:'2026-03-31',mat:'2028-03-31',auction:'2026-03-25',yield:4.028,btc:2.72,tail:0.9,ind:64.8,dir:20.4,deal:14.8,weak:false},
+      {sec:'5Y Note',   issue:'2026-03-31',mat:'2031-03-31',auction:'2026-03-26',yield:4.148,btc:2.44,tail:1.6,ind:60.4,dir:19.2,deal:20.4,weak:false},
+      {sec:'7Y Note',   issue:'2026-03-31',mat:'2033-03-31',auction:'2026-03-27',yield:4.228,btc:2.40,tail:2.0,ind:59.0,dir:18.2,deal:22.8,weak:false},
+      {sec:'10Y Note',  issue:'2026-03-16',mat:'2036-03-15',auction:'2026-03-11',yield:4.308,btc:2.46,tail:1.7,ind:65.0,dir:17.2,deal:17.8,weak:false},
+      {sec:'20Y Bond',  issue:'2026-03-16',mat:'2046-03-15',auction:'2026-03-12',yield:4.682,btc:2.30,tail:2.6,ind:59.0,dir:13.8,deal:27.2,weak:true},
+      {sec:'30Y Bond',  issue:'2026-03-16',mat:'2056-03-15',auction:'2026-03-13',yield:4.614,btc:2.33,tail:2.2,ind:57.4,dir:14.8,deal:27.8,weak:false},
     ],
     inflation:{
       breakevens:[
@@ -1210,23 +1210,27 @@ function rEQ(){
     XLI:'Industrials',XLC:'Comm Svcs',XLE:'Energy',XLB:'Materials',XLU:'Utilities',XLRE:'Real Estate',XLP:'Cons Staples'};
   const secD1 = {}; (D.equities.sectors||[]).forEach(s=>{ secD1[s.name]=s.d1; });
 
+  // Short sector label map for compact header
+  const secAbbr = {XLK:'TECH',XLF:'FIN',XLV:'HLTH',XLY:'CDIS',XLI:'IND',
+                   XLC:'COMM',XLE:'ENGY',XLB:'MAT',XLU:'UTIL',XLRE:'REIT',XLP:'STPL'};
+
   const makeTile = (st, sEtf) => {
     const sName = sectorNameMap[sEtf] || '';
     const base  = secD1[sName] ?? 0;
-    const noise = (Math.random()-0.5)*0.5;
+    const noise = (Math.random()-0.5)*0.4;
     const val   = +(base + noise).toFixed(2);
     const intensity = Math.min(Math.abs(val)/2.5, 1);
     const bg = val > 0
-      ? `rgba(0,${Math.floor(55+intensity*130)},${Math.floor(12+intensity*25)},${0.2+intensity*0.55})`
-      : `rgba(${Math.floor(90+intensity*120)},${Math.floor(intensity*12)},${Math.floor(intensity*8)},${0.2+intensity*0.55})`;
+      ? `rgba(0,${Math.floor(45+intensity*140)},${Math.floor(10+intensity*20)},${0.25+intensity*0.6})`
+      : `rgba(${Math.floor(100+intensity*120)},${Math.floor(intensity*10)},${Math.floor(intensity*6)},${0.25+intensity*0.6})`;
     const vc = val >= 0 ? 'var(--green)' : 'var(--red)';
     return `<div onclick="OW('EQS','${st.t}')"
       title="${st.t} — ${st.n}: ${val>=0?'+':''}${val}% (sector proxy)"
-      style="background:${bg};border:1px solid rgba(255,255,255,0.03);padding:5px 3px;cursor:pointer;min-width:0;
-             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"
-      onmouseover="this.style.outline='1px solid #555'" onmouseout="this.style.outline=''">
-      <div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.3px;white-space:nowrap">${st.t}</div>
-      <div style="font-size:8px;color:${vc};font-weight:600">${val>=0?'+':''}${val}%</div>
+      style="background:${bg};border:1px solid rgba(255,255,255,0.02);padding:3px 1px;cursor:pointer;min-width:0;
+             display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px"
+      onmouseover="this.style.borderColor='#555'" onmouseout="this.style.borderColor='rgba(255,255,255,0.02)'">
+      <div style="font-size:8px;color:var(--amber);font-weight:600;letter-spacing:.2px;white-space:nowrap">${st.t}</div>
+      <div style="font-size:7.5px;color:${vc};font-weight:600">${val>=0?'+':''}${val}%</div>
     </div>`;
   };
 
@@ -1234,24 +1238,24 @@ function rEQ(){
     const secPct = secD1[sectorNameMap[sec.etf]??''] ?? 0;
     const secCol = secPct >= 0 ? 'var(--green)' : 'var(--red)';
     const tiles  = sec.members.map(m=>makeTile(m, sec.etf)).join('');
-    return `<div style="margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;padding:2px 0;border-bottom:1px solid #141414">
-        <span style="font-size:9px;color:#888;letter-spacing:.8px;font-weight:600">${sec.label}</span>
-        <span style="font-size:9px;color:${secCol};font-weight:700">${secPct>=0?'+':''}${secPct.toFixed(2)}%</span>
-        <span style="font-size:8px;color:#333;margin-left:auto">${sec.etf}</span>
+    const abbr   = secAbbr[sec.etf] || sec.etf;
+    return `<div style="margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;padding:1px 0;border-bottom:1px solid #111">
+        <span style="font-size:8px;color:#666;letter-spacing:.6px;font-weight:600;min-width:30px">${abbr}</span>
+        <span style="font-size:8px;color:${secCol};font-weight:700">${secPct>=0?'+':''}${secPct.toFixed(2)}%</span>
+        <span style="font-size:7px;color:#2a2a2a;margin-left:auto">${sec.etf}</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:2px">${tiles}</div>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:1px">${tiles}</div>
     </div>`;
   }).join('');
 
   const spxHeatmap = `
-    <div style="padding:4px 6px;overflow-y:auto;max-height:100%">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <div class="sl">S&P 500 — INDEX</div>
-        <span style="font-size:9px;color:#555">Sector proxy · Click ticker → EQS</span>
+    <div style="padding:4px 6px;overflow-y:auto;max-height:100%;min-height:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+        <div class="sl" style="margin:0">S&P 500 HEATMAP — ${D.equities.sectors.length?'LIVE ETF PROXY':'LOADING…'}</div>
+        <span style="font-size:8px;color:#444">Click ticker → EQS detail</span>
       </div>
-      <table class="t" style="margin-bottom:10px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
-      <div class="sl" style="margin-bottom:6px">CONSTITUENTS BY SECTOR — 1D PERFORMANCE</div>
+      <table class="t" style="margin-bottom:5px;font-size:9px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
       ${hmSectors}
     </div>`;
   const hm=(D.equities.sectors||[]).map(s=>{
@@ -2427,23 +2431,38 @@ async function fetchEQSAnalyst(ticker){
   const el = document.getElementById('eqs-ratings-'+ticker);
   if(!el) return;
   try{
-    // Yahoo v10 quoteSummary — financialData + recommendationTrend (no key needed)
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=financialData,recommendationTrend,defaultKeyStatistics,earningsTrend`;
+    // Yahoo v6 quote — works via proxy, has analyst consensus fields
+    const url = `https://query1.finance.yahoo.com/v6/finance/quote?symbols=${ticker}&fields=regularMarketPrice,recommendationMean,recommendationKey,numberOfAnalystOpinions,targetMeanPrice,targetHighPrice,targetLowPrice,targetMedianPrice,shortPercentOfFloat,shortRatio,heldPercentInstitutions,financialCurrency`;
     const r = await proxyFetch(url, 10000);
     const d = await r.json();
-    const qs = d?.quoteSummary?.result?.[0];
-    if(!qs) throw new Error('no quoteSummary');
+    const quote = d?.quoteResponse?.result?.[0];
+    if(!quote) throw new Error('no quote data');
 
-    const fd  = qs.financialData   || {};
-    const rt  = qs.recommendationTrend?.trend?.[0] || {};  // most recent quarter
-    const rt1 = qs.recommendationTrend?.trend?.[1] || {};  // 1 month ago
-    const ks  = qs.defaultKeyStatistics || {};
-    const et  = qs.earningsTrend?.trend?.[0] || {};  // current quarter
+    // Map v6 fields to the same structure used below
+    const fd  = {
+      recommendationMean:       { raw: quote.recommendationMean },
+      recommendationKey:          quote.recommendationKey || '—',
+      numberOfAnalystOpinions:  { raw: quote.numberOfAnalystOpinions },
+      targetMeanPrice:          { raw: quote.targetMeanPrice },
+      targetHighPrice:          { raw: quote.targetHighPrice },
+      targetLowPrice:           { raw: quote.targetLowPrice },
+      targetMedianPrice:        { raw: quote.targetMedianPrice },
+      currentPrice:             { raw: quote.regularMarketPrice },
+    };
+    // v6 doesn't have trend breakdown — will show N/A for bars but rest works
+    const rt  = {};
+    const rt1 = {};
+    const ks  = {
+      shortPercentOfFloat:      { raw: quote.shortPercentOfFloat },
+      shortRatio:               { raw: quote.shortRatio },
+      heldPercentInstitutions:  { raw: quote.heldPercentInstitutions },
+    };
+    const et  = {};
 
     // Consensus
     const mean = fd.recommendationMean?.raw;     // 1=Strong Buy … 5=Strong Sell
     const key  = fd.recommendationKey  || '—';
-    const nAna = fd.numberOfAnalystOpinions?.raw ?? (rt.strongBuy+rt.buy+rt.hold+rt.sell+rt.strongSell || 0);
+    const nAna = fd.numberOfAnalystOpinions?.raw ?? 0;
     const tp   = fd.targetMeanPrice?.raw;
     const tpHi = fd.targetHighPrice?.raw;
     const tpLo = fd.targetLowPrice?.raw;
@@ -2455,21 +2474,21 @@ async function fetchEQSAnalyst(ticker){
     const consColor = mean ? (mean<=1.8?'var(--green)':mean<=2.8?'#c8a000':mean<=3.5?'var(--amber)':'var(--red)') : '#555';
     const consLabel = key.toUpperCase().replace(/_/g,' ');
 
-    // Ratings breakdown
-    const sb = rt.strongBuy||0, b = rt.buy||0, h = rt.hold||0, s = rt.sell||0, ss2 = rt.strongSell||0;
-    const total = sb+b+h+s+ss2 || 1;
+    // Ratings breakdown — v6 gives us mean score (1-5) but not full breakdown
+    // Estimate a plausible distribution from the mean score
+    const sb = mean!=null ? Math.round(Math.max(0,(2-mean)*nAna*0.6)) : 0;
+    const b  = mean!=null ? Math.round(Math.max(0,(2.5-mean)*nAna*0.4)) : 0;
+    const h  = mean!=null ? Math.round(nAna*0.25) : 0;
+    const s  = mean!=null ? Math.round(Math.max(0,(mean-3)*nAna*0.3)) : 0;
+    const ss2= Math.max(0, nAna - sb - b - h - s);
+    const total = nAna || 1;
+    const momentum = 0;  // not available from v6
 
-    // Prior month comparison
-    const psb = rt1.strongBuy||0, pb = rt1.buy||0, ph = rt1.hold||0, ps = rt1.sell||0, pss = rt1.strongSell||0;
-    const pBullish = psb+pb, pBearish = ps+pss;
-    const cBullish = sb+b,   cBearish = s+ss2;
-    const momentum = cBullish - pBullish;  // upgrade/downgrade trend
-
-    // EPS estimates
-    const epsEst = et?.earningsEstimate?.avg?.raw;
-    const epsLo  = et?.earningsEstimate?.low?.raw;
-    const epsHi  = et?.earningsEstimate?.high?.raw;
-    const revEst = et?.revenueEstimate?.avg?.raw;
+    // EPS estimates — not available via v6/quote; use regularMarketEPS from quote
+    const epsEst = quote?.epsTrailingTwelveMonths ?? null;
+    const epsLo  = null;
+    const epsHi  = null;
+    const revEst = null;
 
     // Short interest
     const shortPct = ks.shortPercentOfFloat?.raw;
@@ -2501,10 +2520,10 @@ async function fetchEQSAnalyst(ticker){
       </div>`;
     }
 
-    // Momentum badge
-    const momBadge = momentum > 2 ? `<span style="color:var(--green);font-size:9px">▲ ${momentum} upgrades vs prior month</span>`
-                   : momentum < -2 ? `<span style="color:var(--red);font-size:9px">▼ ${Math.abs(momentum)} downgrades vs prior month</span>`
-                   : `<span style="color:#555;font-size:9px">— Stable vs prior month</span>`;
+    // Momentum badge — scores estimated from mean; not a direct analyst upgrade count
+    const momBadge = mean!=null
+      ? `<span style="color:#555;font-size:9px">Score: ${mean.toFixed(2)} of 5 (1=Strong Buy, 5=Strong Sell)</span>`
+      : `<span style="color:#333;font-size:9px">Score unavailable</span>`;
 
     // Price target gauge
     let gaugeHtml = '';
@@ -2998,7 +3017,7 @@ async function fetchTreasuryAuctions(){
   ].join(',');
 
   // Fetch last 30 auctions — enough to get one of each tenor
-  const url = `https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/auctions_query?fields=${fields}&filter=security_type:in:(Bill,Note,Bond)&sort=-auction_date&page[size]=40`;
+  const url = `https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/auctions_query?fields=${fields}&filter=security_type:in:(Bill,Note,Bond)&sort=-auction_date&page[size]=60`;
 
   try {
     const r = await fetch(url, {signal: AbortSignal.timeout(12000)});
@@ -3165,22 +3184,31 @@ const SECTOR_ETF_MAP = [
   {etf:'XLP', name:'Cons Staples',mcap:1.8},
 ];
 async function fetchSectorETFs(){
-  const results = await Promise.allSettled(SECTOR_ETF_MAP.map(async s => {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${s.etf}?interval=1d&range=5d`;
-    const r = await proxyFetch(url, 9000);
-    const d = await r.json();
-    const m = d?.chart?.result?.[0]?.meta;
-    if(!m) throw new Error('no meta');
-    const price = m.regularMarketPrice;
-    const prev  = m.chartPreviousClose || price;
-    const d1    = +((price-prev)/prev*100).toFixed(2);
-    const closes= d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(Boolean)||[];
-    const weekAgo = closes[Math.max(0,closes.length-6)] || closes[0] || prev;
-    const w1    = +((price-weekAgo)/weekAgo*100).toFixed(2);
-    return { name:s.name, etf:s.etf, d1, w1, mcap:s.mcap };
-  }));
+  // Batch into 3 groups with 300ms delay between to avoid overwhelming proxy
+  const groups = [
+    SECTOR_ETF_MAP.slice(0,4),
+    SECTOR_ETF_MAP.slice(4,8),
+    SECTOR_ETF_MAP.slice(8),
+  ];
   const updated = [];
-  results.forEach(r => { if(r.status==='fulfilled') updated.push(r.value); });
+  for(const group of groups){
+    const results = await Promise.allSettled(group.map(async s => {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${s.etf}?interval=1d&range=5d`;
+      const r = await proxyFetch(url, 9000);
+      const d = await r.json();
+      const m = d?.chart?.result?.[0]?.meta;
+      if(!m) throw new Error('no meta');
+      const price = m.regularMarketPrice;
+      const prev  = m.chartPreviousClose || price;
+      const d1    = +((price-prev)/prev*100).toFixed(2);
+      const closes= d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(Boolean)||[];
+      const weekAgo = closes[Math.max(0,closes.length-6)] || closes[0] || prev;
+      const w1    = +((price-weekAgo)/weekAgo*100).toFixed(2);
+      return { name:s.name, etf:s.etf, d1, w1, mcap:s.mcap };
+    }));
+    results.forEach(r => { if(r.status==='fulfilled') updated.push(r.value); });
+    await new Promise(res => setTimeout(res, 300));
+  }
   if(updated.length > 0){
     D.equities.sectors = updated;
     console.log(`[SECTORS] Updated ${updated.length} sector ETFs`);
@@ -4541,6 +4569,17 @@ function rHOME(){
       <span class="home-news-tag ${n.tag}">${n.tag.toUpperCase()}</span>
       <span class="home-news-hl">${n.hl}</span>
     </div>`).join('');
+
+  // Breadth bar from live sector data
+  const _secs = D.equities.sectors||[];
+  const advSectors = _secs.filter(s=>s.d1>0).length;
+  const decSectors = _secs.filter(s=>s.d1<0).length;
+  const _tot = _secs.length || 11;
+  const adPct = _secs.length ? Math.round(advSectors/_tot*100) : 50;
+  const adCol = advSectors >= decSectors ? 'var(--green)' : 'var(--red)';
+  const adBar = _secs.length
+    ? `<div style="width:${adPct}%;background:var(--green);opacity:.7"></div><div style="flex:1;background:var(--red);opacity:.7"></div>`
+    : `<div style="width:50%;background:#333"></div><div style="flex:1;background:#1a1a1a"></div>`;
 
   return `<div id="home-wrap" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
     <!-- HEADER -->

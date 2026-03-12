@@ -119,12 +119,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* ── WORKSPACE ── */
 #workspace{
   position:relative;width:100%;height:calc(100vh - 70px);
-  background-color:#060708;
+  background-color:#050608;
   background-image:
-    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.048) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.048) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
   background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
   background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
   overflow:hidden;
@@ -484,6 +484,7 @@ canvas{display:block}
     </div>
     <div id="livebadge">● LIVE</div>
     <div id="clock">--:--:--</div>
+    <div id="fomc-countdown" style="font-size:9px;color:#3a2a00;letter-spacing:1px;padding:0 6px;border-left:1px solid #1a1a1a"></div>
   </div>
 </div>
 
@@ -521,90 +522,53 @@ canvas{display:block}
 
 <!-- WORKSPACE -->
 <div id="workspace">
-<svg id="bg-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice"
-  style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:1">
-
-  <!-- Equator -->
-  <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(255,255,255,0.13)" stroke-width="0.8" stroke-dasharray="10,7"/>
-  <!-- Tropic of Cancer / Capricorn -->
-  <line x1="0" y1="185" x2="1000" y2="185" stroke="rgba(255,255,255,0.05)" stroke-width="0.6" stroke-dasharray="4,10"/>
-  <line x1="0" y1="315" x2="1000" y2="315" stroke="rgba(255,255,255,0.05)" stroke-width="0.6" stroke-dasharray="4,10"/>
-  <!-- Prime meridian (500px = 0°) -->
-  <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(255,255,255,0.10)" stroke-width="0.7" stroke-dasharray="8,8"/>
-  <!-- 90°W / 90°E -->
-  <line x1="250" y1="0" x2="250" y2="500" stroke="rgba(255,255,255,0.05)" stroke-width="0.5" stroke-dasharray="3,11"/>
-  <line x1="750" y1="0" x2="750" y2="500" stroke="rgba(255,255,255,0.05)" stroke-width="0.5" stroke-dasharray="3,11"/>
-
-  <!-- North America -->
-  <path d="M95,80 L120,75 L145,72 L165,78 L175,90 L180,105 L172,118 L165,130 L158,148
-           L150,162 L140,175 L135,190 L128,205 L120,218 L115,230 L118,242 L125,250
-           L130,260 L128,272 L120,278 L112,272 L105,262 L98,252 L92,240 L88,225
-           L82,212 L78,198 L75,182 L72,165 L70,148 L68,130 L70,112 L75,98 L85,88 Z"
-    fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.40)" stroke-width="1.2"/>
-  <!-- Greenland -->
-  <path d="M185,42 L202,38 L218,40 L228,50 L225,62 L215,70 L200,72 L188,65 L182,54 Z"
-    fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.25)" stroke-width="0.8"/>
-  <!-- Central America -->
-  <path d="M130,260 L138,268 L145,278 L150,292 L147,304 L139,310 L131,305 L125,294 L123,280 L126,268 Z"
-    fill="rgba(255,171,0,0.06)" stroke="rgba(255,171,0,0.30)" stroke-width="0.8"/>
-  <!-- South America -->
-  <path d="M175,278 L188,272 L202,270 L215,274 L225,285 L230,302 L228,320 L222,338
-           L215,354 L208,370 L200,383 L192,393 L183,400 L174,406 L167,399 L161,385
-           L157,368 L155,350 L155,332 L157,314 L162,298 L168,285 Z"
-    fill="rgba(255,171,0,0.08)" stroke="rgba(255,171,0,0.40)" stroke-width="1.2"/>
-
-  <!-- Europe -->
-  <path d="M428,68 L445,64 L463,65 L476,72 L482,85 L477,97 L466,103 L457,115
-           L449,124 L441,130 L434,123 L429,110 L425,95 L425,80 Z"
-    fill="rgba(80,160,255,0.09)" stroke="rgba(80,160,255,0.42)" stroke-width="1.2"/>
-  <!-- Scandinavia -->
-  <path d="M460,47 L473,42 L484,47 L488,60 L482,71 L470,74 L461,68 L457,55 Z"
-    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.32)" stroke-width="0.8"/>
-  <!-- UK -->
-  <path d="M416,69 L428,65 L436,70 L433,81 L422,83 L415,77 Z"
-    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.30)" stroke-width="0.8"/>
-
-  <!-- Africa -->
-  <path d="M446,148 L465,142 L483,140 L501,144 L514,157 L522,173 L524,192
-           L521,212 L515,233 L508,253 L499,272 L488,288 L476,301 L463,311
-           L450,315 L436,310 L425,298 L417,282 L412,263 L410,243 L411,222
-           L413,202 L418,183 L426,165 L435,153 Z"
-    fill="rgba(0,200,100,0.07)" stroke="rgba(0,200,100,0.35)" stroke-width="1.2"/>
-  <!-- Madagascar -->
-  <path d="M518,270 L524,265 L530,270 L528,285 L522,290 L516,282 Z"
-    fill="rgba(0,200,100,0.05)" stroke="rgba(0,200,100,0.22)" stroke-width="0.7"/>
-
-  <!-- Asia main -->
-  <path d="M492,67 L522,59 L552,54 L582,51 L612,53 L640,57 L662,65 L680,77
-           L690,91 L692,107 L686,121 L673,131 L657,137 L640,142 L621,146
-           L603,149 L585,151 L568,153 L552,151 L536,146 L521,139 L508,129
-           L498,116 L493,101 L491,85 Z"
-    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.32)" stroke-width="1.2"/>
-  <!-- Indian subcontinent -->
-  <path d="M568,153 L587,150 L604,154 L615,167 L618,184 L613,200 L602,214
-           L588,224 L575,220 L566,203 L563,185 L564,168 Z"
-    fill="rgba(80,160,255,0.08)" stroke="rgba(80,160,255,0.32)" stroke-width="0.9"/>
-  <!-- SE Asia peninsula -->
-  <path d="M638,142 L659,147 L675,160 L682,176 L676,191 L661,197 L645,191 L636,175 L635,159 Z"
-    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.28)" stroke-width="0.8"/>
-  <!-- Japan -->
-  <path d="M718,87 L729,83 L739,87 L743,97 L738,107 L727,109 L719,103 L715,93 Z"
-    fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.30)" stroke-width="0.8"/>
-
-  <!-- Australia -->
-  <path d="M676,294 L700,286 L725,283 L746,287 L762,298 L770,315 L767,332
-           L755,345 L737,352 L717,354 L699,349 L683,337 L675,322 L673,308 Z"
-    fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.38)" stroke-width="1.2"/>
-  <!-- New Zealand -->
-  <path d="M790,352 L796,347 L802,351 L800,362 L793,364 L788,358 Z"
-    fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.22)" stroke-width="0.7"/>
-
+<svg id="bg-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500"
+  preserveAspectRatio="xMidYMid slice"
+  style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0">
   <defs>
-    <radialGradient id="vig" cx="50%" cy="50%" r="70%">
-      <stop offset="40%" stop-color="transparent"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.55)"/>
+    <radialGradient id="vig" cx="50%" cy="50%" r="65%">
+      <stop offset="30%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.60)"/>
     </radialGradient>
   </defs>
+
+  <!-- Geographic lines -->
+  <!-- Equator -->
+  <line x1="0" y1="250" x2="1000" y2="250" stroke="rgba(255,255,255,0.10)" stroke-width="0.7" stroke-dasharray="10,8"/>
+  <!-- Tropics -->
+  <line x1="0" y1="185" x2="1000" y2="185" stroke="rgba(255,255,255,0.045)" stroke-width="0.5" stroke-dasharray="5,12"/>
+  <line x1="0" y1="315" x2="1000" y2="315" stroke="rgba(255,255,255,0.045)" stroke-width="0.5" stroke-dasharray="5,12"/>
+  <!-- Prime meridian -->
+  <line x1="500" y1="0" x2="500" y2="500" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="8,10"/>
+  <!-- 90°W / 90°E -->
+  <line x1="250" y1="0" x2="250" y2="500" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,14"/>
+  <line x1="750" y1="0" x2="750" y2="500" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,14"/>
+
+  <!-- Continents -->
+  <path d="M33.3,52.8 L111.1,55.6 L166.7,44.4 L236.1,50.0 L272.2,66.7 L319.4,75.0 L333.3,119.4 L319.4,127.8 L305.6,130.6 L291.7,152.8 L275.0,180.6 L255.6,208.3 L244.4,205.6 L236.1,197.2 L230.6,177.8 L230.6,161.1 L175.0,161.1 L155.6,147.2 L155.6,113.9 L138.9,97.2 L111.1,83.3 L77.8,83.3 L41.7,77.8 L33.3,66.7 Z" fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.50)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M33.3,100.0 L50.0,97.2 L61.1,88.9 L77.8,88.9 L88.9,83.3 L77.8,77.8 L61.1,77.8 L50.0,83.3 L33.3,91.7 Z" fill="rgba(255,171,0,0.06)" stroke="rgba(255,171,0,0.40)" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M377.8,83.3 L450.0,55.6 L452.8,38.9 L430.6,19.4 L375.0,19.4 L338.9,36.1 L333.3,55.6 L352.8,69.4 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.35)" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M263.9,188.9 L272.2,186.1 L286.1,194.4 L291.7,194.4 L286.1,194.4 L272.2,188.9 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.28)" stroke-width="0.7" stroke-linejoin="round"/>
+  <path d="M275.0,227.8 L286.1,227.8 L291.7,250.0 L300.0,272.2 L311.1,300.0 L319.4,311.1 L325.0,355.6 L319.4,366.7 L311.1,400.0 L300.0,388.9 L305.6,366.7 L300.0,361.1 L311.1,344.4 L305.6,327.8 L300.0,300.0 L311.1,283.3 L333.3,261.1 L347.2,250.0 L361.1,238.9 L333.3,236.1 L325.0,227.8 L300.0,219.4 L291.7,222.2 L286.1,230.6 Z" fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.50)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M475.0,150.0 L494.4,150.0 L508.3,138.9 L508.3,130.6 L494.4,127.8 L477.8,127.8 L475.0,133.3 L475.0,150.0 Z" fill="rgba(80,160,255,0.08)" stroke="rgba(80,160,255,0.45)" stroke-width="1.0" stroke-linejoin="round"/>
+  <path d="M494.4,127.8 L522.2,127.8 L544.4,122.2 L577.8,127.8 L583.3,133.3 L600.0,144.4 L605.6,138.9 L600.0,133.3 L577.8,122.2 L561.1,116.7 L550.0,111.1 L538.9,100.0 L522.2,94.4 L513.9,88.9 L513.9,77.8 L527.8,75.0 L538.9,69.4 L555.6,61.1 L577.8,55.6 L555.6,61.1 L538.9,69.4 L527.8,77.8 L513.9,88.9 L505.6,105.6 L500.0,111.1 L486.1,116.7 L494.4,127.8 Z" fill="rgba(80,160,255,0.08)" stroke="rgba(80,160,255,0.45)" stroke-width="1.0" stroke-linejoin="round"/>
+  <path d="M513.9,88.9 L513.9,77.8 L527.8,75.0 L538.9,69.4 L555.6,61.1 L577.8,55.6 L583.3,61.1 L569.4,69.4 L555.6,75.0 L550.0,83.3 L550.0,91.7 L533.3,94.4 L522.2,91.7 L513.9,91.7 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.38)" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M486.1,111.1 L491.7,111.1 L500.0,108.3 L502.8,105.6 L500.0,102.8 L494.4,97.2 L491.7,88.9 L488.9,94.4 L486.1,100.0 L486.1,105.6 L491.7,108.3 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.38)" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M516.7,127.8 L522.2,127.8 L544.4,144.4 L550.0,138.9 L544.4,138.9 L538.9,144.4 L533.3,138.9 L527.8,127.8 L516.7,127.8 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.35)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M450.0,211.1 L458.3,222.2 L477.8,236.1 L502.8,233.3 L522.2,238.9 L541.7,244.4 L583.3,250.0 L611.1,250.0 L616.7,216.7 L622.2,216.7 L638.9,216.7 L622.2,238.9 L611.1,238.9 L605.6,227.8 L616.7,211.1 L622.2,216.7 L638.9,216.7 L611.1,216.7 L600.0,188.9 L594.4,172.2 L588.9,166.7 L588.9,161.1 L577.8,161.1 L566.7,161.1 L561.1,150.0 L538.9,150.0 L527.8,144.4 L522.2,144.4 L505.6,144.4 L494.4,155.6 L483.3,161.1 L461.1,177.8 L452.8,191.7 L450.0,211.1 Z" fill="rgba(0,200,100,0.07)" stroke="rgba(0,200,100,0.45)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M611.1,216.7 L622.2,216.7 L638.9,216.7 L644.4,219.4 L622.2,238.9 L611.1,238.9 L605.6,227.8 Z" fill="rgba(0,200,100,0.06)" stroke="rgba(0,200,100,0.35)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M622.2,283.3 L638.9,288.9 L638.9,322.2 L622.2,319.4 Z" fill="rgba(0,200,100,0.05)" stroke="rgba(0,200,100,0.30)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M572.2,133.3 L600.0,144.4 L616.7,144.4 L633.3,166.7 L655.6,183.3 L666.7,188.9 L688.9,183.3 L700.0,194.4 L722.2,216.7 L744.4,188.9 L755.6,188.9 L766.7,180.6 L777.8,188.9 L794.4,216.7 L800.0,222.2 L805.6,238.9 L819.4,238.9 L833.3,183.3 L838.9,166.7 L850.0,155.6 L861.1,155.6 L875.0,155.6 L888.9,138.9 L888.9,125.0 L877.8,122.2 L866.7,122.2 L855.6,105.6 L847.2,105.6 L833.3,88.9 L819.4,83.3 L805.6,69.4 L791.7,61.1 L777.8,61.1 L766.7,55.6 L722.2,50.0 L688.9,50.0 L666.7,55.6 L644.4,61.1 L638.9,83.3 L644.4,105.6 L652.8,116.7 L652.8,133.3 L638.9,133.3 L627.8,133.3 L616.7,133.3 L600.0,133.3 L583.3,133.3 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.40)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M688.9,183.3 L700.0,194.4 L700.0,211.1 L711.1,227.8 L722.2,227.8 L722.2,216.7 L733.3,216.7 L744.4,188.9 L722.2,183.3 L711.1,188.9 L700.0,188.9 Z" fill="rgba(80,160,255,0.07)" stroke="rgba(80,160,255,0.38)" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M600.0,166.7 L622.2,166.7 L655.6,183.3 L633.3,188.9 L622.2,188.9 L616.7,211.1 L605.6,205.6 L600.0,188.9 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.35)" stroke-width="0.9" stroke-linejoin="round"/>
+  <path d="M861.1,155.6 L872.2,155.6 L883.3,150.0 L888.9,138.9 L883.3,138.9 L872.2,144.4 L861.1,150.0 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.35)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M777.8,188.9 L788.9,188.9 L794.4,216.7 L800.0,222.2 L777.8,238.9 L777.8,222.2 L777.8,188.9 Z" fill="rgba(80,160,255,0.06)" stroke="rgba(80,160,255,0.33)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M944.4,83.3 L966.7,77.8 L966.7,100.0 L950.0,105.6 L938.9,105.6 L944.4,94.4 L944.4,83.3 Z" fill="rgba(80,160,255,0.05)" stroke="rgba(80,160,255,0.28)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M816.7,311.1 L816.7,322.2 L822.2,344.4 L833.3,344.4 L855.6,344.4 L877.8,344.4 L883.3,350.0 L888.9,355.6 L900.0,355.6 L911.1,361.1 L922.2,316.7 L916.7,316.7 L911.1,305.6 L905.6,300.0 L888.9,300.0 L875.0,288.9 L861.1,283.3 L850.0,288.9 L838.9,300.0 Z" fill="rgba(255,171,0,0.07)" stroke="rgba(255,171,0,0.45)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M972.2,372.2 L983.3,350.0 L994.4,355.6 L994.4,366.7 L983.3,377.8 L972.2,372.2 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.32)" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M888.9,272.2 L900.0,261.1 L911.1,261.1 L916.7,266.7 L905.6,272.2 L894.4,272.2 Z" fill="rgba(255,171,0,0.05)" stroke="rgba(255,171,0,0.30)" stroke-width="0.8" stroke-linejoin="round"/>
+
+  <!-- Vignette -->
   <rect width="1000" height="500" fill="url(#vig)"/>
 </svg>
 </div>
@@ -705,8 +669,8 @@ const D = {
       // ── MARCH 2026 ──
       {date:'Mar 07',time:'08:30',cty:'US',event:'Nonfarm Payrolls Feb',      prev:'143K',  fore:'160K',          act:'151K',  impact:'HIGH',beat:true},
       {date:'Mar 07',time:'08:30',cty:'US',event:'Unemployment Rate Feb',     prev:'4.0%',  fore:'4.0%',          act:'4.1%',  impact:'HIGH',beat:false},
-      {date:'Mar 12',time:'08:30',cty:'US',event:'CPI MoM Feb',               prev:'0.5%',  fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 12',time:'08:30',cty:'US',event:'Core CPI MoM Feb',          prev:'0.4%',  fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
+      {date:'Mar 12',time:'08:30',cty:'US',event:'CPI MoM Feb',               prev:'0.5%',  fore:'0.3%',          act:'0.2%',  impact:'HIGH',beat:true},
+      {date:'Mar 12',time:'08:30',cty:'US',event:'Core CPI MoM Feb',          prev:'0.4%',  fore:'0.3%',          act:'0.2%',  impact:'HIGH',beat:true},
       {date:'Mar 13',time:'08:30',cty:'US',event:'PPI Final Demand MoM Feb',  prev:'0.4%',  fore:'0.3%',          act:null,    impact:'MED', beat:null},
       {date:'Mar 13',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'242K',  fore:'235K',          act:null,    impact:'MED', beat:null},
       {date:'Mar 14',time:'09:15',cty:'US',event:'Industrial Production MoM', prev:'-0.1%', fore:'0.2%',          act:null,    impact:'MED', beat:null},
@@ -759,7 +723,7 @@ const D = {
     centralBanks:[
       {name:'FED',  rate:'4.25-4.50%',lastChg:'-25bp Dec-25',next:'Mar 19',bias:'HOLD',outlook:'CAUTIOUS'},
       {name:'ECB',  rate:'2.40%',      lastChg:'-25bp Mar-26',next:'Apr 14',bias:'CUT', outlook:'EASING'},
-      {name:'BOJ',  rate:'0.50%',      lastChg:'+25bp Jan-26',next:'Mar 18',bias:'HIKE',outlook:'TIGHTENING'},
+      {name:'BOJ',  rate:'0.50%',      lastChg:'HOLD Mar-26', next:'May 01',bias:'HOLD',outlook:'CAUTIOUS'},
       {name:'BOE',  rate:'4.50%',      lastChg:'-25bp Feb-26',next:'May 07',bias:'CUT', outlook:'EASING'},
       {name:'PBOC', rate:'3.10%',      lastChg:'-10bp Jan-26',next:'Apr 15',bias:'CUT', outlook:'EASING'},
       {name:'RBA',  rate:'4.10%',      lastChg:'-25bp Feb-26',next:'Apr 01',bias:'CUT', outlook:'EASING'},
@@ -838,8 +802,8 @@ function getSpawnPos(sz){
 
 const WTITLES={
   FI:'TREASURY MONITOR',EQ:'EQUITY MONITOR',FX:'FX & RATES',CMDTY:'COMMODITIES & ENERGY',
-  MAP:'GLOBAL INTELLIGENCE MAP',MACRO:'MACRO CALENDAR & CB',NEWS:'NEWS TERMINAL',
-  SPREAD:'CREDIT SPREAD MONITOR',INFL:'INFLATION MONITOR',AUCTION:'AUCTION MONITOR',
+  MACRO:'MACRO CALENDAR & CB',NEWS:'NEWS TERMINAL',
+  INFL:'INFLATION MONITOR',AUCTION:'AUCTION MONITOR',
   VOL:'VOLATILITY & RISK',EQS:'EQUITY SEARCH',CHART:'PRICE CHART'
 };
 const WSIZES={
@@ -973,7 +937,7 @@ function renderW(cmd,key,extra){
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
     case'WATCH':  b.innerHTML=rWATCH();setTimeout(()=>initWATCH(),60);break;
     case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
-    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MAP MACRO NEWS SPREAD INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN</div>`;
+    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MACRO NEWS INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN CB CARRY ROTATION LADDER WATCH CHART</div>`;
   }
 }
 
@@ -1301,7 +1265,7 @@ function rEQ(){
   const makeTile = (st, sEtf) => {
     const sName = sectorNameMap[sEtf] || '';
     const base  = secD1[sName] ?? 0;
-    const noise = (Math.random()-0.5)*0.4;
+    const noise = 0; // removed random noise
     const val   = +(base + noise).toFixed(2);
     const intensity = Math.min(Math.abs(val)/2.5, 1);
     const bg = val > 0
@@ -1354,15 +1318,13 @@ function rEQ(){
 
   // ROTATION tab content
   const sectors = D.equities.sectors||[];
-  const enriched = sectors.map(s=>({...s, w1:+(s.d1*3.5+(Math.random()-.45)*1.5).toFixed(2), m1:+(s.d1*14+(Math.random()-.45)*4).toFixed(2), m3:+(s.d1*38+(Math.random()-.45)*8).toFixed(2)}));
-  const ranked = [...enriched].sort((a,b)=>b.m1-a.m1);
+  const ranked = [...sectors].sort((a,b)=>b.d1-a.d1);
   const rotRows = ranked.map((s,i)=>{
-    const rc=i<3?'var(--green)':i>=8?'var(--red)':'#555';
+    const rc=i<3?'var(--green)':i>=ranked.length-3?'var(--red)':'#555';
+    const w1str=s.w1!=null?`<span style="color:${s.w1>0?'var(--green)':'var(--red)'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</span>`:'<span style="color:#333">—</span>';
     return `<tr><td style="color:${rc};font-weight:600">#${i+1}</td><td style="color:var(--text-dim)">${s.name}</td>
       <td style="color:${s.d1>0?'var(--green)':'var(--red)'}">${s.d1>0?'+':''}${s.d1.toFixed(2)}%</td>
-      <td style="color:${s.w1>0?'var(--green)':'var(--red)'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</td>
-      <td style="color:${s.m1>0?'var(--green)':'var(--red)'};font-weight:600">${s.m1>0?'+':''}${s.m1.toFixed(2)}%</td>
-      <td style="color:${s.m3>0?'var(--green)':'var(--red)'}">${s.m3>0?'+':''}${s.m3.toFixed(2)}%</td>
+      <td>${w1str}</td>
     </tr>`;
   }).join('');
 
@@ -1677,9 +1639,7 @@ function rVOL(){
                : vix<25?{l:'ELEVATED — CAUTION',c:'#ff6f00'}
                : vix<30?{l:'HIGH — STRESS',c:'var(--red)'}
                : {l:'EXTREME — CRISIS',c:'#ff1744'};
-  const ts=[{t:'SPOT',v:vix},{t:'M1',v:+(vix*1.02+0.3).toFixed(2)},{t:'M2',v:+(vix*1.04+0.5).toFixed(2)},{t:'M3',v:+(vix*1.06+0.8).toFixed(2)},{t:'M4',v:+(vix*1.08+1.1).toFixed(2)},{t:'M5',v:+(vix*1.09+1.3).toFixed(2)},{t:'M6',v:+(vix*1.10+1.5).toFixed(2)}];
-  const contango=ts[1].v>ts[0].v;
-  const structLabel=contango?{l:'CONTANGO — NORMAL',c:'var(--green)'}:{l:'BACKWARDATION — FEAR',c:'var(--red)'};
+  // VIX futures term structure requires paid data — removed
   const vrp=(vix - Math.abs(spxP)*Math.sqrt(252)*10).toFixed(1);
 
   const volTab=`
@@ -1688,16 +1648,13 @@ function rVOL(){
         <div class="si"><span class="sil">VIX SPOT</span><span class="siv" style="color:${regime.c};font-size:13px;font-weight:600">${vix.toFixed(2)}</span></div>
         <div class="si"><span class="sil">1D CHG</span><span class="siv ${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</span></div>
         <div class="si"><span class="sil">REGIME</span><span class="siv" style="color:${regime.c}">${regime.l}</span></div>
-        <div class="si"><span class="sil">STRUCTURE</span><span class="siv" style="color:${structLabel.c}">${structLabel.l}</span></div>
         <div class="si"><span class="sil">VOL RISK PREM</span><span class="siv" style="color:${parseFloat(vrp)>0?'var(--amber)':'var(--green)'}">${parseFloat(vrp)>0?'+':''}${vrp}</span></div>
       </div>
-      <div class="sl">VIX TERM STRUCTURE</div>
-      <div class="sf" style="margin-bottom:6px">${ts.map(x=>`<div class="si"><span class="sil">${x.t}</span><span class="siv" style="color:${x.v>vix*1.1?'var(--red)':x.v<vix*0.95?'var(--green)':'var(--amber)'}">${x.v.toFixed(2)}</span></div>`).join('')}</div>
-      <canvas id="vol-ts-c" height="70" style="width:100%;margin-bottom:8px"></canvas>
+
       <div class="sl">VOL INDICES</div>
       <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
         <tr><td style="color:var(--amber)">VIX</td><td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td><td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td><td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td><td style="color:#333;font-size:9px">S&P 500 30D implied</td></tr>
-        <tr><td style="color:var(--amber)">VVIX</td><td>${(vix*5.8+3).toFixed(1)}</td><td class="neu">—</td><td class="${vix<20?'up':'dn'}">${vix<20?'NORMAL':'ELEVATED'}</td><td style="color:#707070;font-size:9px">Vol-of-vol</td></tr>
+        <tr><td style="color:var(--amber)">VVIX</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">Vol-of-vol index</td></tr>
         <tr><td style="color:var(--amber)">MOVE</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">ICE BofA Treasury vol index</td></tr>
         <tr><td style="color:var(--amber)">SKEW</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">CBOE tail risk index</td></tr>
       </tbody></table>
@@ -1707,7 +1664,7 @@ function rVOL(){
 
   return buildTabs('vol-tabs',[
     {id:'vol-main',    label:'VIX & INDICES', content:volTab},
-    {id:'vol-options', label:'OPTIONS FLOW',  content:`<div style="padding:4px 6px">${rOPTIONS()}</div>`},
+    {id:'vol-options', label:'OPTIONS FLOW',  content:`<div style="padding:8px 10px"><div class="sl" style="margin-bottom:8px">OPTIONS FLOW — EXTERNAL SOURCES</div><div style="font-size:9px;color:#555;margin-bottom:12px">Real-time options flow requires premium data subscriptions. Access via:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${[['Unusual Whales','https://unusualwhales.com'],['Market Chameleon','https://marketchameleon.com'],['Barchart Options','https://www.barchart.com/options'],['CBOE LiveVol','https://datashop.cboe.com'],['SpotGamma','https://spotgamma.com'],['Quant Data','https://quantdata.us']].map(([n,u])=>'<a href="'+u+'" target="_blank" style="display:block;padding:6px 8px;border:1px solid #1a1a1a;color:var(--amber);font-size:10px;text-decoration:none;letter-spacing:0.5px">↗ '+n+'</a>').join('')}</div></div>`},
   ]);
 }
 
@@ -1766,13 +1723,7 @@ function rOPTIONS(){
       <thead><tr><th>SYMBOL</th><th>EXP</th><th>STRIKE</th><th>TYPE</th><th>CONTRACTS</th><th>PREMIUM</th><th>BIAS</th><th>NOTE</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="sl" style="margin-top:8px">TERM STRUCTURE — VIX FUTURES (INDICATIVE)</div>
-    <div class="sf">
-      ${['SPOT','M1','M2','M3','M4','M5','M6'].map((t,i)=>{
-        const v = (vix + i*0.8 + (i>2?i*0.3:0)).toFixed(2);
-        return `<div class="si"><span class="sil">${t}</span><span class="siv">${v}</span></div>`;
-      }).join('')}
-    </div>`;
+`;
 }
 
 // ═══════════════════════════════════════════
@@ -1781,8 +1732,8 @@ function rOPTIONS(){
 function rEARN(){
   const earnings = [
     // Week of Mar 10
-    {date:'Mar 10',sym:'ORCL', name:'Oracle Corp',        eps_est:'1.48', eps_act:null, rev_est:'14.4B', beat:null, time:'AMC', mktcap:'360B'},
-    {date:'Mar 11',sym:'ADBE', name:'Adobe Inc',          eps_est:'4.97', eps_act:null, rev_est:'5.8B',  beat:null, time:'AMC', mktcap:'195B'},
+    {date:'Mar 10',sym:'ORCL', name:'Oracle Corp',        eps_est:'1.48', eps_act:'1.47',rev_est:'14.4B',beat:false,time:'AMC', mktcap:'360B'},
+    {date:'Mar 11',sym:'ADBE', name:'Adobe Inc',          eps_est:'4.97', eps_act:'5.08',rev_est:'5.8B', beat:true, time:'AMC', mktcap:'195B'},
     {date:'Mar 12',sym:'ULTA', name:'Ulta Beauty',        eps_est:'7.12', eps_act:null, rev_est:'3.5B',  beat:null, time:'AMC', mktcap:'18B'},
     {date:'Mar 13',sym:'DKS',  name:'Dick\'s Sporting',   eps_est:'3.60', eps_act:null, rev_est:'3.9B',  beat:null, time:'BMO', mktcap:'19B'},
     // Week of Mar 17
@@ -1966,14 +1917,12 @@ function rCARRY(){
 function rROTATION(){
   const sectors = D.equities?.sectors || [];
 
-  // Simulate 1W, 1M, 3M returns anchored to live 1D data
-  const enriched = sectors.map(s=>{
-    const trend = s.d1 > 0 ? 1 : -1;
-    const w1  = +(s.d1 * 3.5 + (Math.random()-.45)*1.5).toFixed(2);
-    const m1  = +(s.d1 * 14  + (Math.random()-.45)*4.0).toFixed(2);
-    const m3  = +(s.d1 * 38  + (Math.random()-.45)*8.0).toFixed(2);
-    return {...s, w1, m1, m3};
-  });
+  // Use live w1 from ETF fetch; m1/m3 not available without paid data
+  const enriched = sectors.map(s=>({...s,
+    w1: s.w1 ?? null,
+    m1: null,
+    m3: null,
+  }));
 
   // Rank by 1M performance
   const ranked = [...enriched].sort((a,b)=>b.m1-a.m1);
@@ -1990,18 +1939,14 @@ function rROTATION(){
     const rank = i+1;
     const rankCol = rank<=3?'var(--green)':rank>=9?'var(--red)':'#555';
     const col1D = s.d1>0?'var(--green)':s.d1<0?'var(--red)':'#444';
-    const col1W = s.w1>0?'var(--green)':s.w1<0?'var(--red)':'#444';
-    const col1M = s.m1>0?'var(--green)':s.m1<0?'var(--red)':'#444';
-    const col3M = s.m3>0?'var(--green)':s.m3<0?'var(--red)':'#444';
-    const momentum = s.m1>2?'▲▲':s.m1>0?'▲':s.m1<-2?'▼▼':'▼';
-    const momCol = s.m1>0?'var(--green)':'var(--red)';
+    const momentum = s.d1>0.5?'▲▲':s.d1>0?'▲':s.d1<-0.5?'▼▼':'▼';
+    const momCol = s.d1>0?'var(--green)':'var(--red)';
+    const w1str = s.w1!=null ? `<span style="color:${s.w1>0?'var(--green)':s.w1<0?'var(--red)':'#444'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</span>` : '<span style="color:#2a2a2a">—</span>';
     return `<tr>
       <td style="color:${rankCol};font-weight:600;width:24px">#${rank}</td>
       <td style="color:var(--text-dim)">${s.name}</td>
       <td style="color:${col1D}">${s.d1>0?'+':''}${s.d1.toFixed(2)}%</td>
-      <td style="color:${col1W}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</td>
-      <td style="color:${col1M};font-weight:600">${s.m1>0?'+':''}${s.m1.toFixed(2)}%</td>
-      <td style="color:${col3M}">${s.m3>0?'+':''}${s.m3.toFixed(2)}%</td>
+      <td>${w1str}</td>
       <td style="color:${momCol}">${momentum}</td>
     </tr>`;
   }).join('');
@@ -2014,9 +1959,9 @@ function rROTATION(){
       <div class="si"><span class="sil">LAGGING</span><span class="siv" style="color:var(--red);font-size:9px">${ranked[ranked.length-1]?.name||'—'}</span></div>
     </div>
     <div class="sl">SECTOR PERFORMANCE — 1D / 1W / 1M / 3M (RANKED BY 1M)</div>
-    <div style="font-size:10px;color:#707070;margin-bottom:4px">1D LIVE · 1W/1M/3M ESTIMATED FROM TREND</div>
+    <div style="font-size:10px;color:#707070;margin-bottom:4px">● 1D + 1W LIVE FROM ETF DATA</div>
     <table class="t">
-      <thead><tr><th>RANK</th><th>SECTOR</th><th>1D</th><th>1W</th><th>1M</th><th>3M</th><th>MOM</th></tr></thead>
+      <thead><tr><th>RANK</th><th>SECTOR</th><th>1D ●</th><th>1W ●</th><th>MOM</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="sl" style="margin-top:8px">VISUAL PERFORMANCE BAR</div>
@@ -2031,7 +1976,7 @@ function drawRotation(){
   if(!sectors.length) return;
   const enriched = sectors.map(s=>({
     name:s.name.replace('Consumer ','').replace(' & Services','').replace('Information ','Info '),
-    m1: +(s.d1*14+(Math.random()-.45)*4).toFixed(2)
+    m1: s.d1  // use live 1D for the bar chart
   })).sort((a,b)=>b.m1-a.m1);
   const mx = Math.max(...enriched.map(s=>Math.abs(s.m1)))+0.5;
   const bh = 8, gap = 2, pad = {l:100,r:50,t:6,b:6};
@@ -2172,7 +2117,20 @@ function rMACRO(){
   </div>`;
 
   // ── CENTRAL BANKS TAB ──
-  const cbCards=D.macro.centralBanks.map(cb=>`
+  const _cbNextBadge=(next)=>{
+  if(!next) return '<span style="color:#333">—</span>';
+  const parts=next.match(/(\w+)\s+(\d+)/);
+  if(!parts) return `<span style="color:#666">${next}</span>`;
+  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const now=new Date();
+  const yr=now.getFullYear();
+  const d=new Date(yr,months[parts[1]]??0,parseInt(parts[2]));
+  const isPast=d<now && (now-d)>86400000;
+  return isPast
+    ? `<span style="color:#333;text-decoration:line-through">${next}</span> <span style="color:var(--red);font-size:8px">PAST</span>`
+    : `<span style="color:${(now-d)>-604800000?'var(--amber)':'#666'}">${next}</span>`;
+};
+const cbCards=D.macro.centralBanks.map(cb=>`
     <div style="border:1px solid var(--border);padding:8px;background:var(--bg2)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <span style="color:var(--amber);font-size:12px;font-weight:700;letter-spacing:1px">${cb.name}</span>
@@ -2180,7 +2138,7 @@ function rMACRO(){
       </div>
       <div style="display:flex;gap:12px;font-size:9px">
         <span style="color:#444">LAST: <span style="color:#666">${cb.lastChg}</span></span>
-        <span style="color:#444">NEXT: <span style="color:#666">${cb.next}</span></span>
+        <span style="color:#444">NEXT: ${_cbNextBadge(cb.next)}</span>
         <span style="color:#444">BIAS: <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#555'};font-weight:600">${cb.bias}</span></span>
         <span style="color:#444">OUTLOOK: <span style="color:#555">${cb.outlook}</span></span>
       </div>
@@ -2603,7 +2561,29 @@ let leafletMap = null;
 
 // ── Geopolitical hotspots with market relevance ──
 function updateClock(){
-  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})+' ET';
+  const now = new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})+' MT';
+  // FOMC countdown
+  const fomcEl = document.getElementById('fomc-countdown');
+  if(fomcEl){
+    const nextFOMC = D.macro.centralBanks.find(b=>b.name==='FED')?.next;
+    if(nextFOMC){
+      const parts = nextFOMC.match(/(\w+)\s+(\d+)/);
+      if(parts){
+        const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+        const yr = now.getFullYear();
+        const target = new Date(yr, months[parts[1]]||0, parseInt(parts[2]), 14, 0, 0);
+        if(target < now) { fomcEl.textContent=''; return; }
+        const diff = target - now;
+        const days = Math.floor(diff/86400000);
+        const hrs  = Math.floor((diff%86400000)/3600000);
+        const mins = Math.floor((diff%3600000)/60000);
+        fomcEl.textContent = days>0
+          ? `FOMC ${days}d ${hrs}h`
+          : hrs>0 ? `FOMC ${hrs}h ${mins}m` : `FOMC ${mins}m`;
+      }
+    }
+  }
 }
 setInterval(updateClock,1000);updateClock();
 
@@ -3269,7 +3249,6 @@ function buildSearchCorpus(){
     {key:'EQ',      label:'Equity Monitor',              meta:'Indices, sectors, heatmap'},
     {key:'FX',      label:'FX & Rates',                  meta:'G10 + EM currencies'},
     {key:'CMDTY',   label:'Commodities & Energy',        meta:'Oil, metals, agriculture'},
-    {key:'MAP',     label:'Global Intelligence Map',     meta:'Satellite map · sovereign yields'},
     {key:'MACRO',   label:'Macro Calendar & CB',         meta:'Events, central banks'},
     {key:'NEWS',    label:'News Terminal',               meta:'Headlines feed'},
     {key:'INFL',    label:'Inflation Monitor',           meta:'Breakevens, CPI, PCE, FRED live'},
@@ -3418,7 +3397,7 @@ function resolveQuery(raw) {
     matches:[]};
 
   // 6. Panel command pass-through
-  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','SPREAD','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB'];
+  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB','CARRY','ROTATION','LADDER','OPTIONS','EARN','ECON','WATCH','CHART'];
   if(panelCmds.includes(first)){
     return {type:'command', target:first, extra:rest||null,
       entry:{key:first, label:first, meta:'', type:'command', action:()=>OW(first, rest||null)},
@@ -4080,10 +4059,37 @@ async function scrnFetchLive(){
   const btn = document.getElementById('scrn-live-btn');
   const spinner = document.getElementById('scrn-spinner');
   const src = document.getElementById('scrn-source');
-
-  if(true){  // live screener enrichment disabled — using static data
-    if(src) src.textContent = 'REFERENCE DATA — fundamentals as of Q4 2025 · px/chg are indicative';
-    return;
+  if(SCRN_STATE.isLoading) return;
+  SCRN_STATE.isLoading = true;
+  if(btn){btn.disabled=true;btn.textContent='⟳ LOADING';}
+  if(src) src.textContent = 'FETCHING LIVE PRICES…';
+  // Batch Yahoo Finance price fetch for visible rows
+  const tickers = [...new Set((SCRN_STATE.filtered.length?SCRN_STATE.filtered:SCRN_STATE.rawData).map(s=>s.sym))].slice(0,40);
+  const BATCH=5; let updated=0;
+  try{
+    for(let i=0;i<tickers.length;i+=BATCH){
+      const batch=tickers.slice(i,i+BATCH);
+      await Promise.allSettled(batch.map(async sym=>{
+        try{
+          const url=`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`;
+          const r=await proxyFetch(url,8000);
+          const d=await r.json();
+          const m=d?.chart?.result?.[0]?.meta;
+          if(!m) return;
+          const price=m.regularMarketPrice;
+          const prev=m.chartPreviousClose||price;
+          const chg=+((price-prev)/prev*100).toFixed(2);
+          const row=SCRN_UNIVERSE.find(s=>s.sym===sym);
+          if(row){row.px=+price.toFixed(2);row.chg=chg; updated++;}
+        }catch(e){}
+      }));
+      await new Promise(r=>setTimeout(r,250));
+    }
+    if(src) src.textContent=`LIVE PRICES UPDATED · ${updated} tickers · fundamentals Q4 2025`;
+    renderSCRN();
+  }finally{
+    SCRN_STATE.isLoading=false;
+    if(btn){btn.disabled=false;btn.textContent='⟳ LIVE';}
   }
 
   if(SCRN_STATE.isLoading) return;
@@ -4330,7 +4336,8 @@ function rHOME(){
       ${tile('ndx','NASDAQ', ndx.val.toFixed(1), ndx.pct, ndx.pct.toFixed(2)+'%', 'NDX', 'EQ')}
       ${tile('dow','DOW', dow.val.toFixed(0), dow.pct, dow.pct.toFixed(2)+'%', 'DJIA', 'EQ')}
       ${tile('vix','VIX', `<span style="color:${vixLevel.col}">${vix.val.toFixed(2)}</span>`, vix.chg, vix.chg.toFixed(2), vixLevel.txt, 'VOL')}
-      ${tile('ust10','UST 10Y', y10.toFixed(3)+'%', t.find(x=>x.tenor==='10Y')?.d1??0, ((t.find(x=>x.tenor==='10Y')?.d1??0)).toFixed(3), '2s10s '+(s2_10>=0?'+':'')+s2_10.toFixed(0)+'bp', 'FI')}
+      ${tile('ust10','UST 10Y', y10.toFixed(3)+'%', t.find(x=>x.tenor==='10Y')?.d1??0, ((t.find(x=>x.tenor==='10Y')?.d1??0)).toFixed(3), '10Y YIELD', 'FI')}
+      ${tile('s2_10','2s10s', (s2_10>=0?'+':'')+s2_10.toFixed(0)+'bp', s2_10, s2_10.toFixed(0), s2_10<0?'INVERTED':'NORMAL CURVE', 'FI')}
       ${tile('dxy','DXY', dxy.val.toFixed(2), dxy.d1, dxy.d1.toFixed(3), 'DOLLAR INDEX', 'FX')}
       ${tile('eur','EUR/USD', eur.val.toFixed(4), eur.d1, eur.d1.toFixed(4), 'G10 FX', 'FX')}
       ${tile('wti','WTI', '$'+wti.spot.toFixed(2), wti.d1, wti.d1.toFixed(2)+'%', '$/BBL', 'CMDTY')}
@@ -4370,6 +4377,7 @@ function rHOME(){
             <span style="color:var(--text-dim)">${cb.name}</span>
             <span style="color:var(--amber);font-weight:600">${cb.rate}</span>
             <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#444'};font-size:9px">${cb.bias}</span>
+            <span style="font-size:8px;color:#333">${_cbNextBadge(cb.next)}</span>
           </div>`).join('')}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
@@ -4820,7 +4828,6 @@ async function initWATCH(){
 function rHELP(){
   const core = [
     {cmd:'HOME',  desc:'Market Overview',         detail:'UST 2Y · UST 10Y · 2s10s spread · SPX · Nasdaq · VIX · DXY · WTI · Gold · CB rates · News feed'},
-    {cmd:'MAP',   desc:'Global Intelligence Map', detail:'Satellite tiles · Sovereign 10Y yields table · Zoom + pan'},
     {cmd:'HEAT',  desc:'Visual Heatmap',          detail:'SECTOR: 11 GICS sectors by 1D % · CURVE: UST bars by tenor colored by 1D change'},
     {cmd:'FI',    desc:'Fixed Income Monitor',    detail:'Full UST curve 1M→30Y · Yield / duration / price · 1D/1W/1M Δ · 2s10s · 3m10y · 5s30s spreads · NORMAL/FLAT/INVERTED regime'},
     {cmd:'MACRO', desc:'Macro Calendar & CBs',    detail:'Economic events · Actual vs forecast · HIGH/MED/LOW impact · 6 central banks: FED ECB BOJ BOE PBOC RBA · Rate bias & outlook'},
@@ -4834,7 +4841,6 @@ function rHELP(){
     {cmd:'FX',      desc:'FX & Rates',        detail:'G10 + DXY + EM pairs · 1D/1W/1M changes · Vol level: LOW / MOD / HIGH'},
     {cmd:'CMDTY',   desc:'Commodities',       detail:'Energy · Metals · Agriculture · Spot price · 1D% change · Curve'},
     {cmd:'NEWS',    desc:'News Terminal',     detail:'12 headlines · Filter: macro eq energy credit geo · Click headline for full story'},
-    {cmd:'SPREAD',  desc:'Credit Spreads',    detail:'IG / HY / Muni / EM · OAS in basis points · 1D/1W changes · 5-year percentile'},
     {cmd:'INFL',    desc:'Inflation Monitor', detail:'TIPS breakevens 5Y/10Y/30Y/5Y5Y · CPI PCE Core PCE · Breakeven curve chart'},
     {cmd:'AUCTION', desc:'Treasury Auctions', detail:'Bid-to-cover · Tail bp · Indirect / Direct / Dealer split · Weak flag (red)'},
     {cmd:'VOL',     desc:'Volatility & Risk', detail:'VIX · VVIX · MOVE · SKEW · 2s10s inversion · MOVE 60-day history chart'},
@@ -5416,6 +5422,7 @@ async function buildTickerTape(){
 // ═══════════════════════════════════════════
 function rCHART(ticker){
   ticker=(ticker||'SPY').toUpperCase();
+  _chartRange=_chartPrefs.range; _chartType=_chartPrefs.type;
   return `<div style="display:flex;flex-direction:column;height:100%;gap:0">
     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:5px 6px;border-bottom:1px solid #111;flex-shrink:0;background:#050505">
       <input id="chart-sym-input" value="${ticker}" style="background:#0a0a0a;border:1px solid #2e2e2e;color:#e0e0e0;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:2px 6px;width:80px;outline:none;text-transform:uppercase" onkeydown="if(event.key==='Enter')loadChartData()" />
@@ -5456,6 +5463,7 @@ let _chartVolInstance=null;
 let _chartRange='1y';
 let _chartType='line';
 let _chartData=null; // cached raw data
+const _chartPrefs={range:'1y',type:'line'}; // persists across ticker changes
 
 function setChartRange(range,btn){
   _chartRange=range;

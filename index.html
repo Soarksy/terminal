@@ -561,10 +561,10 @@ const D = {
     ],
     inflation:{
       breakevens:[
-        {tenor:'5Y',   be:2.44,nom:4.18,real:1.74,d1:-.01},
-        {tenor:'10Y',  be:2.38,nom:4.32,real:1.94,d1:-.01},
-        {tenor:'30Y',  be:2.34,nom:4.72,real:2.38,d1:+.01},
-        {tenor:'5Y5Y', be:2.44,nom:null,real:null,d1:+.00},
+        {tenor:'5Y',   be:null,nom:null,real:null,d1:null},
+        {tenor:'10Y',  be:null,nom:null,real:null,d1:null},
+        {tenor:'30Y',  be:null,nom:null,real:null,d1:null},
+        {tenor:'5Y5Y', be:null,nom:null,real:null,d1:null},
       ],
       metrics:[]  // removed — FRED gauges above are live
     }
@@ -572,49 +572,52 @@ const D = {
 
   equities:{
     indices:[
-      {name:'S&P 500', val:5614.6, chg:-28.4, pct:-.50, vol:'MOD'},
-      {name:'Nasdaq',  val:17612.5,chg:-98.2, pct:-.55, vol:'MOD'},
-      {name:'Dow',     val:41511.8,chg:-142.3,pct:-.34, vol:'LOW'},
-      {name:'Russell', val:2116.4, chg:-18.2, pct:-.85, vol:'MOD'},
-      {name:'VIX',     val:22.44,  chg:+1.12, pct:+5.26,vol:'—'},
-      {name:'VVIX',    val:98.2,   chg:+2.4,  pct:+2.51,vol:'—'},
+      {name:'S&P 500', val:null, chg:null, pct:null, vol:'—'},
+      {name:'Nasdaq',  val:null, chg:null, pct:null, vol:'—'},
+      {name:'Dow',     val:null, chg:null, pct:null, vol:'—'},
+      {name:'Russell', val:null, chg:null, pct:null, vol:'—'},
+      {name:'VIX',     val:null, chg:null, pct:null, vol:'—'},
     ],
     sectors:[]  // populated live by fetchSectorETFs()
   },
 
   fx:[
-    {name:'DXY',     val:104.88,d1:+.34,w1:+.58,m1:-.44,  vol:'MOD', type:'idx'},
-    {name:'EURUSD',  val:1.0432,d1:-.0028,w1:-.0062,m1:+.0044,vol:'MOD', type:'g10'},
-    {name:'USDJPY',  val:148.44,d1:+.38,w1:+.72,m1:-1.22, vol:'MOD', type:'g10'},
-    {name:'GBPUSD',  val:1.2862,d1:-.0014,w1:-.0032,m1:+.0088,vol:'LOW',type:'g10'},
-    {name:'USDCHF',  val:.8988, d1:+.0012,w1:+.0024,m1:-.0038,vol:'LOW',type:'g10'},
-    {name:'AUDUSD',  val:.6288, d1:-.0028,w1:-.0054,m1:-.0122,vol:'MOD',type:'g10'},
-    {name:'USDCAD',  val:1.4388,d1:+.0022,w1:+.0044,m1:+.0122,vol:'MOD',type:'g10'},
-    {name:'USDCNH',  val:7.2488,d1:+.0044,w1:+.0088,m1:+.0188,vol:'LOW',type:'em'},
-    {name:'USDBRL',  val:5.8422,d1:+.0344,w1:+.0688,m1:+.1422,vol:'HIGH',type:'em'},
-    {name:'USDINR',  val:86.88, d1:+.06,  w1:+.12,  m1:+.32,  vol:'LOW', type:'em'},
-    {name:'USDMXN',  val:20.44, d1:+.22,  w1:+.44,  m1:+.88,  vol:'HIGH',type:'em'},
-    {name:'USDZAR',  val:18.44, d1:+.18,  w1:+.36,  m1:+.72,  vol:'HIGH',type:'em'},
+    {name:'DXY',     val:null,d1:null,w1:null,m1:null,vol:null,type:'idx'},
+    {name:'EURUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'USDJPY',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'GBPUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'USDCHF',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'AUDUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'USDCAD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'NZDUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
+    {name:'USDSEK',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDNOK',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDBRL',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDMXN',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDINR',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDCNY',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDZAR',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'USDTRY',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
   ],
 
   commodities:{
     energy:[
-      {name:'WTI Crude', spot:68.44, d1:+.88,  curve:+.44, unit:'$/bbl'},
-      {name:'Brent Crude',spot:71.88,d1:+.72,  curve:+.22, unit:'$/bbl'},
-      {name:'Nat Gas',   spot:4.188, d1:+.22,  curve:-.44, unit:'$/MMBtu'},
-      {name:'Heating Oil',spot:2.388,d1:+.44,  curve:+.08, unit:'$/gal'},
+      {name:'WTI Crude',  spot:null, d1:null, curve:null, unit:'$/bbl'},
+      {name:'Brent Crude',spot:null, d1:null, curve:null, unit:'$/bbl'},
+      {name:'Nat Gas',    spot:null, d1:null, curve:null, unit:'$/MMBtu'},
+      {name:'Heating Oil',spot:null, d1:null, curve:null, unit:'$/gal'},
     ],
     metals:[
-      {name:'Gold',   spot:2888.4,d1:+8.44,curve:+12.4, unit:'$/oz'},
-      {name:'Silver', spot:31.88, d1:+.28, curve:+.44,  unit:'$/oz'},
-      {name:'Copper', spot:4.488, d1:+.44, curve:+.088, unit:'$/lb'},
-      {name:'Platinum',spot:988.0,d1:+2.8, curve:+4.4,  unit:'$/oz'},
+      {name:'Gold',     spot:null, d1:null, curve:null, unit:'$/oz'},
+      {name:'Silver',   spot:null, d1:null, curve:null, unit:'$/oz'},
+      {name:'Copper',   spot:null, d1:null, curve:null, unit:'$/lb'},
+      {name:'Platinum', spot:null, d1:null, curve:null, unit:'$/oz'},
     ],
     agriculture:[
-      {name:'Corn',    spot:456.0,d1:+.28,curve:+2.4,unit:'¢/bu'},
-      {name:'Wheat',   spot:588.0,d1:-.44,curve:-8.8,unit:'¢/bu'},
-      {name:'Soybeans',spot:1244.0,d1:+.18,curve:+4.4,unit:'¢/bu'},
-      {name:'Sugar',   spot:22.8, d1:+.88, curve:+.4, unit:'¢/lb'},
+      {name:'Corn',     spot:null, d1:null, curve:null, unit:'¢/bu'},
+      {name:'Wheat',    spot:null, d1:null, curve:null, unit:'¢/bu'},
+      {name:'Soybeans', spot:null, d1:null, curve:null, unit:'¢/bu'},
+      {name:'Sugar',    spot:null, d1:null, curve:null, unit:'¢/lb'},
     ]
   },
 
@@ -822,7 +825,6 @@ function refreshWin(winKey, cmd, extra){
     case'EARN':  b.innerHTML=rEARN();  break;
     case'ECON':  b.innerHTML=rECON();  break;
     case'HOME':  b.innerHTML=rHOME();  setTimeout(()=>initHOME(),30); break;
-    case'CARRY': b.innerHTML=rCARRY(); break;
     case'ROTATION':b.innerHTML=rROTATION();setTimeout(()=>drawRotation(),40);break;
     case'LADDER':b.innerHTML=rLADDER();break;
     default: break;
@@ -882,7 +884,6 @@ function renderW(cmd,key,extra){
     case'OPTIONS':b.innerHTML=rOPTIONS();break;
     case'EARN':   b.innerHTML=rEARN();break;
     case'ECON':   b.innerHTML=rECON();break;
-    case'CARRY':  b.innerHTML=rCARRY();break;
     case'ROTATION':b.innerHTML=rROTATION();setTimeout(()=>drawRotation(),40);break;
     case'LADDER': b.innerHTML=rLADDER();break;
     case'HELP':   b.innerHTML=rHELP();break;
@@ -891,7 +892,7 @@ function renderW(cmd,key,extra){
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
     case'WATCH':  b.innerHTML=rWATCH();setTimeout(()=>initWATCH(),60);break;
     case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
-    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MACRO NEWS INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN CB CARRY ROTATION LADDER WATCH CHART</div>`;
+    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MACRO NEWS INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN CB ROTATION LADDER WATCH CHART</div>`;
   }
 }
 
@@ -1299,21 +1300,29 @@ function rEQ(){
     {date:'Apr 30',sym:'AMZN',name:'Amazon.com',eps_est:'1.36',time:'AMC',mktcap:'2.2T'},
     {date:'May 1', sym:'NVDA',name:'Nvidia Corp',eps_est:'0.88',time:'AMC',mktcap:'2.8T'},
   ];
-  const earnRows=earnings.map(e=>`<tr>
-    <td style="color:#555;font-size:9px">${e.date}</td>
-    <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
-    <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
-    <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:8px;padding:1px 4px">${e.time}</td>
-    <td style="color:#888">$${e.eps_est}</td>
-    <td style="color:#333">—</td>
-    <td style="color:#2a2a2a;font-size:9px">${e.mktcap}</td>
-  </tr>`).join('');
+  const _months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const _now=new Date();
+  const _parseEarnDate=s=>{const p=s.match(/(\w+)\s+(\d+)/);return p?new Date(_now.getFullYear(),_months[p[1]]??0,+p[2]):null;};
+  const earnRows=earnings.map(e=>{
+    const d=_parseEarnDate(e.date);
+    const isPast=d && d<_now && (_now-d)>3600000*12;
+    const rowStyle=isPast?'opacity:0.35':'';
+    const dateBadge=isPast?`${e.date} <span style="color:var(--red);font-size:8px">PAST</span>`:e.date;
+    return `<tr style="${rowStyle}">
+      <td style="color:#555;font-size:9px">${dateBadge}</td>
+      <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
+      <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
+      <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:8px;padding:1px 4px">${e.time}</td>
+      <td style="color:#888">$${e.eps_est}</td>
+      <td style="color:#2a2a2a;font-size:9px">${e.mktcap}</td>
+    </tr>`;
+  }).join('');
 
   return buildTabs('eq-tabs',[
     {id:'eq-indices',  label:'S&P 500',   content:spxHeatmap},
     {id:'eq-sectors',  label:'SECTORS',   content:`<div style="padding:4px 6px"><div class="sl">SECTOR HEATMAP — 1D PERFORMANCE</div><div class="hm-grid">${hm}</div></div>`},
-    {id:'eq-rotation', label:'ROTATION',  content:`<div style="padding:4px 6px"><div style="font-size:10px;color:#707070;margin-bottom:4px">1D LIVE · 1W/1M/3M ESTIMATED FROM TREND</div><table class="t"><thead><tr><th>RANK</th><th>SECTOR</th><th>1D</th><th>1W</th><th>1M</th><th>3M</th></tr></thead><tbody>${rotRows}</tbody></table></div>`},
-    {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>MKTCAP</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
+    {id:'eq-rotation', label:'ROTATION',  content:`<div style="padding:4px 6px"><div style="font-size:10px;color:#707070;margin-bottom:4px">● 1D + 1W LIVE FROM ETF DATA</div><table class="t"><thead><tr><th>RANK</th><th>SECTOR</th><th>1D ●</th><th>1W ●</th><th>MOM</th></tr></thead><tbody>${rotRows}</tbody></table></div>`},
+    {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>MKTCAP</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
   ]);
 }
 function drawEQ(){}
@@ -1331,7 +1340,7 @@ function rFX(){
         <td>${vol}</td></tr>`;
     }).join('');
     return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>LAST</th><th>1D ●</th><th style="color:#383838">1W</th><th style="color:#383838">1M</th><th>VOL</th></tr></thead><tbody>${rows}</tbody></table>
+      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th><th style="color:#383838">1W ref</th><th style="color:#383838">1M ref</th></tr></thead><tbody>${rows}</tbody></table>
       <div style="font-size:8px;color:#2a2a2a;padding:2px 4px">● 1D live · 1W/1M reference values</div>`;
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
@@ -1423,13 +1432,6 @@ function rFX(){
   return buildTabs('fx-tabs',[
     {id:'fx-g10',   label:'G10 & DXY', content:`<div style="padding:4px 6px">${fxTable('G10 & DXY',g10)}</div>`},
     {id:'fx-em',    label:'EMERGING',  content:`<div style="padding:4px 6px">${fxTable('EMERGING MARKETS',em)}</div>`},
-    {id:'fx-carry', label:'CARRY',     content:`<div style="padding:4px 6px">
-      <div class="sl">G10 POLICY RATES</div>
-      <div class="sf" style="margin-bottom:8px">${rateBar}</div>
-      <div class="sl">CARRY OPPORTUNITIES — SORTED BY RATE DIFFERENTIAL</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>CARRY</th><th>BASE</th><th>QUOTE</th><th>SPOT</th><th>SIGNAL</th></tr></thead><tbody>${carryRows}</tbody></table>
-      <div style="margin-top:6px;padding:5px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">⚠ JPY &amp; CHF unwind sharply in risk-off. Monitor VIX.</div>
-    </div>`},
     {id:'fx-calc',  label:'CALCULATOR', content:calcContent},
   ]);
 }
@@ -1441,10 +1443,10 @@ function rCMDTY(){
     const rows=data.map(r=>`<tr>
       <td>${r.name}</td><td class="hl">${r.spot.toFixed(r.spot>100?1:3)}</td>
       <td>${r.d1>0?`<span class="up">+${r.d1.toFixed(2)}%</span>`:`<span class="dn">${r.d1.toFixed(2)}%</span>`}</td>
-      <td>${fmtC(r.curve,r.curve>10?1:3)}</td><td class="neu">${r.unit}</td>
+<td class="neu">${r.unit}</td>
     </tr>`).join('');
     return`<div class="sl" style="color:${color}">${title}</div>
-      <table class="t"><thead><tr><th>NAME</th><th>SPOT</th><th>1D%</th><th>CURVE</th><th>UNIT</th></tr></thead><tbody>${rows}</tbody></table>`;
+      <table class="t"><thead><tr><th>NAME</th><th>SPOT ●</th><th>1D% ●</th><th>UNIT</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
   return cs('ENERGY',D.commodities.energy,'#e65100')
         +cs('METALS',D.commodities.metals,'#b5921a')
@@ -1475,10 +1477,8 @@ function rINFL(){
   });
   const be = beData.map(b=>`<tr>
     <td>${b.tenor}</td>
-    <td style="color:var(--amber);font-weight:600">${b.be.toFixed(2)}%</td>
-    <td>${b.nom!=null?b.nom.toFixed(2)+'%':'—'}</td>
-    <td>${b.real!=null?b.real.toFixed(2)+'%':'—'}</td>
-    <td class="${b.d1>0?'dn':b.d1<0?'up':'neu'}">${b.d1>0?'+':''}${b.d1.toFixed(3)}</td>
+    <td style="color:var(--amber);font-weight:600">${b.be!=null?b.be.toFixed(2)+'%':'<span style=\"color:#2a2a2a\">—</span>'}</td>
+    <td class="${b.d1!=null?(b.d1>0?'dn':b.d1<0?'up':'neu'):'neu'}">${b.d1!=null?(b.d1>0?'+':'')+b.d1.toFixed(3):'—'}</td>
   </tr>`).join('');
 
   // Live FRED inflation gauges
@@ -1517,7 +1517,7 @@ function rINFL(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div>
         <div class="sl">BREAKEVEN / TIPS CURVE — ${be10?'LIVE FRED':'STATIC'}</div>
-        <table class="t"><thead><tr><th>TENOR</th><th>BREAKEVEN</th><th>NOMINAL</th><th>REAL</th><th>1D Δ</th></tr></thead><tbody>${be}</tbody></table>
+        <table class="t"><thead><tr><th>TENOR</th><th>BREAKEVEN ●</th><th>1D Δ</th></tr></thead><tbody>${be}</tbody></table>
       </div>
       <div>
         <div class="sl">INFLATION GAUGES — FRED LIVE</div>
@@ -1594,7 +1594,6 @@ function rVOL(){
                : vix<30?{l:'HIGH — STRESS',c:'var(--red)'}
                : {l:'EXTREME — CRISIS',c:'#ff1744'};
   // VIX futures term structure requires paid data — removed
-  const vrp=(vix - Math.abs(spxP)*Math.sqrt(252)*10).toFixed(1);
 
   const volTab=`
     <div style="padding:4px 6px">
@@ -1602,7 +1601,6 @@ function rVOL(){
         <div class="si"><span class="sil">VIX SPOT</span><span class="siv" style="color:${regime.c};font-size:13px;font-weight:600">${vix.toFixed(2)}</span></div>
         <div class="si"><span class="sil">1D CHG</span><span class="siv ${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</span></div>
         <div class="si"><span class="sil">REGIME</span><span class="siv" style="color:${regime.c}">${regime.l}</span></div>
-        <div class="si"><span class="sil">VOL RISK PREM</span><span class="siv" style="color:${parseFloat(vrp)>0?'var(--amber)':'var(--green)'}">${parseFloat(vrp)>0?'+':''}${vrp}</span></div>
       </div>
 
       <div class="sl">VOL INDICES</div>
@@ -1624,60 +1622,42 @@ function rVOL(){
 
 
 function rOPTIONS(){
-  // Key sentiment indicators derived from market data
   const vix = D.equities.indices[4]?.val || 0;
   const vixLevel = vix<15?{l:'LOW',c:'var(--green)'}:vix<20?{l:'MODERATE',c:'var(--amber)'}:vix<30?{l:'ELEVATED',c:'#ff6f00'}:{l:'EXTREME',c:'var(--red)'};
+  const vixStr = vix>0 ? vix.toFixed(2) : '—';
 
-  // Simulated but realistic options flow data — updated with current market context
-  const flowData = [
-    {sym:'SPY',  exp:'Mar 21',strike:'$560P', size:'42,000', prem:'$8.2M',  side:'PUT',  sentiment:'BEARISH',  note:'Protective hedge vs index'},
-    {sym:'QQQ',  exp:'Mar 28',strike:'$470C', size:'28,500', prem:'$4.1M',  side:'CALL', sentiment:'BULLISH',  note:'Tech sector upside play'},
-    {sym:'NVDA', exp:'Apr 17',strike:'$900C', size:'12,000', prem:'$6.8M',  side:'CALL', sentiment:'BULLISH',  note:'Earnings run-up positioning'},
-    {sym:'AAPL', exp:'Mar 21',strike:'$210P', size:'18,200', prem:'$2.9M',  side:'PUT',  sentiment:'BEARISH',  note:'Near-term downside protection'},
-    {sym:'IWM',  exp:'Apr 4', strike:'$205P', size:'35,000', prem:'$3.4M',  side:'PUT',  sentiment:'BEARISH',  note:'Small-cap risk hedge'},
-    {sym:'GLD',  exp:'May 16',strike:'$220C', size:'9,800',  prem:'$1.8M',  side:'CALL', sentiment:'BULLISH',  note:'Gold breakout bet'},
-    {sym:'TLT',  exp:'Mar 28',strike:'$90C',  size:'22,000', prem:'$1.2M',  side:'CALL', sentiment:'BULLISH',  note:'Rate cut anticipation'},
-    {sym:'XLE',  exp:'Apr 17',strike:'$88P',  size:'15,600', prem:'$1.1M',  side:'PUT',  sentiment:'BEARISH',  note:'Energy sector weakness'},
-    {sym:'META', exp:'Apr 25',strike:'$580C', size:'8,400',  prem:'$5.2M',  side:'CALL', sentiment:'BULLISH',  note:'Post-earnings momentum'},
-    {sym:'SPY',  exp:'Jun 20',strike:'$600C', size:'31,000', prem:'$3.8M',  side:'CALL', sentiment:'BULLISH',  note:'H1 2026 upside target'},
+  const links = [
+    {name:'Unusual Whales',   url:'https://unusualwhales.com',         desc:'Unusual options flow · dark pool prints · political trades'},
+    {name:'Market Chameleon', url:'https://marketchameleon.com',       desc:'IV rank · earnings vol · options screener'},
+    {name:'Barchart Options', url:'https://barchart.com/options',      desc:'Most active · unusual volume · IV percentile'},
+    {name:'SpotGamma',        url:'https://spotgamma.com',             desc:'GEX · dealer positioning · key gamma levels'},
+    {name:'CBOE Data',        url:'https://cboe.com/us/options/market_statistics/', desc:'Official P/C ratio · volume by exchange'},
+    {name:'OptionsFlow.io',   url:'https://optionflow.io',             desc:'Real-time flow scanner · sweep detector'},
   ];
 
-  const rows = flowData.map(f=>{
-    const sCol = f.side==='CALL'?'var(--green)':'var(--red)';
-    return `<tr>
-      <td style="color:var(--amber);font-weight:600">${f.sym}</td>
-      <td>${f.exp}</td>
-      <td style="color:${sCol};font-weight:600">${f.strike}</td>
-      <td style="color:${sCol};font-weight:600">${f.side}</td>
-      <td>${f.size}</td>
-      <td style="color:var(--amber)">${f.prem}</td>
-      <td style="color:${sCol};font-size:9px">${f.sentiment}</td>
-      <td style="color:#707070;font-size:9px">${f.note}</td>
-    </tr>`;
-  }).join('');
-
-  const bullCount = flowData.filter(f=>f.side==='CALL').length;
-  const bearCount = flowData.filter(f=>f.side==='PUT').length;
-  const bullPrem  = flowData.filter(f=>f.side==='CALL').reduce((a,b)=>a+parseFloat(b.prem.replace('$','').replace('M','')),0);
-  const bearPrem  = flowData.filter(f=>f.side==='PUT').reduce((a,b)=>a+parseFloat(b.prem.replace('$','').replace('M','')),0);
-  const pcRatio   = (bearPrem/bullPrem).toFixed(2);
+  const linkRows = links.map(l=>`
+    <tr onclick="window.open('${l.url}','_blank')" style="cursor:pointer">
+      <td style="color:var(--amber);font-weight:600">${l.name}</td>
+      <td style="color:#666;font-size:9px">${l.desc}</td>
+      <td style="color:#333;font-size:9px">${l.url.replace('https://','')}</td>
+    </tr>`).join('');
 
   return`
-    <div class="sl">SENTIMENT INDICATORS</div>
+    <div class="sl">SENTIMENT — LIVE</div>
     <div class="sf" style="margin-bottom:8px">
-      <div class="si"><span class="sil">VIX</span><span class="siv" style="color:${vixLevel.c}">${vix.toFixed(2)} — ${vixLevel.l}</span></div>
-      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:#444">—</span></div>
-      <div class="si"><span class="sil">CALL PREM</span><span class="siv up">$${bullPrem.toFixed(1)}M</span></div>
-      <div class="si"><span class="sil">PUT PREM</span><span class="siv dn">$${bearPrem.toFixed(1)}M</span></div>
-      <div class="si"><span class="sil">FLOW BIAS</span><span class="siv" style="color:${bullCount>=bearCount?'var(--green)':'var(--red)'}">${bullCount>=bearCount?'BULLISH':'BEARISH'}</span></div>
+      <div class="si"><span class="sil">VIX</span><span class="siv" style="color:${vixLevel.c}">${vixStr}</span><span class="sim" style="color:${vixLevel.c}">${vixLevel.l}</span></div>
+      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#2a2a2a">NO FREE API</span></div>
+      <div class="si"><span class="sil">VVIX</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#2a2a2a">NO FREE API</span></div>
+      <div class="si"><span class="sil">SKEW</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#2a2a2a">NO FREE API</span></div>
     </div>
-    <div class="sl">UNUSUAL OPTIONS ACTIVITY — LARGE PREMIUM FLOWS</div>
-    <div style="font-size:10px;color:#707070;margin-bottom:4px">INDICATIVE DATA — EDUCATIONAL PURPOSES</div>
-    <table class="t">
-      <thead><tr><th>SYMBOL</th><th>EXP</th><th>STRIKE</th><th>TYPE</th><th>CONTRACTS</th><th>PREMIUM</th><th>BIAS</th><th>NOTE</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-`;
+    <div class="sl" style="margin-top:8px">OPTIONS FLOW — EXTERNAL DATA SOURCES</div>
+    <div style="font-size:9px;color:#444;padding:4px 0 8px">Live flow data requires a paid subscription. Links below open in new tab.</div>
+    <div class="tw">
+      <table class="t">
+        <thead><tr><th>SOURCE</th><th>DESCRIPTION</th><th>URL</th></tr></thead>
+        <tbody>${linkRows}</tbody>
+      </table>
+    </div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -1780,7 +1760,7 @@ function rECON(){
       <td style="color:${chgCol}">${chgTxt}</td>
       <td style="color:#707070;font-size:9px">${date}</td>
       <td style="color:#555;font-size:9px">${r.freq}</td>
-      <td style="color:var(--amber);font-size:9px">${r.next}</td>
+      
     </tr>`;
   }).join('');
 
@@ -1800,70 +1780,7 @@ function rECON(){
     ${!hasData?`<div style="color:#3a2a00;font-size:9px;padding:8px;margin-top:8px;border:1px solid #2a1a00">⟳ FRED DATA LOADING — REFRESH IN 30s IF EMPTY</div>`:''}`;
 }
 
-// ═══════════════════════════════════════════
-// RENDER: FX CARRY TRADE MONITOR
-// ═══════════════════════════════════════════
-function rCARRY(){
-  const fx = D.fx || [];
-  // G10 policy rates — static, update with FRED/CB data where possible
-  const rates = {
-    USD:4.375, EUR:2.40, GBP:4.50, JPY:0.50, AUD:4.10,
-    NZD:3.75,  CAD:3.00, CHF:0.50, NOK:4.50, SEK:2.50
-  };
-  const pairs = [
-    {base:'AUD',quote:'JPY', carry: rates.AUD - rates.JPY},
-    {base:'NZD',quote:'JPY', carry: rates.NZD - rates.JPY},
-    {base:'GBP',quote:'JPY', carry: rates.GBP - rates.JPY},
-    {base:'USD',quote:'JPY', carry: rates.USD - rates.JPY},
-    {base:'NOK',quote:'JPY', carry: rates.NOK - rates.JPY},
-    {base:'AUD',quote:'CHF', carry: rates.AUD - rates.CHF},
-    {base:'GBP',quote:'CHF', carry: rates.GBP - rates.CHF},
-    {base:'USD',quote:'CHF', carry: rates.USD - rates.CHF},
-    {base:'AUD',quote:'EUR', carry: rates.AUD - rates.EUR},
-    {base:'GBP',quote:'EUR', carry: rates.GBP - rates.EUR},
-  ].sort((a,b)=>b.carry-a.carry);
 
-  const fxLookup = {};
-  fx.forEach(f=>{ fxLookup[f.name] = f; });
-
-  const rows = pairs.map(p=>{
-    const name = p.base+p.quote;
-    const f = fxLookup[name] || fxLookup[p.base+'/'+p.quote];
-    const px    = f ? f.val.toFixed(4) : '—';
-    const d1    = f ? f.d1 : null;
-    const d1col = d1===null?'#444':d1>0?'var(--green)':'var(--red)';
-    const carryCol = p.carry > 3 ? 'var(--green)' : p.carry > 1.5 ? 'var(--amber)' : '#888';
-    const signal = p.carry > 3 ? 'STRONG BUY' : p.carry > 2 ? 'BUY' : p.carry > 1 ? 'MILD' : 'WEAK';
-    const sigCol = p.carry > 3 ? 'var(--green)' : p.carry > 2 ? 'var(--amber)' : '#555';
-    return `<tr>
-      <td style="color:var(--amber);font-weight:600">${p.base}/${p.quote}</td>
-      <td style="color:${carryCol};font-weight:600">${p.carry.toFixed(2)}%</td>
-      <td style="color:#666">${rates[p.base].toFixed(2)}%</td>
-      <td style="color:#666">${rates[p.quote].toFixed(2)}%</td>
-      <td style="color:#888">${px}</td>
-      <td style="color:${d1col}">${d1!==null?(d1>=0?'+':'')+d1.toFixed(4):'—'}</td>
-      <td style="color:${sigCol};font-size:9px">${signal}</td>
-    </tr>`;
-  }).join('');
-
-  const rateRows = Object.entries(rates).map(([ccy,rate])=>{
-    const bias = rate>3?{l:'RESTRICTIVE',c:'var(--red)'}:rate>1.5?{l:'NEUTRAL',c:'var(--amber)'}:{l:'ACCOMMODATIVE',c:'var(--green)'};
-    return `<div class="si"><span class="sil" style="color:#888">${ccy}</span><span class="siv" style="color:${bias.c}">${rate.toFixed(2)}%</span></div>`;
-  }).join('');
-
-  return`
-    <div class="sl">G10 POLICY RATES</div>
-    <div class="sf" style="margin-bottom:10px">${rateRows}</div>
-    <div class="sl">CARRY TRADE OPPORTUNITIES — SORTED BY DIFFERENTIAL</div>
-    <div style="font-size:10px;color:#707070;margin-bottom:4px">LONG HIGH-YIELD CCY / SHORT LOW-YIELD CCY — INDICATIVE</div>
-    <table class="t">
-      <thead><tr><th>PAIR</th><th>CARRY DIFF</th><th>BASE RATE</th><th>QUOTE RATE</th><th>SPOT</th><th>1D CHG</th><th>SIGNAL</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div style="margin-top:8px;padding:6px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">
-      ⚠ CARRY TRADE RISK: Positions unwind sharply during risk-off. JPY and CHF tend to strengthen during stress events (flight-to-safety). Monitor VIX and current account balances.
-    </div>`;
-}
 
 // ═══════════════════════════════════════════
 // RENDER: SECTOR ROTATION TRACKER
@@ -2024,7 +1941,18 @@ function rMACRO(){
     ? `<span title="Medium market impact" style="color:var(--amber);font-size:11px;line-height:1">●</span>`
     : `<span title="Low market impact" style="color:#333;font-size:11px;line-height:1">●</span>`;
 
-  const calRows=D.macro.calendar.map(e=>{
+  const _mth={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const _parseDate=s=>{const p=(s||'').match(/(\w+)\s+(\d+)/);return p?new Date(new Date().getFullYear(),_mth[p[1]]??0,+p[2]):null;};
+  const _calNow=new Date();
+  const calFiltered=D.macro.calendar.filter(e=>{
+    const d=_parseDate(e.date);
+    if(!d) return true;
+    const ageMs=_calNow-d;
+    if(ageMs<0) return true;           // future: always show
+    if(e.act!==null) return ageMs < 14*86400000; // past with actual: keep 14 days
+    return true;                       // pending: always show
+  });
+  const calRows=calFiltered.map(e=>{
     const pending = e.act === null;
     // For released events: show actual with beat/miss color
     // For pending: show forecast only (no actual column)
@@ -2128,7 +2056,7 @@ const cbCards=D.macro.centralBanks.map(cb=>`
       <td style="color:#555">${prev}</td>
       <td style="color:${chgCol}">${chg!==null?(chg>0?'+':'')+chg.toFixed(2):'—'}</td>
       <td style="color:#888;font-size:9px">${d?.date||'—'}</td>
-      <td style="color:var(--amber);font-size:9px">${r.next}</td>
+      <td style="font-size:9px;color:${(()=>{const p=(r.next||'').match(/(\w+)\s+(\d+)/);if(!p)return'#333';const mn={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};const d=new Date(new Date().getFullYear(),mn[p[1]]??0,+p[2]);return d<new Date()?'#2a2a2a':'var(--amber)';})()}">${(()=>{const p=(r.next||'').match(/(\w+)\s+(\d+)/);if(!p)return r.next||'—';const mn={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};const d=new Date(new Date().getFullYear(),mn[p[1]]??0,+p[2]);return d<new Date()?r.next+' ✕':r.next;})()}</td>
     </tr>`;
   }).join('');
   const econTab=`<div style="padding:4px 6px">
@@ -2137,7 +2065,7 @@ const cbCards=D.macro.centralBanks.map(cb=>`
       <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">Mar 19, 2026</span></div>
       <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
     </div>
-    <table class="t"><thead><tr><th>CAT</th><th>INDICATOR</th><th>LATEST</th><th>PREV</th><th>CHG</th><th>DATE</th><th>NEXT</th></tr></thead><tbody>${econRows}</tbody></table>
+    <table class="t"><thead><tr><th>CAT</th><th>INDICATOR</th><th>LATEST ●</th><th>PREV</th><th>CHG</th><th>RELEASE DATE</th></tr></thead><tbody>${econRows}</tbody></table>
   </div>`;
 
   return buildTabs('macro-tabs',[
@@ -3212,8 +3140,7 @@ function buildSearchCorpus(){
     {key:'EARN',    label:'Earnings Calendar',           meta:'Upcoming reports, EPS estimates'},
     {key:'ECON',    label:'Economic Releases — FRED',    meta:'CPI, NFP, GDP, PCE live data'},
     {key:'HEAT',    label:'Heatmap — Sector / Curve',   meta:'2 visual modes'},
-    {key:'CARRY',   label:'FX Carry Trade Monitor',     meta:'G10 rate differentials'},
-    {key:'ROTATION',label:'Sector Rotation Tracker',    meta:'1W/1M/3M sector performance'},
+        {key:'ROTATION',label:'Sector Rotation Tracker',    meta:'1W/1M/3M sector performance'},
     {key:'LADDER',  label:'Bond Ladder / Duration Risk', meta:'DV01, duration, yield by tenor'},
   ];
   PANELS.forEach(p=>C.push({key:p.key, label:p.label, meta:p.meta, type:'command',
@@ -3351,7 +3278,7 @@ function resolveQuery(raw) {
     matches:[]};
 
   // 6. Panel command pass-through
-  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB','CARRY','ROTATION','LADDER','OPTIONS','EARN','ECON','WATCH','CHART'];
+  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB','ROTATION','LADDER','OPTIONS','EARN','ECON','WATCH','CHART'];
   if(panelCmds.includes(first)){
     return {type:'command', target:first, extra:rest||null,
       entry:{key:first, label:first, meta:'', type:'command', action:()=>OW(first, rest||null)},
@@ -3808,16 +3735,17 @@ function rSCRN(){
           <th data-col="sym"    onclick="scrnSort('sym')"   style="text-align:left">TICKER</th>
           <th data-col="name"   onclick="scrnSort('name')"  style="text-align:left">NAME</th>
           <th data-col="sector" onclick="scrnSort('sector')" style="text-align:left">SECTOR</th>
-          <th data-col="px"     onclick="scrnSort('px')">PRICE</th>
-          <th data-col="chg"    onclick="scrnSort('chg')">1D %</th>
+          <th data-col="px"     onclick="scrnSort('px')">PRICE ●</th>
+          <th data-col="chg"    onclick="scrnSort('chg')">1D % ●</th>
           <th data-col="mcap"   onclick="scrnSort('mcap')">MKT CAP</th>
-          <th data-col="pe"     onclick="scrnSort('pe')">P/E</th>
-          <th data-col="fwdPe"  onclick="scrnSort('fwdPe')">FWD P/E</th>
-          <th data-col="div"    onclick="scrnSort('div')">DIV %</th>
+          <th data-col="pe"     onclick="scrnSort('pe')" title="Reference: Q4 2025">P/E *</th>
+          <th data-col="fwdPe"  onclick="scrnSort('fwdPe')" title="Reference: Q4 2025">FWD P/E *</th>
+          <th data-col="div"    onclick="scrnSort('div')" title="Reference: Q4 2025">DIV % *</th>
           <th data-col="vol"    onclick="scrnSort('vol')">AVG VOL</th>
+          <th data-col="beta"   onclick="scrnSort('beta')" title="Reference: Q4 2025">BETA *</th>
         </tr></thead>
         <tbody id="scrn-tbody">
-          <tr><td colspan="14" class="scrn-no-results" style="color:#888">
+          <tr><td colspan="11" class="scrn-no-results" style="color:#888">
             SET FILTERS AND CLICK ▶ RUN SCREEN
           </td></tr>
         </tbody>
@@ -3940,7 +3868,7 @@ function scrnRenderTable(){
   if(countEl) countEl.textContent = SCRN_STATE.filtered.length + (SCRN_STATE.filtered.length>200?' (showing 200)':'');
 
   if(!rows.length){
-    tbody.innerHTML=`<tr><td colspan="14" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="11" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
     return;
   }
 
@@ -3952,21 +3880,20 @@ function scrnRenderTable(){
     const divStr = r.div > 0 ? r.div.toFixed(2)+'%' : '<span style="color:#2a2a2a">—</span>';
     const volStr = r.vol >= 1e6 ? (r.vol/1e6).toFixed(1)+'M' : (r.vol/1e3).toFixed(0)+'K';
     const mcapStr = r.mcap >= 1000 ? (r.mcap/1000).toFixed(2)+'T' : r.mcap.toFixed(0)+'B';
+    const pxStr = r.px!=null ? '$'+r.px.toFixed(2) : '<span style="color:#2a2a2a">—</span>';
+    const chgTxt = r.chg!=null ? chgSign+r.chg.toFixed(2)+'%' : '<span style="color:#2a2a2a">—</span>';
     return `<tr>
       <td onclick="OW('EQS','${r.sym}')" style="color:var(--amber);cursor:pointer">${r.sym}</td>
       <td style="text-align:left;color:var(--text-mid);max-width:140px;overflow:hidden;text-overflow:ellipsis">${r.name}</td>
       <td style="text-align:left;color:var(--text-dim)">${r.sector}</td>
-      <td>$${r.px.toFixed(2)}</td>
-      <td style="color:${chgCol}">${chgSign}${r.chg.toFixed(2)}%</td>
+      <td>${pxStr}</td>
+      <td style="color:${chgCol}">${chgTxt}</td>
       <td>$${mcapStr}</td>
       <td>${peStr}</td>
       <td>${fwdStr}</td>
       <td>${divStr}</td>
       <td style="color:var(--text-dim)">${volStr}</td>
       <td style="color:${r.beta!=null?(r.beta>1.5?'var(--red)':r.beta<0.8?'var(--green)':'var(--text-mid)'):'#333'}">${r.beta!=null?r.beta.toFixed(2):'<span style="color:#333">—</span>'}</td>
-      <td style="color:#a0a0a0">${r.roe!=null?r.roe.toFixed(0)+'%':'<span style="color:#333">—</span>'}</td>
-      <td>${r.pb!=null?r.pb.toFixed(2):'<span style="color:#333">—</span>'}</td>
-      <td style="color:#888">${r.evEbitda!=null?r.evEbitda.toFixed(1):'<span style="color:#333">—</span>'}</td>
     </tr>`;
   }).join('');
 }
@@ -4596,7 +4523,6 @@ WTITLES['HEAT'] = 'HEATMAP';
 WTITLES['OPTIONS'] = 'OPTIONS FLOW & SENTIMENT';
 WTITLES['EARN']    = 'EARNINGS CALENDAR';
 WTITLES['ECON']    = 'ECONOMIC RELEASES — FRED';
-WTITLES['CARRY']   = 'FX CARRY TRADE MONITOR';
 WTITLES['ROTATION']= 'SECTOR ROTATION TRACKER';
 WTITLES['LADDER']  = 'BOND LADDER — DURATION RISK';
 WSIZES['HELP']  = [680,560];
@@ -4608,7 +4534,6 @@ WSIZES['HEAT']  = [720,480];
 WSIZES['OPTIONS']= [720,500];
 WSIZES['EARN']  = [680,460];
 WSIZES['ECON']  = [680,480];
-WSIZES['CARRY'] = [700,420];
 WSIZES['ROTATION']=[760,480];
 WSIZES['LADDER']= [680,420];
 

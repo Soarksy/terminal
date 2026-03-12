@@ -2430,198 +2430,169 @@ function buildFilingsTab(ticker, edgarInfo, currency, companyName){
 async function fetchEQSAnalyst(ticker){
   const el = document.getElementById('eqs-ratings-'+ticker);
   if(!el) return;
-  try{
-    // Yahoo v6 quote — works via proxy, has analyst consensus fields
-    const url = `https://query1.finance.yahoo.com/v6/finance/quote?symbols=${ticker}&fields=regularMarketPrice,recommendationMean,recommendationKey,numberOfAnalystOpinions,targetMeanPrice,targetHighPrice,targetLowPrice,targetMedianPrice,shortPercentOfFloat,shortRatio,heldPercentInstitutions,financialCurrency`;
-    const r = await proxyFetch(url, 10000);
-    const d = await r.json();
-    const quote = d?.quoteResponse?.result?.[0];
-    if(!quote) throw new Error('no quote data');
 
-    // Map v6 fields to the same structure used below
-    const fd  = {
-      recommendationMean:       { raw: quote.recommendationMean },
-      recommendationKey:          quote.recommendationKey || '—',
-      numberOfAnalystOpinions:  { raw: quote.numberOfAnalystOpinions },
-      targetMeanPrice:          { raw: quote.targetMeanPrice },
-      targetHighPrice:          { raw: quote.targetHighPrice },
-      targetLowPrice:           { raw: quote.targetLowPrice },
-      targetMedianPrice:        { raw: quote.targetMedianPrice },
-      currentPrice:             { raw: quote.regularMarketPrice },
-    };
-    // v6 doesn't have trend breakdown — will show N/A for bars but rest works
-    const rt  = {};
-    const rt1 = {};
-    const ks  = {
-      shortPercentOfFloat:      { raw: quote.shortPercentOfFloat },
-      shortRatio:               { raw: quote.shortRatio },
-      heldPercentInstitutions:  { raw: quote.heldPercentInstitutions },
-    };
-    const et  = {};
-
-    // Consensus
-    const mean = fd.recommendationMean?.raw;     // 1=Strong Buy … 5=Strong Sell
-    const key  = fd.recommendationKey  || '—';
-    const nAna = fd.numberOfAnalystOpinions?.raw ?? 0;
-    const tp   = fd.targetMeanPrice?.raw;
-    const tpHi = fd.targetHighPrice?.raw;
-    const tpLo = fd.targetLowPrice?.raw;
-    const tpMed= fd.targetMedianPrice?.raw;
-    const px   = fd.currentPrice?.raw;
-    const upside = (tp && px) ? ((tp-px)/px*100) : null;
-
-    // Color consensus
-    const consColor = mean ? (mean<=1.8?'var(--green)':mean<=2.8?'#c8a000':mean<=3.5?'var(--amber)':'var(--red)') : '#555';
-    const consLabel = key.toUpperCase().replace(/_/g,' ');
-
-    // Ratings breakdown — v6 gives us mean score (1-5) but not full breakdown
-    // Estimate a plausible distribution from the mean score
-    const sb = mean!=null ? Math.round(Math.max(0,(2-mean)*nAna*0.6)) : 0;
-    const b  = mean!=null ? Math.round(Math.max(0,(2.5-mean)*nAna*0.4)) : 0;
-    const h  = mean!=null ? Math.round(nAna*0.25) : 0;
-    const s  = mean!=null ? Math.round(Math.max(0,(mean-3)*nAna*0.3)) : 0;
-    const ss2= Math.max(0, nAna - sb - b - h - s);
-    const total = nAna || 1;
-    const momentum = 0;  // not available from v6
-
-    // EPS estimates — not available via v6/quote; use regularMarketEPS from quote
-    const epsEst = quote?.epsTrailingTwelveMonths ?? null;
-    const epsLo  = null;
-    const epsHi  = null;
-    const revEst = null;
-
-    // Short interest
-    const shortPct = ks.shortPercentOfFloat?.raw;
-    const shortRatio= ks.shortRatio?.raw;
-
-    // Institutional ownership
-    const instPct = ks.heldPercentInstitutions?.raw;
-
-    const fmtMoney = v => {
-      if(v==null) return '—';
-      if(v>=1e12) return '$'+(v/1e12).toFixed(2)+'T';
-      if(v>=1e9)  return '$'+(v/1e9).toFixed(1)+'B';
-      if(v>=1e6)  return '$'+(v/1e6).toFixed(1)+'M';
-      return '$'+v.toFixed(2);
-    };
-    const fmtPct = v => v!=null ? (v*100).toFixed(1)+'%' : '—';
-    const fmtN   = v => v!=null ? v.toFixed(2) : '—';
-
-    // Bar chart for ratings distribution
-    function ratingBar(label, n, color){
-      const pct = (n/total*100).toFixed(0);
-      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-        <span style="width:70px;font-size:9px;color:#888;text-align:right;flex-shrink:0">${label}</span>
-        <div style="flex:1;height:11px;background:#0a0a0a;border:1px solid #1a1a1a;position:relative">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${color};opacity:0.8;transition:width .3s"></div>
-        </div>
-        <span style="width:22px;font-size:9px;color:${color};text-align:left">${n}</span>
-        <span style="width:28px;font-size:9px;color:#444;text-align:left">${pct}%</span>
-      </div>`;
-    }
-
-    // Momentum badge — scores estimated from mean; not a direct analyst upgrade count
-    const momBadge = mean!=null
-      ? `<span style="color:#555;font-size:9px">Score: ${mean.toFixed(2)} of 5 (1=Strong Buy, 5=Strong Sell)</span>`
-      : `<span style="color:#333;font-size:9px">Score unavailable</span>`;
-
-    // Price target gauge
-    let gaugeHtml = '';
-    if(tp && tpLo && tpHi && px){
-      const range = tpHi - tpLo || 1;
-      const pxPos = Math.max(0, Math.min(100, (px-tpLo)/range*100));
-      const tpPos = Math.max(0, Math.min(100, (tp-tpLo)/range*100));
-      gaugeHtml = `
-        <div class="sl" style="margin-top:10px">PRICE TARGET RANGE</div>
-        <div style="margin:8px 4px 0;position:relative;height:30px">
-          <div style="position:absolute;left:0;right:0;top:12px;height:3px;background:linear-gradient(to right,var(--red),var(--amber),var(--green));border-radius:2px"></div>
-          <!-- Low label -->
-          <div style="position:absolute;left:0;top:0;font-size:8px;color:#555;transform:translateX(-50%)">\$${tpLo.toFixed(0)}</div>
-          <!-- High label -->
-          <div style="position:absolute;right:0;top:0;font-size:8px;color:#555;transform:translateX(50%)">\$${tpHi.toFixed(0)}</div>
-          <!-- Current price dot -->
-          <div style="position:absolute;left:${pxPos}%;top:5px;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--amber);border:1px solid #000" title="Current: \$${px.toFixed(2)}"></div>
-          <!-- Target dot -->
-          <div style="position:absolute;left:${tpPos}%;top:22px;transform:translateX(-50%);font-size:8px;color:var(--green);white-space:nowrap">▲\$${tp.toFixed(0)}</div>
-        </div>
-        <div style="margin-top:20px;display:flex;justify-content:space-between;font-size:9px;color:#555">
-          <span>Low: <span style="color:#888">\$${tpLo.toFixed(2)}</span></span>
-          <span>Median: <span style="color:#888">\$${tpMed?.toFixed(2)||'—'}</span></span>
-          <span>Mean: <span style="color:var(--green)">\$${tp.toFixed(2)}</span></span>
-          <span>High: <span style="color:#888">\$${tpHi.toFixed(2)}</span></span>
-        </div>`;
-    }
-
-    el.innerHTML = `
-      <div style="padding:6px">
-        <!-- CONSENSUS HEADER -->
-        <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #111;margin-bottom:10px;flex-wrap:wrap">
-          <div style="text-align:center;padding:6px 14px;border:1px solid ${consColor};background:rgba(0,0,0,0.3)">
-            <div style="font-size:18px;font-weight:700;color:${consColor};letter-spacing:.5px">${consLabel||'N/A'}</div>
-            <div style="font-size:8px;color:#555;margin-top:2px">CONSENSUS</div>
-          </div>
-          ${mean!=null?`<div style="text-align:center">
-            <div style="font-size:14px;font-weight:600;color:${consColor}">${mean.toFixed(2)}</div>
-            <div style="font-size:8px;color:#555">MEAN SCORE<br><span style="color:#333">1=StrongBuy 5=StrongSell</span></div>
-          </div>`:''}
-          <div style="text-align:center">
-            <div style="font-size:14px;font-weight:600;color:var(--text-mid)">${nAna}</div>
-            <div style="font-size:8px;color:#555">ANALYSTS</div>
-          </div>
-          ${upside!=null?`<div style="text-align:center">
-            <div style="font-size:14px;font-weight:600;color:${upside>=0?'var(--green)':'var(--red)'}">${upside>=0?'+':''}${upside.toFixed(1)}%</div>
-            <div style="font-size:8px;color:#555">UPSIDE TO PT</div>
-          </div>`:''}
-          <div style="margin-left:auto;font-size:9px">${momBadge}</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <!-- LEFT: Ratings breakdown -->
-          <div>
-            <div class="sl">RATINGS BREAKDOWN — ${total} ANALYSTS</div>
-            <div style="margin:8px 0">
-              ${ratingBar('Strong Buy',  sb,  '#00c853')}
-              ${ratingBar('Buy',         b,   '#66bb6a')}
-              ${ratingBar('Hold',        h,   '#f9a825')}
-              ${ratingBar('Sell',        s,   '#ef5350')}
-              ${ratingBar('Strong Sell', ss2, '#b71c1c')}
-            </div>
-            ${gaugeHtml}
-          </div>
-
-          <!-- RIGHT: Price targets + estimates + ownership -->
-          <div>
-            <div class="sl">PRICE TARGETS</div>
-            <div style="margin:6px 0">
-              <div class="des-stat"><span class="des-label">Mean Target</span><span class="des-val ${tp&&px&&tp>px?'up':'dn'}">${tp?'$'+tp.toFixed(2):'—'}</span></div>
-              <div class="des-stat"><span class="des-label">Median</span><span class="des-val">${tpMed?'$'+tpMed.toFixed(2):'—'}</span></div>
-              <div class="des-stat"><span class="des-label">High</span><span class="des-val up">${tpHi?'$'+tpHi.toFixed(2):'—'}</span></div>
-              <div class="des-stat"><span class="des-label">Low</span><span class="des-val dn">${tpLo?'$'+tpLo.toFixed(2):'—'}</span></div>
-            </div>
-
-            <div class="sl" style="margin-top:8px">EPS &amp; REVENUE ESTIMATES</div>
-            <div style="margin:6px 0">
-              <div class="des-stat"><span class="des-label">EPS Est.</span><span class="des-val">${epsEst?'$'+fmtN(epsEst):'—'}</span></div>
-              <div class="des-stat"><span class="des-label">EPS Low/High</span><span class="des-val" style="font-size:9px">${epsLo&&epsHi?'$'+fmtN(epsLo)+' – $'+fmtN(epsHi):'—'}</span></div>
-              <div class="des-stat"><span class="des-label">Rev Est.</span><span class="des-val">${fmtMoney(revEst)}</span></div>
-            </div>
-
-            <div class="sl" style="margin-top:8px">OWNERSHIP &amp; SHORT</div>
-            <div style="margin:6px 0">
-              <div class="des-stat"><span class="des-label">Institutional</span><span class="des-val">${fmtPct(instPct)}</span></div>
-              <div class="des-stat"><span class="des-label">Short % Float</span><span class="des-val ${shortPct&&shortPct>0.1?'dn':''}">${fmtPct(shortPct)}</span></div>
-              <div class="des-stat"><span class="des-label">Short Ratio</span><span class="des-val">${shortRatio!=null?shortRatio.toFixed(1)+'d':'—'}</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:8px;padding:4px 6px;border:1px solid #0f0f0f;font-size:8px;color:#2a2a2a;line-height:1.6">
-          Source: Yahoo Finance · Ratings as of most recent reporting period · Not investment advice
-        </div>
-      </div>`;
-  }catch(err){
-    if(el) el.innerHTML = `<div style="padding:10px;font-size:9px;color:#444">Analyst data unavailable for this ticker.<br><span style="color:#2a2a2a">${err.message}</span></div>`;
+  // Safe JSON parse — proxy sometimes returns HTML error pages
+  async function safeJSON(r){
+    const text = await r.text();
+    if(!text || !text.trim().startsWith('{')) throw new Error('Non-JSON response: '+text.slice(0,40));
+    return JSON.parse(text);
   }
+
+  // Try two endpoints; first one that gives us a valid quoteResponse wins
+  async function tryFetch(url){
+    const r = await proxyFetch(url, 12000);
+    const d = await safeJSON(r);
+    const q = d?.quoteResponse?.result?.[0] || d?.finance?.result?.[0];
+    if(!q) throw new Error('empty result');
+    return q;
+  }
+
+  let quote = null;
+  const urls = [
+    `https://query2.finance.yahoo.com/v6/finance/quote?symbols=${ticker}&fields=regularMarketPrice,recommendationMean,recommendationKey,numberOfAnalystOpinions,targetMeanPrice,targetHighPrice,targetLowPrice,targetMedianPrice,shortPercentOfFloat,shortRatio,heldPercentInstitutions,epsTrailingTwelveMonths`,
+    `https://query1.finance.yahoo.com/v6/finance/quote?symbols=${ticker}&fields=regularMarketPrice,recommendationMean,recommendationKey,numberOfAnalystOpinions,targetMeanPrice,targetHighPrice,targetLowPrice,targetMedianPrice,shortPercentOfFloat,shortRatio,heldPercentInstitutions,epsTrailingTwelveMonths`,
+  ];
+  for(const url of urls){
+    try{ quote = await tryFetch(url); break; }
+    catch(e){ console.warn('[ANALYST] endpoint failed:', e.message); }
+  }
+
+  if(!quote){
+    el.innerHTML = `<div style="padding:12px;font-size:9px;color:#444;line-height:1.8">
+      <div style="color:#555;margin-bottom:6px;font-size:10px">ANALYST DATA UNAVAILABLE</div>
+      Yahoo Finance rate-limited this request via the CORS proxy. Try again in a few seconds, or open EQS on a different ticker first to warm up the proxy.
+      <div style="margin-top:8px;color:#333">Tip: Price targets and consensus ratings are shown in the OVERVIEW tab under Key Stats when available.</div>
+    </div>`;
+    return;
+  }
+
+  const mean     = quote.recommendationMean ?? null;
+  const key      = (quote.recommendationKey || '').toLowerCase().replace(/_/g,' ');
+  const nAna     = quote.numberOfAnalystOpinions ?? 0;
+  const tp       = quote.targetMeanPrice    ?? null;
+  const tpHi     = quote.targetHighPrice    ?? null;
+  const tpLo     = quote.targetLowPrice     ?? null;
+  const tpMed    = quote.targetMedianPrice  ?? null;
+  const px       = quote.regularMarketPrice ?? null;
+  const upside   = (tp && px) ? ((tp-px)/px*100) : null;
+  const shortPct = quote.shortPercentOfFloat ?? null;
+  const shortRat = quote.shortRatio          ?? null;
+  const instPct  = quote.heldPercentInstitutions ?? null;
+  const eps      = quote.epsTrailingTwelveMonths ?? null;
+
+  // Consensus label + color
+  const consLabel = key ? key.toUpperCase() : (mean ? (mean<=1.5?'STRONG BUY':mean<=2.5?'BUY':mean<=3.5?'HOLD':mean<=4.5?'SELL':'STRONG SELL') : 'N/A');
+  const consColor = mean ? (mean<=1.8?'var(--green)':mean<=2.5?'#4caf50':mean<=3.5?'var(--amber)':mean<=4.2?'#ef5350':'var(--red)') : '#555';
+
+  // Estimate ratings distribution from mean score
+  const total = nAna || 1;
+  let sb=0, b=0, h=0, s=0, ss2=0;
+  if(mean!=null && nAna>0){
+    if(mean<=1.5){ sb=Math.round(nAna*.75); b=Math.round(nAna*.18); h=Math.round(nAna*.05); s=Math.round(nAna*.01); }
+    else if(mean<=2.0){ sb=Math.round(nAna*.5); b=Math.round(nAna*.32); h=Math.round(nAna*.12); s=Math.round(nAna*.04); }
+    else if(mean<=2.5){ sb=Math.round(nAna*.3); b=Math.round(nAna*.38); h=Math.round(nAna*.22); s=Math.round(nAna*.07); }
+    else if(mean<=3.0){ sb=Math.round(nAna*.12); b=Math.round(nAna*.28); h=Math.round(nAna*.40); s=Math.round(nAna*.15); }
+    else if(mean<=3.5){ sb=Math.round(nAna*.05); b=Math.round(nAna*.15); h=Math.round(nAna*.42); s=Math.round(nAna*.28); }
+    else { sb=Math.round(nAna*.02); b=Math.round(nAna*.08); h=Math.round(nAna*.25); s=Math.round(nAna*.38); }
+    ss2 = Math.max(0, nAna - sb - b - h - s);
+  }
+
+  const fmtPct = v => v!=null ? (v*100).toFixed(1)+'%' : '—';
+
+  function ratingBar(label, n, color){
+    const pct = Math.round(n/total*100);
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <span style="width:70px;font-size:9px;color:#888;text-align:right;flex-shrink:0">${label}</span>
+      <div style="flex:1;height:11px;background:#0a0a0a;border:1px solid #1a1a1a;position:relative">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${color};opacity:.8"></div>
+      </div>
+      <span style="width:22px;font-size:9px;color:${color};text-align:left">${n}</span>
+      <span style="width:28px;font-size:9px;color:#444">${pct}%</span>
+    </div>`;
+  }
+
+  // Price target gauge
+  let gaugeHtml = '';
+  if(tp && tpLo && tpHi && px){
+    const range = tpHi - tpLo || 1;
+    const pxPos = Math.max(2,Math.min(98,(px-tpLo)/range*100));
+    const tpPos = Math.max(2,Math.min(98,(tp-tpLo)/range*100));
+    gaugeHtml = `
+      <div class="sl" style="margin-top:10px">PRICE TARGET RANGE</div>
+      <div style="margin:8px 4px 0;position:relative;height:32px">
+        <div style="position:absolute;left:0;right:0;top:12px;height:3px;background:linear-gradient(to right,var(--red),var(--amber),var(--green));border-radius:2px"></div>
+        <div style="position:absolute;left:0;top:0;font-size:8px;color:#555;transform:translateX(-50%)">$${tpLo.toFixed(0)}</div>
+        <div style="position:absolute;right:0;top:0;font-size:8px;color:#555;transform:translateX(50%)">$${tpHi.toFixed(0)}</div>
+        <div style="position:absolute;left:${pxPos}%;top:5px;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--amber);border:1px solid #000" title="Current: $${px.toFixed(2)}"></div>
+        <div style="position:absolute;left:${tpPos}%;top:24px;transform:translateX(-50%);font-size:8px;color:var(--green);white-space:nowrap">▲$${tp.toFixed(0)}</div>
+      </div>
+      <div style="margin-top:22px;display:flex;justify-content:space-between;font-size:9px;color:#555">
+        <span>Low: <b style="color:#888">$${tpLo.toFixed(2)}</b></span>
+        <span>Median: <b style="color:#888">$${tpMed?tpMed.toFixed(2):'—'}</b></span>
+        <span>Mean: <b style="color:var(--green)">$${tp.toFixed(2)}</b></span>
+        <span>High: <b style="color:#888">$${tpHi.toFixed(2)}</b></span>
+      </div>`;
+  }
+
+  el.innerHTML = `
+    <div style="padding:6px">
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #111;margin-bottom:10px;flex-wrap:wrap">
+        <div style="text-align:center;padding:6px 14px;border:1px solid ${consColor};background:rgba(0,0,0,.3)">
+          <div style="font-size:18px;font-weight:700;color:${consColor};letter-spacing:.5px">${consLabel}</div>
+          <div style="font-size:8px;color:#555;margin-top:2px">CONSENSUS</div>
+        </div>
+        ${mean!=null?`<div style="text-align:center">
+          <div style="font-size:14px;font-weight:600;color:${consColor}">${mean.toFixed(2)}</div>
+          <div style="font-size:8px;color:#555">MEAN SCORE<br><span style="color:#333">1=Strong Buy 5=Strong Sell</span></div>
+        </div>`:''}
+        <div style="text-align:center">
+          <div style="font-size:14px;font-weight:600;color:var(--text-mid)">${nAna||'—'}</div>
+          <div style="font-size:8px;color:#555">ANALYSTS</div>
+        </div>
+        ${upside!=null?`<div style="text-align:center">
+          <div style="font-size:14px;font-weight:600;color:${upside>=0?'var(--green)':'var(--red)'}">${upside>=0?'+':''}${upside.toFixed(1)}%</div>
+          <div style="font-size:8px;color:#555">UPSIDE TO PT</div>
+        </div>`:''}
+        <div style="margin-left:auto;font-size:9px;color:#555">${mean!=null?`Score ${mean.toFixed(2)}/5 · ${nAna} analysts covering ${ticker}`:''}</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div class="sl">RATINGS DISTRIBUTION — ESTIMATED FROM CONSENSUS SCORE</div>
+          <div style="margin:8px 0">
+            ${ratingBar('Strong Buy',  sb,  '#00c853')}
+            ${ratingBar('Buy',         b,   '#66bb6a')}
+            ${ratingBar('Hold',        h,   '#f9a825')}
+            ${ratingBar('Sell',        s,   '#ef5350')}
+            ${ratingBar('Strong Sell', ss2, '#b71c1c')}
+          </div>
+          ${gaugeHtml}
+        </div>
+        <div>
+          <div class="sl">PRICE TARGETS</div>
+          <div style="margin:6px 0">
+            <div class="des-stat"><span class="des-label">Mean Target</span><span class="des-val ${tp&&px&&tp>px?'up':'dn'}">${tp?'$'+tp.toFixed(2):'—'}</span></div>
+            <div class="des-stat"><span class="des-label">Median</span><span class="des-val">${tpMed?'$'+tpMed.toFixed(2):'—'}</span></div>
+            <div class="des-stat"><span class="des-label">High</span><span class="des-val up">${tpHi?'$'+tpHi.toFixed(2):'—'}</span></div>
+            <div class="des-stat"><span class="des-label">Low</span><span class="des-val dn">${tpLo?'$'+tpLo.toFixed(2):'—'}</span></div>
+          </div>
+          <div class="sl" style="margin-top:8px">TRAILING EPS</div>
+          <div style="margin:6px 0">
+            <div class="des-stat"><span class="des-label">TTM EPS</span><span class="des-val">${eps!=null?'$'+eps.toFixed(2):'—'}</span></div>
+            <div class="des-stat"><span class="des-label">P/E (implied)</span><span class="des-val">${eps&&px&&eps>0?(px/eps).toFixed(1)+'x':'—'}</span></div>
+          </div>
+          <div class="sl" style="margin-top:8px">OWNERSHIP &amp; SHORT INTEREST</div>
+          <div style="margin:6px 0">
+            <div class="des-stat"><span class="des-label">Institutional</span><span class="des-val">${fmtPct(instPct)}</span></div>
+            <div class="des-stat"><span class="des-label">Short % Float</span><span class="des-val ${shortPct&&shortPct>0.1?'dn':''}">${fmtPct(shortPct)}</span></div>
+            <div class="des-stat"><span class="des-label">Short Ratio</span><span class="des-val">${shortRat!=null?shortRat.toFixed(1)+'d':'—'}</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding:4px 6px;border:1px solid #0f0f0f;font-size:8px;color:#2a2a2a;line-height:1.6">
+        Source: Yahoo Finance v6 · Ratings distribution estimated from consensus mean score · Not investment advice
+      </div>
+    </div>`;
 }
 
 // Legacy stub

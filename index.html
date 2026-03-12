@@ -4133,7 +4133,8 @@ function rHOME(){
   const wti   = D.commodities.energy[0];
   const gold  = D.commodities.metals[0];
 
-  const vixLevel = vix.val < 15 ? {txt:'LOW',col:'var(--green)'} : vix.val < 20 ? {txt:'MOD',col:'var(--amber)'} : vix.val < 30 ? {txt:'ELEV',col:'#ff6f00'} : {txt:'HIGH',col:'var(--red)'};
+  const _vixV = vix.val ?? 0;
+  const vixLevel = _vixV < 15 ? {txt:'LOW',col:'var(--green)'} : _vixV < 20 ? {txt:'MOD',col:'var(--amber)'} : _vixV < 30 ? {txt:'ELEV',col:'#ff6f00'} : {txt:'HIGH',col:'var(--red)'};
   const now = new Date();
   const mktHr = parseInt(now.toLocaleTimeString('en-US',{hour:'2-digit',hour12:false,timeZone:'America/New_York'}));
   const mktMin = parseInt(now.toLocaleTimeString('en-US',{minute:'2-digit',hour12:false,timeZone:'America/New_York'}));
@@ -4142,6 +4143,8 @@ function rHOME(){
   const isWeekend = dayOfWeek==='Sat'||dayOfWeek==='Sun';
   const mktStatus = isWeekend ? {txt:'CLOSED — WEEKEND', col:'#444'} : mktOpen ? {txt:'● MARKET OPEN', col:'var(--green)'} : {txt:'○ MARKET CLOSED', col:'#555'};
 
+  const _n = (v,d=2,pre='',suf='') => v!=null ? pre+v.toFixed(d)+suf : '<span style="color:#2a2a2a">—</span>';
+  const _nc = (v,d=2) => v!=null ? (v>0?'+':'')+v.toFixed(d) : '—';
   function tile(id,label,valFmt,chg,chgFmt,meta,cmd,extra){
     const chgCol = chg>0?'var(--green)':chg<0?'var(--red)':'#444';
     const chgSign = chg>0?'+':'';
@@ -4172,14 +4175,14 @@ function rHOME(){
   const earningsRows = `<tr><td colspan="4" style="color:#444;font-size:9px;text-align:center;padding:8px">Open EQ → EARNINGS for upcoming releases</td></tr>`;
 
   // SPX key levels
-  const spxVal = spx.val;
-  const spxLevels = [
+  const spxVal = spx.val ?? 0;
+  const spxLevels = spxVal > 0 ? [
     {label:'R2', val:(spxVal*1.018).toFixed(0), col:'var(--red)'},
     {label:'R1', val:(spxVal*1.009).toFixed(0), col:'#c62828'},
     {label:'LAST',val:spxVal.toFixed(1),         col:'var(--amber)'},
     {label:'S1', val:(spxVal*0.991).toFixed(0), col:'#2e7d32'},
     {label:'S2', val:(spxVal*0.982).toFixed(0), col:'var(--green)'},
-  ];
+  ] : []
 
 
 
@@ -4213,16 +4216,16 @@ function rHOME(){
     ${buildMarketSummary()}
     <!-- MARKET TILES -->
     <div id="home-grid" style="flex-shrink:0">
-      ${tile('spx','S&P 500', spx.val.toFixed(1), spx.pct, spx.pct.toFixed(2)+'%', 'SPX', 'EQ')}
-      ${tile('ndx','NASDAQ', ndx.val.toFixed(1), ndx.pct, ndx.pct.toFixed(2)+'%', 'NDX', 'EQ')}
-      ${tile('dow','DOW', dow.val.toFixed(0), dow.pct, dow.pct.toFixed(2)+'%', 'DJIA', 'EQ')}
-      ${tile('vix','VIX', `<span style="color:${vixLevel.col}">${vix.val.toFixed(2)}</span>`, vix.chg, vix.chg.toFixed(2), vixLevel.txt, 'VOL')}
+      ${tile('spx','S&P 500', _n(spx.val,1), spx.pct??0, _nc(spx.pct,2)+'%', 'SPX', 'EQ')}
+      ${tile('ndx','NASDAQ', _n(ndx.val,1), ndx.pct??0, _nc(ndx.pct,2)+'%', 'NDX', 'EQ')}
+      ${tile('dow','DOW', _n(dow.val,0), dow.pct??0, _nc(dow.pct,2)+'%', 'DJIA', 'EQ')}
+      ${tile('vix','VIX', `<span style="color:${vixLevel.col}">${(vix.val!=null?vix.val.toFixed(2):'—')}</span>`, vix.chg??0, _nc(vix.chg??0,2), vixLevel.txt, 'VOL')}
       ${tile('ust10','UST 10Y', y10.toFixed(3)+'%', t.find(x=>x.tenor==='10Y')?.d1??0, ((t.find(x=>x.tenor==='10Y')?.d1??0)).toFixed(3), '10Y YIELD', 'FI')}
       ${tile('s2_10','2s10s', (s2_10>=0?'+':'')+s2_10.toFixed(0)+'bp', s2_10, s2_10.toFixed(0), s2_10<0?'INVERTED':'NORMAL CURVE', 'FI')}
-      ${tile('dxy','DXY', dxy.val.toFixed(2), dxy.d1, dxy.d1.toFixed(3), 'DOLLAR INDEX', 'FX')}
-      ${tile('eur','EUR/USD', eur.val.toFixed(4), eur.d1, eur.d1.toFixed(4), 'G10 FX', 'FX')}
-      ${tile('wti','WTI', '$'+wti.spot.toFixed(2), wti.d1, wti.d1.toFixed(2)+'%', '$/BBL', 'CMDTY')}
-      ${tile('gold','GOLD', '$'+gold.spot.toFixed(0), gold.d1, gold.d1.toFixed(2)+'%', '$/OZ', 'CMDTY')}
+      ${tile('dxy','DXY', _n(dxy.val,2), dxy.d1??0, _nc(dxy.d1??0,3), 'DOLLAR INDEX', 'FX')}
+      ${tile('eur','EUR/USD', _n(eur.val,4), eur.d1??0, _nc(eur.d1??0,4), 'G10 FX', 'FX')}
+      ${tile('wti','WTI', _n(wti.spot,2,'$'), wti.d1??0, _nc(wti.d1??0,2)+'%', '$/BBL', 'CMDTY')}
+      ${tile('gold','GOLD', _n(gold.spot,0,'$'), gold.d1??0, _nc(gold.d1??0,2)+'%', '$/OZ', 'CMDTY')}
     </div>
     <!-- BREADTH BAR -->
     <div style="display:flex;align-items:center;gap:12px;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:#030303;flex-wrap:nowrap;overflow:hidden">
@@ -5652,10 +5655,11 @@ window.addEventListener('load',()=>{
     const tests = [
       {name:'allorigins → Yahoo SPY', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('bad payload'); return 'SPY $'+p;})},
       {name:'open.er-api.com FX',     fn:()=>fetch('https://open.er-api.com/v6/latest/USD',{signal:AbortSignal.timeout(8000)}).then(r=>r.json()).then(d=>{if(d.result!=='success')throw new Error('bad'); return 'EUR='+d.rates.EUR.toFixed(4);})},
-      {name:'allorigins → Yahoo ^IRX', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EIRX?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('no data'); return '3M='+p+'%';})},
+      {name:'Yahoo ^TNX (10Y Treasury)', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?interval=1d&range=5d',8000).then(r=>r.text()).then(t=>{let d;try{d=JSON.parse(t);}catch(e){throw new Error('proxy returned non-JSON: '+t.slice(0,40));}const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;if(!p)throw new Error('no data');return '10Y='+p+'%';})},
       {name:'allorigins → MktWatch RSS',fn:()=>proxyFetch('https://finance.yahoo.com/rss/topstories',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
-      {name:'allorigins → CNBC RSS',    fn:()=>proxyFetch('https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
+      {name:'NBC News Business RSS',     fn:()=>proxyFetch('https://feeds.nbcnews.com/nbcnews/public/business',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
       {name:'allorigins → Yahoo RSS',  fn:()=>proxyFetch('https://finance.yahoo.com/rss/topstories',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
+      {name:'FRED API (St. Louis Fed)',  fn:()=>fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key=${API_KEYS.FRED}&sort_order=desc&limit=1&file_type=json`,{signal:AbortSignal.timeout(8000)}).then(r=>r.json()).then(d=>{const v=d?.observations?.[0]?.value;if(!v)throw new Error('no data');return 'FEDFUNDS='+v+'%';})},
     ];
     const diagKey='NETTEST';
     if(WR[diagKey]) CW(diagKey);

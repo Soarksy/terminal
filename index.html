@@ -46,8 +46,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   display:flex;align-items:center;padding:0 8px;gap:10px;z-index:2000;position:relative;
 }
 #logo{color:var(--amber);font-weight:600;font-size:12px;letter-spacing:3px;white-space:nowrap}
-#cmdwrap{flex:1;display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);padding:0 6px}
-#cmdprompt{color:var(--text-dim);font-family:var(--font);font-size:11px}
+#cmdwrap{width:260px;flex-shrink:0;display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);padding:0 6px}
 #cmdbar{
   flex:1;background:transparent;border:none;color:var(--text-bright);
   font-family:var(--font);font-size:12px;outline:none;caret-color:var(--amber);
@@ -449,8 +448,7 @@ canvas{display:block}
 <div id="topbar">
   <div id="logo">◈ TERMINAL &nbsp;<span id="clock" style="font-size:10px;font-weight:400;letter-spacing:1px;color:#666">--:--:--</span></div>
   <div id="cmdwrap">
-    <span id="cmdprompt">&gt;&gt;</span>
-    <input id="cmdbar" type="text" placeholder=">> SEARCH" autocomplete="off" spellcheck="false">
+    <input id="cmdbar" type="text" placeholder="SEARCH" autocomplete="off" spellcheck="false">
     <div id="search-type-badge"></div>
   </div>
   <div id="topright">
@@ -459,7 +457,6 @@ canvas{display:block}
       <span id="live-refresh-text" style="color:#555;margin-left:10px">REFRESHED: --:--:--</span>
       <span id="live-fetching-text"></span>
     </div>
-    <div id="fomc-countdown" style="font-size:9px;color:#cc8800;letter-spacing:1px;padding:0 6px;border-left:1px solid #1a1a1a"></div>
   </div>
 </div>
 
@@ -1276,20 +1273,20 @@ function rEQ(){
 
   // EARNINGS tab
   const earnings=[
-    {date:'Mar 10',sym:'ORCL',name:'Oracle Corp',eps_est:'1.48',time:'AMC',mktcap:'360B'},
-    {date:'Mar 11',sym:'ADBE',name:'Adobe Inc',eps_est:'4.97',time:'AMC',mktcap:'195B'},
-    {date:'Mar 19',sym:'MU',  name:'Micron Technology',eps_est:'1.43',time:'AMC',mktcap:'104B'},
-    {date:'Mar 20',sym:'NKE', name:'Nike Inc',eps_est:'0.29',time:'AMC',mktcap:'106B'},
-    {date:'Mar 21',sym:'FDX', name:'FedEx Corp',eps_est:'3.96',time:'AMC',mktcap:'58B'},
-    {date:'Apr 11',sym:'JPM', name:'JPMorgan Chase',eps_est:'4.61',time:'BMO',mktcap:'720B'},
-    {date:'Apr 14',sym:'GS',  name:'Goldman Sachs',eps_est:'11.44',time:'BMO',mktcap:'185B'},
-    {date:'Apr 22',sym:'TSLA',name:'Tesla Inc',eps_est:'0.48',time:'AMC',mktcap:'890B'},
-    {date:'Apr 23',sym:'META',name:'Meta Platforms',eps_est:'6.72',time:'AMC',mktcap:'1.5T'},
-    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',eps_est:'2.01',time:'AMC',mktcap:'2.1T'},
-    {date:'Apr 25',sym:'MSFT',name:'Microsoft Corp',eps_est:'3.22',time:'AMC',mktcap:'3.1T'},
-    {date:'Apr 29',sym:'AAPL',name:'Apple Inc',eps_est:'1.62',time:'AMC',mktcap:'3.4T'},
-    {date:'Apr 30',sym:'AMZN',name:'Amazon.com',eps_est:'1.36',time:'AMC',mktcap:'2.2T'},
-    {date:'May 1', sym:'NVDA',name:'Nvidia Corp',eps_est:'0.88',time:'AMC',mktcap:'2.8T'},
+    {date:'Mar 10',sym:'ORCL',name:'Oracle Corp',eps_est:'1.48',time:'AMC'},
+    {date:'Mar 11',sym:'ADBE',name:'Adobe Inc',eps_est:'4.97',time:'AMC'},
+    {date:'Mar 19',sym:'MU',  name:'Micron Technology',eps_est:'1.43',time:'AMC'},
+    {date:'Mar 20',sym:'NKE', name:'Nike Inc',eps_est:'0.29',time:'AMC'},
+    {date:'Mar 21',sym:'FDX', name:'FedEx Corp',eps_est:'3.96',time:'AMC'},
+    {date:'Apr 11',sym:'JPM', name:'JPMorgan Chase',eps_est:'4.61',time:'BMO'},
+    {date:'Apr 14',sym:'GS',  name:'Goldman Sachs',eps_est:'11.44',time:'BMO'},
+    {date:'Apr 22',sym:'TSLA',name:'Tesla Inc',eps_est:'0.48',time:'AMC'},
+    {date:'Apr 23',sym:'META',name:'Meta Platforms',eps_est:'6.72',time:'AMC'},
+    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',eps_est:'2.01',time:'AMC'},
+    {date:'Apr 25',sym:'MSFT',name:'Microsoft Corp',eps_est:'3.22',time:'AMC'},
+    {date:'Apr 29',sym:'AAPL',name:'Apple Inc',eps_est:'1.62',time:'AMC'},
+    {date:'Apr 30',sym:'AMZN',name:'Amazon.com',eps_est:'1.36',time:'AMC'},
+    {date:'May 1', sym:'NVDA',name:'Nvidia Corp',eps_est:'0.88',time:'AMC'},
   ];
   const _months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
   const _now=new Date();
@@ -1305,7 +1302,6 @@ function rEQ(){
       <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
       <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:9px;padding:1px 4px">${e.time}</td>
       <td style="color:#888">$${e.eps_est}</td>
-      <td style="color:#555;font-size:9px">${e.mktcap}</td>
     </tr>`;
   }).join('');
 
@@ -1313,7 +1309,7 @@ function rEQ(){
     {id:'eq-indices',  label:'S&P 500',   content:spxHeatmap},
     {id:'eq-sectors',  label:'SECTORS',   content:`<div style="padding:4px 6px"><div class="sl">SECTOR HEATMAP — 1D PERFORMANCE</div><div class="hm-grid">${hm}</div></div>`},
     {id:'eq-rotation', label:'ROTATION',  content:`<div style="padding:4px 6px"><div style="font-size:10px;color:#707070;margin-bottom:4px">● 1D + 1W LIVE FROM ETF DATA</div><table class="t"><thead><tr><th>RANK</th><th>SECTOR</th><th>1D ●</th><th>1W ●</th><th>MOM</th></tr></thead><tbody>${rotRows}</tbody></table></div>`},
-    {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>MKTCAP</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
+    {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
   ]);
 }
 function drawEQ(){}
@@ -1693,7 +1689,6 @@ function rEARN(){
       <td style="color:#888">$${e.eps_est}</td>
       <td style="color:${e.eps_act?'var(--amber)':'#2a2a2a'}">${e.eps_act?'$'+e.eps_act:'—'}</td>
       <td style="color:${beatCol};font-size:9px">${beatTxt}</td>
-      <td style="color:#555;font-size:9px">${e.mktcap}</td>
     </tr>`;
   }).join('');
 
@@ -1707,7 +1702,7 @@ function rEARN(){
     </div>
     <div class="sl">UPCOMING EARNINGS — CLICK TICKER FOR EQS</div>
     <table class="t">
-      <thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>RESULT</th><th>MKTCAP</th></tr></thead>
+      <thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>RESULT</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
@@ -2424,27 +2419,6 @@ let leafletMap = null;
 function updateClock(){
   const now = new Date();
   document.getElementById('clock').textContent=now.toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})+' MT';
-  // FOMC countdown
-  const fomcEl = document.getElementById('fomc-countdown');
-  if(fomcEl){
-    const nextFOMC = D.macro.centralBanks.find(b=>b.name==='FED')?.next;
-    if(nextFOMC){
-      const parts = nextFOMC.match(/(\w+)\s+(\d+)/);
-      if(parts){
-        const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-        const yr = now.getFullYear();
-        const target = new Date(yr, months[parts[1]]||0, parseInt(parts[2]), 14, 0, 0);
-        if(target < now) { fomcEl.textContent=''; return; }
-        const diff = target - now;
-        const days = Math.floor(diff/86400000);
-        const hrs  = Math.floor((diff%86400000)/3600000);
-        const mins = Math.floor((diff%3600000)/60000);
-        fomcEl.textContent = days>0
-          ? `FOMC ${days}d ${hrs}h`
-          : hrs>0 ? `FOMC ${hrs}h ${mins}m` : `FOMC ${mins}m`;
-      }
-    }
-  }
 }
 setInterval(updateClock,1000);updateClock();
 
@@ -3675,14 +3649,6 @@ function rSCRN(){
         <input class="scrn-input" id="sf-mcap" type="number" placeholder="e.g. 10" min="0">
       </div>
       <div class="scrn-fgroup">
-        <span class="scrn-flabel">P/E &lt;</span>
-        <input class="scrn-input" id="sf-pe" type="number" placeholder="e.g. 30" min="0">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">DIV YIELD &gt; (%)</span>
-        <input class="scrn-input" id="sf-div" type="number" placeholder="e.g. 2" min="0" step="0.1">
-      </div>
-      <div class="scrn-fgroup">
         <span class="scrn-flabel">PRICE &gt; ($)</span>
         <input class="scrn-input" id="sf-px" type="number" placeholder="e.g. 50" min="0">
       </div>
@@ -3694,31 +3660,11 @@ function rSCRN(){
         <span class="scrn-flabel">1D CHG MAX (%)</span>
         <input class="scrn-input" id="sf-chgmax" type="number" placeholder="e.g. 5" step="0.1">
       </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">BETA &lt;</span>
-        <input class="scrn-input" id="sf-beta" type="number" placeholder="e.g. 1.2" step="0.1" min="0">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">P/B &lt;</span>
-        <input class="scrn-input" id="sf-pb" type="number" placeholder="e.g. 5" step="0.1" min="0">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">ROE &gt; (%)</span>
-        <input class="scrn-input" id="sf-roe" type="number" placeholder="e.g. 15" min="0">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">EV/EBITDA &lt;</span>
-        <input class="scrn-input" id="sf-evebitda" type="number" placeholder="e.g. 20" min="0">
-      </div>
       <div class="scrn-sep"></div>
       <div style="display:flex;flex-direction:column;gap:3px;align-self:flex-end">
         <div class="scrn-presets">
-          <button class="scrn-preset" onclick="scrnPreset('div')">HIGH DIV</button>
-          <button class="scrn-preset" onclick="scrnPreset('growth')">GROWTH</button>
-          <button class="scrn-preset" onclick="scrnPreset('value')">VALUE</button>
           <button class="scrn-preset" onclick="scrnPreset('momentum')">MOMENTUM</button>
-          <button class="scrn-preset" onclick="scrnPreset('lowvol')">LOW VOL</button>
-          <button class="scrn-preset" onclick="scrnPreset('quality')">QUALITY</button>
+          <button class="scrn-preset" onclick="scrnPreset('largecap')">LARGE CAP</button>
           <button class="scrn-preset" onclick="scrnClear()">CLEAR</button>
         </div>
         <div style="display:flex;gap:4px">
@@ -3744,14 +3690,11 @@ function rSCRN(){
           <th data-col="px"     onclick="scrnSort('px')">PRICE ●</th>
           <th data-col="chg"    onclick="scrnSort('chg')">1D % ●</th>
           <th data-col="mcap"   onclick="scrnSort('mcap')">MKT CAP</th>
-          <th data-col="pe"     onclick="scrnSort('pe')" title="Reference: Q4 2025">P/E *</th>
-          <th data-col="fwdPe"  onclick="scrnSort('fwdPe')" title="Reference: Q4 2025">FWD P/E *</th>
-          <th data-col="div"    onclick="scrnSort('div')" title="Reference: Q4 2025">DIV % *</th>
-          <th data-col="vol"    onclick="scrnSort('vol')">AVG VOL</th>
-          <th data-col="beta"   onclick="scrnSort('beta')" title="Reference: Q4 2025">BETA *</th>
+                      <th data-col="vol"    onclick="scrnSort('vol')">AVG VOL</th>
+    
         </tr></thead>
         <tbody id="scrn-tbody">
-          <tr><td colspan="11" class="scrn-no-results" style="color:#888">
+          <tr><td colspan="7" class="scrn-no-results" style="color:#888">
             SET FILTERS AND CLICK ▶ RUN SCREEN
           </td></tr>
         </tbody>
@@ -3767,7 +3710,7 @@ function initSCRN(){
   const sf = el('sf-sector'); if(sf) sf.value = f.sector;
   ['mcap','pe','div','px','chgmin','chgmax','beta','pb','roe','evebitda'].forEach(k=>{
     const inp = el('sf-'+k);
-    if(inp) inp.value = f[{chgmin:'chgMin',chgmax:'chgMax',beta:'betaMax',pb:'pbMax',roe:'roeMin',evebitda:'evEbitdaMax'}[k]||k] || '';
+    if(inp) inp.value = f[{chgmin:'chgMin',chgmax:'chgMax'}[k]||k] || '';
   });
   // If we already have results, re-render them
   if(SCRN_STATE.filtered.length) scrnRenderTable();
@@ -3784,15 +3727,9 @@ function scrnReadFilters(){
   SCRN_STATE.filters = {
     sector:    v('sf-sector') || 'ALL',
     mcapMin:   v('sf-mcap'),
-    peMax:     v('sf-pe'),
-    divMin:    v('sf-div'),
     pxMin:     v('sf-px'),
     chgMin:    v('sf-chgmin'),
     chgMax:    v('sf-chgmax'),
-    betaMax:   v('sf-beta'),
-    pbMax:     v('sf-pb'),
-    roeMin:    v('sf-roe'),
-    evEbitdaMax: v('sf-evebitda'),
   };
 }
 
@@ -3801,15 +3738,9 @@ function scrnApplyFilters(data){
   const f = SCRN_STATE.filters;
   const n = v => v===''||v===null||v===undefined ? null : parseFloat(v);
   const mcapMin = n(f.mcapMin);
-  const peMax   = n(f.peMax);
-  const divMin  = n(f.divMin);
   const pxMin   = n(f.pxMin);
   const chgMin     = n(f.chgMin);
   const chgMax     = n(f.chgMax);
-  const betaMax    = n(f.betaMax);
-  const pbMax      = n(f.pbMax);
-  const roeMin     = n(f.roeMin);
-  const evEbitdaMax= n(f.evEbitdaMax);
 
   // Deduplicate by symbol first
   const seen = new Set();
@@ -3818,15 +3749,9 @@ function scrnApplyFilters(data){
   return deduped.filter(r=>{
     if(f.sector !== 'ALL' && r.sector !== f.sector) return false;
     if(mcapMin !== null && (r.mcap == null || r.mcap < mcapMin)) return false;
-    if(peMax   !== null && (r.pe   == null || r.pe   > peMax))   return false;
-    if(divMin  !== null && (r.div  == null || r.div  < divMin))  return false;
     if(pxMin   !== null && (r.px   == null || r.px   < pxMin))   return false;
     if(chgMin     !== null && (r.chg      == null || r.chg      < chgMin))     return false;
     if(chgMax     !== null && (r.chg      == null || r.chg      > chgMax))     return false;
-    if(betaMax    !== null && (r.beta     == null || r.beta     > betaMax))    return false;
-    if(pbMax      !== null && (r.pb       == null || r.pb       > pbMax))      return false;
-    if(roeMin     !== null && (r.roe      == null || r.roe      < roeMin))     return false;
-    if(evEbitdaMax!== null && (r.evEbitda == null || r.evEbitda > evEbitdaMax)) return false;
     return true;
   });
 }
@@ -3874,16 +3799,13 @@ function scrnRenderTable(){
   if(countEl) countEl.textContent = SCRN_STATE.filtered.length + (SCRN_STATE.filtered.length>200?' (showing 200)':'');
 
   if(!rows.length){
-    tbody.innerHTML=`<tr><td colspan="11" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="7" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
     return;
   }
 
   tbody.innerHTML = rows.map(r=>{
     const chgCol = r.chg > 0 ? 'var(--green)' : r.chg < 0 ? 'var(--red)' : 'var(--text-dim)';
     const chgSign = r.chg > 0 ? '+' : '';
-    const peStr = r.pe != null ? r.pe.toFixed(1) : '<span style="color:#555">—</span>';
-    const fwdStr = r.fwdPe != null ? r.fwdPe.toFixed(1) : '<span style="color:#555">—</span>';
-    const divStr = r.div > 0 ? r.div.toFixed(2)+'%' : '<span style="color:#555">—</span>';
     const volStr = r.vol >= 1e6 ? (r.vol/1e6).toFixed(1)+'M' : (r.vol/1e3).toFixed(0)+'K';
     const mcapStr = r.mcap >= 1000 ? (r.mcap/1000).toFixed(2)+'T' : r.mcap.toFixed(0)+'B';
     const pxStr = r.px!=null ? '$'+r.px.toFixed(2) : '<span style="color:#555">—</span>';
@@ -3895,9 +3817,6 @@ function scrnRenderTable(){
       <td>${pxStr}</td>
       <td style="color:${chgCol}">${chgTxt}</td>
       <td>$${mcapStr}</td>
-      <td>${peStr}</td>
-      <td>${fwdStr}</td>
-      <td>${divStr}</td>
       <td style="color:var(--text-dim)">${volStr}</td>
       <td style="color:${r.beta!=null?(r.beta>1.5?'var(--red)':r.beta<0.8?'var(--green)':'var(--text-mid)'):'#333'}">${r.beta!=null?r.beta.toFixed(2):'<span style="color:#333">—</span>'}</td>
     </tr>`;
@@ -3918,24 +3837,16 @@ function scrnPreset(name){
   scrnClear();
   const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
   switch(name){
-    case 'div':
-      set('sf-div','3'); set('sf-mcap','10'); break;
-    case 'growth':
-      set('sf-mcap','50'); set('sf-pe','50'); set('sf-chgmin','-0.5'); break;
-    case 'value':
-      set('sf-pe','15'); set('sf-mcap','20'); break;
     case 'momentum':
       set('sf-chgmin','0.5'); set('sf-mcap','10'); break;
-    case 'lowvol':
-      set('sf-beta','0.8'); set('sf-mcap','20'); break;
-    case 'quality':
-      set('sf-roe','20'); set('sf-pb','10'); set('sf-mcap','30'); break;
+    case 'largecap':
+      set('sf-mcap','200'); break;
   }
   scrnRun();
 }
 
 function scrnClear(){
-  ['sf-mcap','sf-pe','sf-div','sf-px','sf-chgmin','sf-chgmax','sf-beta','sf-pb','sf-roe','sf-evebitda'].forEach(id=>{
+  ['sf-mcap','sf-px','sf-chgmin','sf-chgmax'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sec=document.getElementById('sf-sector'); if(sec) sec.value='ALL';
@@ -3972,7 +3883,7 @@ async function scrnFetchLive(){
       }));
       await new Promise(r=>setTimeout(r,250));
     }
-    if(src) src.textContent=`LIVE PRICES UPDATED · ${updated} tickers · fundamentals Q4 2025`;
+    if(src) src.textContent=`LIVE PRICES UPDATED · ${updated} tickers`;
     renderSCRN();
   }finally{
     SCRN_STATE.isLoading=false;

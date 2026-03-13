@@ -650,12 +650,12 @@ const D = {
       {date:'Jun 12',time:'08:30',cty:'US',event:'CPI MoM May',               prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
     ],
     centralBanks:[
-      {name:'FED',  rate:'4.25-4.50%',lastChg:'-25bp Dec-25',next:'Mar 19',bias:'HOLD',outlook:'CAUTIOUS'},
-      {name:'ECB',  rate:'2.40%',      lastChg:'-25bp Mar-26',next:'Apr 14',bias:'CUT', outlook:'EASING'},
-      {name:'BOJ',  rate:'0.50%',      lastChg:'HOLD Mar-26',bias:'HOLD',outlook:'CAUTIOUS'},
-      {name:'BOE',  rate:'4.50%',      lastChg:'-25bp Feb-26',next:'May 07',bias:'CUT', outlook:'EASING'},
-      {name:'PBOC', rate:'3.10%',      lastChg:'-10bp Jan-26',next:'Apr 15',bias:'CUT', outlook:'EASING'},
-      {name:'RBA',  rate:'4.10%',      lastChg:'-25bp Feb-26',next:'Apr 01',bias:'CUT', outlook:'EASING'},
+      {name:'FED',  rate:'4.25-4.50%',next:'Mar 19'},
+      {name:'ECB',  rate:'2.40%',next:'Apr 14'},
+      {name:'BOJ',  rate:'0.50%'},
+      {name:'BOE',  rate:'4.50%',next:'May 07'},
+      {name:'PBOC', rate:'3.10%',next:'Apr 15'},
+      {name:'RBA',  rate:'4.10%',next:'Apr 01'},
     ]
   },
 
@@ -1266,39 +1266,12 @@ function rEQ(){
     </tr>`;
   }).join('');
 
-  // EARNINGS tab
-  const earnings=[
-    {date:'Mar 10',sym:'ORCL',name:'Oracle Corp',eps_est:'1.48',time:'AMC'},
-    {date:'Mar 11',sym:'ADBE',name:'Adobe Inc',eps_est:'4.97',time:'AMC'},
-    {date:'Mar 19',sym:'MU',  name:'Micron Technology',eps_est:'1.43',time:'AMC'},
-    {date:'Mar 20',sym:'NKE', name:'Nike Inc',eps_est:'0.29',time:'AMC'},
-    {date:'Mar 21',sym:'FDX', name:'FedEx Corp',eps_est:'3.96',time:'AMC'},
-    {date:'Apr 11',sym:'JPM', name:'JPMorgan Chase',eps_est:'4.61',time:'BMO'},
-    {date:'Apr 14',sym:'GS',  name:'Goldman Sachs',eps_est:'11.44',time:'BMO'},
-    {date:'Apr 22',sym:'TSLA',name:'Tesla Inc',eps_est:'0.48',time:'AMC'},
-    {date:'Apr 23',sym:'META',name:'Meta Platforms',eps_est:'6.72',time:'AMC'},
-    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',eps_est:'2.01',time:'AMC'},
-    {date:'Apr 25',sym:'MSFT',name:'Microsoft Corp',eps_est:'3.22',time:'AMC'},
-    {date:'Apr 29',sym:'AAPL',name:'Apple Inc',eps_est:'1.62',time:'AMC'},
-    {date:'Apr 30',sym:'AMZN',name:'Amazon.com',eps_est:'1.36',time:'AMC'},
-    {date:'May 1', sym:'NVDA',name:'Nvidia Corp',eps_est:'0.88',time:'AMC'},
-  ];
-  const _months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const _now=new Date();
-  const _parseEarnDate=s=>{const p=s.match(/(\w+)\s+(\d+)/);return p?new Date(_now.getFullYear(),_months[p[1]]??0,+p[2]):null;};
-  const earnRows=earnings.map(e=>{
-    const d=_parseEarnDate(e.date);
-    const isPast=d && d<_now && (_now-d)>3600000*12;
-    const rowStyle=isPast?'opacity:0.35':'';
-    const dateBadge=isPast?`${e.date} <span style="color:var(--red);font-size:9px">PAST</span>`:e.date;
-    return `<tr style="${rowStyle}">
-      <td style="color:#555;font-size:9px">${dateBadge}</td>
-      <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
-      <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
-      <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:9px;padding:1px 4px">${e.time}</td>
-      <td style="color:#888">$${e.eps_est}</td>
-    </tr>`;
-  }).join('');
+  // EARNINGS tab — redirect to dedicated EARN panel
+  const earnTabContent = `<div style="padding:12px">
+    <div class="sl" style="margin-bottom:8px">EARNINGS CALENDAR</div>
+    <div style="font-size:9px;color:#555;margin-bottom:12px">Live earnings data with estimates, whisper numbers and beat/miss tracking.</div>
+    <button onclick="OW('EARN')" style="background:#0a1a0a;border:1px solid #2a5a2a;color:#5aaa7a;font-family:var(--font);font-size:10px;padding:6px 14px;cursor:pointer;letter-spacing:.8px">↗ OPEN EARN PANEL</button>
+  </div>`;
 
   return buildTabs('eq-tabs',[
     {id:'eq-indices',  label:'S&P 500',   content:spxHeatmap},
@@ -1314,102 +1287,21 @@ function drawEQ(){}
 // ═══════════════════════════════════════════
 function rFX(){
   function fxTable(title,data){
-    const rows=data.map(r=>{
+    const rows=data.filter(r=>r.val!=null).map(r=>{
       const dec=r.val>100?2:4;
       const vol=r.vol==='HIGH'?`<span class="dn">HIGH</span>`:r.vol==='MOD'?`<span style="color:var(--amber)">MOD</span>`:`<span class="neu">${r.vol}</span>`;
       return`<tr><td>${r.name}</td><td class="hl">${r.val.toFixed(dec)}</td>
-        <td>${fmtC(r.d1,dec)}</td><td>${fmtC(r.w1,dec)}</td><td>${fmtC(r.m1,dec)}</td>
+        <td>${fmtC(r.d1,dec)}</td>
         <td>${vol}</td></tr>`;
     }).join('');
     return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th></tr></thead><tbody>${rows}</tbody></table>
-      <div style="font-size:9px;color:#555;padding:2px 4px">● 1D live · 1W/1M reference values</div>`;
+      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
   const em=D.fx.filter(f=>f.type==='em');
 
-  // Carry content
-  const rates={USD:4.375,EUR:2.40,GBP:4.50,JPY:0.50,AUD:4.10,NZD:3.75,CAD:3.00,CHF:0.50,NOK:4.50,SEK:2.50};
-  const pairs=[
-    {b:'AUD',q:'JPY'},{b:'NZD',q:'JPY'},{b:'GBP',q:'JPY'},{b:'USD',q:'JPY'},{b:'NOK',q:'JPY'},
-    {b:'AUD',q:'CHF'},{b:'GBP',q:'CHF'},{b:'USD',q:'CHF'},{b:'AUD',q:'EUR'},{b:'GBP',q:'EUR'},
-  ].map(p=>({...p,carry:rates[p.b]-rates[p.q]})).sort((a,b)=>b.carry-a.carry);
+
   const fxLookup={};D.fx.forEach(f=>{fxLookup[f.name]=f;});
-  const carryRows=pairs.map(p=>{
-    const f=fxLookup[p.b+p.q];
-    const px=f?f.val.toFixed(4):'—';
-    const carryCol=p.carry>3?'var(--green)':p.carry>1.5?'var(--amber)':'#888';
-    const sig=p.carry>3?'STRONG BUY':p.carry>2?'BUY':p.carry>1?'MILD':'WEAK';
-    const sigCol=p.carry>3?'var(--green)':p.carry>2?'var(--amber)':'#555';
-    return`<tr>
-      <td style="color:var(--amber);font-weight:600">${p.b}/${p.q}</td>
-      <td style="color:${carryCol};font-weight:600">${p.carry.toFixed(2)}%</td>
-      <td style="color:#666">${rates[p.b].toFixed(2)}%</td>
-      <td style="color:#666">${rates[p.q].toFixed(2)}%</td>
-      <td style="color:#888">${px}</td>
-      <td style="color:${sigCol};font-size:9px">${sig}</td>
-    </tr>`;
-  }).join('');
-  const rateBar=Object.entries(rates).map(([c,r])=>`<div class="si"><span class="sil">${c}</span><span class="siv" style="color:${r>3?'var(--red)':r>1.5?'var(--amber)':'var(--green)'}">${r.toFixed(2)}%</span></div>`).join('');
-
-  // FX Calculator content — built once, lives in the tab
-  const allPairs = [...g10, ...em];
-  const pairOpts = allPairs.map(f=>`<option value="${f.val}" data-name="${f.name}">${f.name}</option>`).join('');
-  // Also build a flat lookup for JS: name->rate
-  const pairLookupJs = JSON.stringify(Object.fromEntries(allPairs.map(f=>[f.name, f.val])));
-
-  const calcContent = `<div style="padding:12px;max-width:480px">
-    <div class="sl" style="margin-bottom:10px">FX CONVERTER</div>
-    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;margin-bottom:12px">
-      <div>
-        <div style="font-size:9px;color:#666;margin-bottom:3px;letter-spacing:.5px">AMOUNT</div>
-        <input id="fxc-amount" type="number" value="1000" min="0" step="any"
-          style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;color:#f0f0f0;font-family:var(--font);font-size:14px;padding:6px 8px;outline:none;box-sizing:border-box"
-          oninput="fxCalc()" />
-      </div>
-      <div style="padding-bottom:6px">
-        <button onclick="fxSwapCalc()" style="background:#111;border:1px solid #2a2a2a;color:#888;font-family:var(--font);font-size:14px;padding:5px 10px;cursor:pointer" title="Swap currencies">⇄</button>
-      </div>
-      <div>
-        <div style="font-size:9px;color:#666;margin-bottom:3px;letter-spacing:.5px">RESULT</div>
-        <div id="fxc-result" style="background:#050505;border:1px solid #1a1a1a;color:var(--amber);font-size:14px;font-weight:600;padding:6px 8px;min-height:32px">—</div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-      <div>
-        <div style="font-size:9px;color:#666;margin-bottom:3px;letter-spacing:.5px">FROM</div>
-        <select id="fxc-from" onchange="fxCalc()"
-          style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;color:#c8c8c8;font-family:var(--font);font-size:11px;padding:5px 6px;outline:none">
-          <option value="1" data-name="USD">USD — US Dollar</option>
-          ${allPairs.map(f=>`<option value="${f.val}" data-name="${f.name}">${f.name} — ${f.name.replace('USD','').replace('/USD','')}</option>`).join('')}
-        </select>
-      </div>
-      <div>
-        <div style="font-size:9px;color:#666;margin-bottom:3px;letter-spacing:.5px">TO</div>
-        <select id="fxc-to" onchange="fxCalc()"
-          style="width:100%;background:#0a0a0a;border:1px solid #2a2a2a;color:#c8c8c8;font-family:var(--font);font-size:11px;padding:5px 6px;outline:none">
-          <option value="1" data-name="USD">USD — US Dollar</option>
-          ${allPairs.map(f=>`<option value="${f.val}" data-name="${f.name}">${f.name}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div id="fxc-rate-box" style="padding:8px;background:#050505;border:1px solid #111;font-size:10px;color:#888;margin-bottom:12px">
-      Select currencies to see exchange rate
-    </div>
-    <div class="sl" style="margin-bottom:6px">QUICK REFERENCE — LIVE RATES vs USD</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
-      ${[...g10,...em].map(f=>{
-        const up = f.d1 >= 0;
-        return `<div style="padding:5px 6px;background:#070707;border:1px solid #111;cursor:pointer"
-          onclick="fxSetPair('${f.name}')"
-          onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor='#111'">
-          <div style="font-size:9px;color:var(--amber);font-weight:600">${f.name}</div>
-          <div style="font-size:10px;color:#e0e0e0">${f.val.toFixed(f.val>10?3:4)}</div>
-          <div style="font-size:9px;color:${up?'var(--green)':'var(--red)'}">${up?'+':''}${f.d1.toFixed(4)}</div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
 
   return buildTabs('fx-tabs',[
     {id:'fx-g10',   label:'G10 & DXY', content:`<div style="padding:4px 6px">${fxTable('G10 & DXY',g10)}</div>`},
@@ -1422,11 +1314,12 @@ function rFX(){
 // ═══════════════════════════════════════════
 function rCMDTY(){
   function cs(title,data,color){
-    const rows=data.map(r=>`<tr>
+    const rows=data.filter(r=>r.spot!=null&&r.d1!=null).map(r=>`<tr>
       <td>${r.name}</td><td class="hl">${r.spot.toFixed(r.spot>100?1:3)}</td>
       <td>${r.d1>0?`<span class="up">+${r.d1.toFixed(2)}%</span>`:`<span class="dn">${r.d1.toFixed(2)}%</span>`}</td>
 <td class="neu">${r.unit}</td>
     </tr>`).join('');
+    if(!rows) return`<div class="sl" style="color:${color}">${title}</div><div style="color:#555;font-size:9px;padding:6px">LOADING…</div>`;
     return`<div class="sl" style="color:${color}">${title}</div>
       <table class="t"><thead><tr><th>NAME</th><th>SPOT ●</th><th>1D% ●</th><th>UNIT</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
@@ -1600,84 +1493,66 @@ function rVOL(){
 
 
 // ═══════════════════════════════════════════
-// RENDER: EARNINGS CALENDAR
+// RENDER: EARNINGS CALENDAR — External links (static estimates removed)
 // ═══════════════════════════════════════════
 function rEARN(){
-  const earnings = [
-    // Week of Mar 10
-    {date:'Mar 10',sym:'ORCL', name:'Oracle Corp',        eps_est:'1.48', eps_act:'1.47',beat:false,time:'AMC'},
-    {date:'Mar 11',sym:'ADBE', name:'Adobe Inc',          eps_est:'4.97', eps_act:'5.08', beat:true, time:'AMC'},
-    {date:'Mar 12',sym:'ULTA', name:'Ulta Beauty',        eps_est:'7.12', eps_act:null, rev_est:'3.5B',  beat:null, time:'AMC'},
-    {date:'Mar 13',sym:'DKS',  name:'Dick\'s Sporting',   eps_est:'3.60', eps_act:null, rev_est:'3.9B',  beat:null, time:'BMO'},
-    // Week of Mar 17
-    {date:'Mar 18',sym:'GIS',  name:'General Mills',      eps_est:'0.97', eps_act:null, rev_est:'4.8B',  beat:null, time:'BMO'},
-    {date:'Mar 19',sym:'MU',   name:'Micron Technology',  eps_est:'1.43', eps_act:null, rev_est:'8.0B',  beat:null, time:'AMC'},
-    {date:'Mar 20',sym:'NKE',  name:'Nike Inc',           eps_est:'0.29', eps_act:null, rev_est:'11.0B', beat:null, time:'AMC'},
-    {date:'Mar 21',sym:'FDX',  name:'FedEx Corp',         eps_est:'3.96', eps_act:null, rev_est:'22.1B', beat:null, time:'AMC'},
-    {date:'Mar 25',sym:'KB',   name:'KB Home',            eps_est:'1.55', eps_act:null, rev_est:'1.5B',  beat:null, time:'AMC'},
-    {date:'Mar 26',sym:'GME',  name:'GameStop Corp',      eps_est:'0.08', eps_act:null, rev_est:'0.9B',  beat:null, time:'AMC'},
-    {date:'Mar 27',sym:'PAYX', name:'Paychex Inc',        eps_est:'1.36', eps_act:null, rev_est:'1.5B',  beat:null, time:'BMO'},
-    {date:'Apr 11',sym:'JPM',  name:'JPMorgan Chase',     eps_est:'4.61', eps_act:null, rev_est:'43.8B', beat:null, time:'BMO'},
-    {date:'Apr 11',sym:'WFC',  name:'Wells Fargo',        eps_est:'1.23', eps_act:null, rev_est:'20.6B', beat:null, time:'BMO'},
-    {date:'Apr 14',sym:'GS',   name:'Goldman Sachs',      eps_est:'11.44',eps_act:null, rev_est:'14.8B', beat:null, time:'BMO'},
-    {date:'Apr 22',sym:'TSLA', name:'Tesla Inc',          eps_est:'0.48', eps_act:null, rev_est:'24.2B', beat:null, time:'AMC'},
-    {date:'Apr 23',sym:'META', name:'Meta Platforms',     eps_est:'6.72', eps_act:null, rev_est:'41.3B', beat:null, time:'AMC'},
-    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',       eps_est:'2.01', eps_act:null, rev_est:'89.4B', beat:null, time:'AMC'},
-    {date:'Apr 25',sym:'MSFT', name:'Microsoft Corp',     eps_est:'3.22', eps_act:null, rev_est:'68.8B', beat:null, time:'AMC'},
-    {date:'Apr 29',sym:'AAPL', name:'Apple Inc',          eps_est:'1.62', eps_act:null, rev_est:'94.5B', beat:null, time:'AMC'},
-    {date:'Apr 30',sym:'AMZN', name:'Amazon.com',         eps_est:'1.36', eps_act:null, rev_est:'187.4B',beat:null, time:'AMC'},
-    {date:'May 1', sym:'NVDA', name:'Nvidia Corp',        eps_est:'0.88', eps_act:null, rev_est:'43.2B', beat:null, time:'AMC'},
+  const EARN_SOURCES = [
+    {name:'Earnings Whispers', url:'https://www.earningswhispers.com/calendar',      desc:'Most accurate EPS estimates · whisper numbers · beat/miss streaks · calendar view'},
+    {name:'Seeking Alpha',     url:'https://seekingalpha.com/earnings/earnings-calendar', desc:'Full earnings calendar · estimates vs actuals · analyst ratings post-earnings'},
+    {name:'Investing.com',     url:'https://www.investing.com/earnings-calendar/',   desc:'Global earnings calendar · EPS & revenue estimates · surprise %'},
+    {name:'Zacks',             url:'https://www.zacks.com/earnings/earnings-calendar.php', desc:'EPS estimates · Zacks rank · earnings ESP (surprise prediction)'},
+    {name:'MarketWatch',       url:'https://www.marketwatch.com/tools/earningscalendar', desc:'Upcoming earnings with analyst consensus estimates'},
+    {name:'StockAnalysis',     url:'https://stockanalysis.com/earnings-calendar/',   desc:'Clean calendar · EPS & revenue estimates · historical actuals · free'},
+    {name:'Yahoo Finance',     url:'https://finance.yahoo.com/calendar/earnings',    desc:'Yahoo earnings calendar · filter by date or ticker'},
   ];
 
-  const rows = earnings.map(e=>{
-    const beatCol = e.beat===true?'var(--green)':e.beat===false?'var(--red)':'#2a2a2a';
-    const beatTxt = e.beat===true?'BEAT':e.beat===false?'MISS':e.eps_act?'IN-LINE':'—';
-    const timeCol = e.time==='BMO'?'#3a5a3a':'#3a3a5a';
-    return `<tr>
-      <td style="color:#555;font-size:9px">${e.date}</td>
-      <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
-      <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
-      <td style="background:${timeCol};color:#888;font-size:9px;padding:1px 4px;text-align:center">${e.time}</td>
-      <td style="color:#888">$${e.eps_est}</td>
-      <td style="color:${e.eps_act?'var(--amber)':'#2a2a2a'}">${e.eps_act?'$'+e.eps_act:'—'}</td>
-      <td style="color:${beatCol};font-size:9px">${beatTxt}</td>
-    </tr>`;
-  }).join('');
+  const rows = EARN_SOURCES.map(s=>`
+    <div onclick="window.open('${s.url}','_blank')"
+         style="display:flex;align-items:center;gap:10px;padding:7px 8px;border:1px solid #111;cursor:pointer;background:#050505;margin-bottom:3px"
+         onmouseover="this.style.borderColor='#2a4a2a'" onmouseout="this.style.borderColor='#111'">
+      <div style="color:var(--amber);font-size:10px;font-weight:600;letter-spacing:.5px;min-width:150px">${s.name}</div>
+      <div style="color:#444;font-size:9px;flex:1;line-height:1.4">${s.desc}</div>
+      <div style="color:#333;font-size:10px">↗</div>
+    </div>`).join('');
 
   return`
-    <div class="sf" style="margin-bottom:6px">
-      <div class="si"><span class="sil">THIS WEEK</span><span class="siv">${earnings.filter(e=>e.date.startsWith('Mar 1')).length} reports</span></div>
-      <div class="si"><span class="sil">NEXT WEEK</span><span class="siv">${earnings.filter(e=>e.date.startsWith('Mar 2')).length} reports</span></div>
-      <div class="si"><span class="sil">BIG TECH</span><span class="siv" style="color:var(--amber)">Apr 22–May 1</span></div>
-      <div class="si"><span class="sil">BMO</span><span class="siv" style="color:#5a9a5a">Before Market</span></div>
-      <div class="si"><span class="sil">AMC</span><span class="siv" style="color:#5a5a9a">After Market</span></div>
-    </div>
-    <div class="sl">UPCOMING EARNINGS — CLICK TICKER FOR EQS</div>
-    <table class="t">
-      <thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th><th>EPS ACT</th><th>RESULT</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+    <div style="padding:6px 8px;overflow-y:auto;height:100%">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #111">
+        <div class="sl" style="margin:0">EARNINGS CALENDAR — EXTERNAL SOURCES</div>
+        <div style="margin-left:auto;font-size:9px;color:#3aaa3a">● LIVE DATA</div>
+      </div>
+      <div style="font-size:9px;color:#555;margin-bottom:10px;line-height:1.5">
+        EPS estimates, whisper numbers, and beat/miss tracking require daily updates that cannot be automated with free APIs.<br>
+        The sources below provide real-time data directly from their servers.
+      </div>
+      ${rows}
+      <div style="margin-top:8px;padding:5px 8px;border:1px solid #1a1a1a;font-size:9px;color:#444;line-height:1.5">
+        Tip: Earnings Whispers is most accurate for EPS estimates · StockAnalysis is cleanest for a quick calendar view
+      </div>
+    </div>`;
 }
 
+
+// ═══════════════════════════════════════════
 // ═══════════════════════════════════════════
 // RENDER: ECONOMIC CALENDAR / RELEASES
 // ═══════════════════════════════════════════
 function rECON(){
   const fred = D.macro?.fred || {};
   const releases = [
-    {cat:'INFLATION',  id:'CPIAUCSL',   label:'CPI MoM',           freq:'Monthly',  next:'Apr 10'},
-    {cat:'INFLATION',  id:'CPILFESL',   label:'Core CPI MoM',      freq:'Monthly',  next:'Apr 10'},
-    {cat:'INFLATION',  id:'PCEPILFE',   label:'Core PCE MoM',      freq:'Monthly',  next:'Mar 28'},
-    {cat:'LABOR',      id:'PAYEMS',     label:'Nonfarm Payrolls',   freq:'Monthly',  next:'Apr 4'},
-    {cat:'LABOR',      id:'UNRATE',     label:'Unemployment Rate',  freq:'Monthly',  next:'Apr 4'},
-    {cat:'LABOR',      id:'ICSA',       label:'Initial Claims',     freq:'Weekly',   next:'Mar 13'},
-    {cat:'GROWTH',     id:'GDP',        label:'GDP QoQ Ann.',       freq:'Quarterly',next:'Mar 27'},
-    {cat:'GROWTH',     id:'INDPRO',     label:'Industrial Prod.',   freq:'Monthly',  next:'Mar 14'},
-    {cat:'GROWTH',     id:'RETAILSMNSA',label:'Retail Sales MoM',   freq:'Monthly',  next:'Mar 17'},
-    {cat:'RATES',      id:'FEDFUNDS',   label:'Fed Funds Rate',     freq:'FOMC',     next:'Mar 19'},
-    {cat:'HOUSING',    id:'MORTGAGE30US',label:'30Y Mortgage Rate', freq:'Weekly',   next:'Mar 13'},
-    {cat:'INFLATION',  id:'T10YIE',     label:'10Y Breakeven',      freq:'Daily',    next:'Live'},
-    {cat:'INFLATION',  id:'T5YIE',      label:'5Y Breakeven',       freq:'Daily',    next:'Live'},
+    {cat:'INFLATION',  id:'CPIAUCSL',   label:'CPI MoM',           freq:'Monthly'},
+    {cat:'INFLATION',  id:'CPILFESL',   label:'Core CPI MoM',      freq:'Monthly'},
+    {cat:'INFLATION',  id:'PCEPILFE',   label:'Core PCE MoM',      freq:'Monthly'},
+    {cat:'LABOR',      id:'PAYEMS',     label:'Nonfarm Payrolls',   freq:'Monthly'},
+    {cat:'LABOR',      id:'UNRATE',     label:'Unemployment Rate',  freq:'Monthly'},
+    {cat:'LABOR',      id:'ICSA',       label:'Initial Claims',     freq:'Weekly'},
+    {cat:'GROWTH',     id:'GDP',        label:'GDP QoQ Ann.',       freq:'Quarterly'},
+    {cat:'GROWTH',     id:'INDPRO',     label:'Industrial Prod.',   freq:'Monthly'},
+    {cat:'GROWTH',     id:'RETAILSMNSA',label:'Retail Sales MoM',   freq:'Monthly'},
+    {cat:'RATES',      id:'FEDFUNDS',   label:'Fed Funds Rate',     freq:'FOMC'},
+    {cat:'HOUSING',    id:'MORTGAGE30US',label:'30Y Mortgage Rate', freq:'Weekly'},
+    {cat:'INFLATION',  id:'T10YIE',     label:'10Y Breakeven',      freq:'Daily'},
+    {cat:'INFLATION',  id:'T5YIE',      label:'5Y Breakeven',       freq:'Daily'},
   ];
 
   const catColors = {INFLATION:'#3a2a00',LABOR:'#0a2a0a',GROWTH:'#0a1a3a',RATES:'#2a0a2a',HOUSING:'#1a2a2a'};
@@ -1935,36 +1810,61 @@ function rMACRO(){
     ${calRows}
   </div>`;
 
-  // ── CENTRAL BANKS TAB ──
-  
-const cbCards=D.macro.centralBanks.map(cb=>`
-    <div style="border:1px solid var(--border);padding:8px;background:var(--bg2)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span style="color:var(--amber);font-size:12px;font-weight:700;letter-spacing:1px">${cb.name}</span>
-        <span style="color:var(--amber);font-size:14px;font-weight:600">${cb.rate}</span>
-      </div>
-      <div style="display:flex;gap:12px;font-size:9px">
-        <span style="color:#444">LAST: <span style="color:#666">${cb.lastChg}</span></span>
-        <span style="color:#444">NEXT: ${_cbNextBadge(cb.next)}</span>
-        <span style="color:#444">BIAS: <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#555'};font-weight:600">${cb.bias}</span></span>
-        <span style="color:#444">OUTLOOK: <span style="color:#555">${cb.outlook}</span></span>
-      </div>
+  // ── CENTRAL BANKS TAB — links to live sources ──
+  const CB_SOURCES = [
+    {name:'FED',   full:'Federal Reserve',      url:'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm', desc:'FOMC calendar, statements, minutes, dot plot'},
+    {name:'ECB',   full:'European Central Bank', url:'https://www.ecb.europa.eu/press/govcouncil/html/index.en.html',   desc:'Governing Council decisions and press conferences'},
+    {name:'BOJ',   full:'Bank of Japan',         url:'https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm/',           desc:'MPM schedule, decisions, Outlook Report'},
+    {name:'BOE',   full:'Bank of England',       url:'https://www.bankofengland.co.uk/monetary-policy/upcoming-dates',  desc:'MPC dates, minutes, Monetary Policy Report'},
+    {name:'PBOC',  full:'People\'s Bank of China',url:'http://www.pbc.gov.cn/en/3688110/index.html',                     desc:'Policy announcements and rate decisions'},
+    {name:'RBA',   full:'Reserve Bank of Australia',url:'https://www.rba.gov.au/monetary-policy/int-rate-decisions/',   desc:'Cash rate decisions and statements'},
+    {name:'RBNZ',  full:'Reserve Bank of NZ',    url:'https://www.rbnz.govt.nz/monetary-policy/official-cash-rate-decisions', desc:'OCR decisions and Monetary Policy Statements'},
+    {name:'BOC',   full:'Bank of Canada',        url:'https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/', desc:'Key rate announcements'},
+    {name:'SNB',   full:'Swiss National Bank',   url:'https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy/monetary-policy-interest-rate', desc:'Policy rate and quarterly assessments'},
+  ];
+  const cbLinks = CB_SOURCES.map(b=>`
+    <div onclick="window.open('${b.url}','_blank')"
+         style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505;margin-bottom:3px"
+         onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor='#111'">
+      <div style="color:var(--amber);font-size:11px;font-weight:700;letter-spacing:1px;min-width:48px">${b.name}</div>
+      <div style="color:#666;font-size:9px;min-width:160px">${b.full}</div>
+      <div style="color:#444;font-size:9px;flex:1">${b.desc}</div>
+      <div style="color:#333;font-size:9px">↗</div>
     </div>`).join('');
-  const cbTab = `<div style="padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px">${cbCards}</div>`;
-
+  const cbMacroLinks = [
+    {name:'Investing.com',  url:'https://www.investing.com/central-banks/',        desc:'Central bank tracker — rates, decisions, forecasts'},
+    {name:'CME FedWatch',   url:'https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html', desc:'Fed funds futures implied probability for each meeting'},
+    {name:'ForexFactory CB',url:'https://www.forexfactory.com/calendar?week=this',  desc:'Central bank calendar with market impact ratings'},
+    {name:'Econoday',       url:'https://mam.econoday.com/p/central-bank-rates.asp',desc:'Global CB rate table with next meeting dates'},
+  ].map(l=>`
+    <div onclick="window.open('${l.url}','_blank')"
+         style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid #0d1a0d;cursor:pointer;background:#050a05;margin-bottom:3px"
+         onmouseover="this.style.borderColor='#2a5a2a'" onmouseout="this.style.borderColor='#0d1a0d'">
+      <div style="color:#5aaa7a;font-size:10px;font-weight:600;min-width:140px">${l.name}</div>
+      <div style="color:#444;font-size:9px;flex:1">${l.desc}</div>
+      <div style="color:#333;font-size:9px">↗</div>
+    </div>`).join('');
+  const cbTabContent = `
+    <div style="padding:6px 8px;overflow-y:auto;height:100%">
+      <div class="sl" style="margin-bottom:6px">OFFICIAL CENTRAL BANK SOURCES</div>
+      <div style="font-size:9px;color:#555;margin-bottom:8px">All rates, schedules and statements sourced directly from each bank's official site</div>
+      ${cbLinks}
+      <div class="sl" style="margin-top:10px;margin-bottom:6px">AGGREGATED TRACKERS</div>
+      ${cbMacroLinks}
+    </div>`;
   // ── ECON / FRED TAB ──
   const fred = D.macro?.fred || {};
   const releases=[
-    {cat:'INFLATION',id:'CPIAUCSL',   label:'CPI MoM',           next:'Apr 10'},
-    {cat:'INFLATION',id:'CPILFESL',   label:'Core CPI MoM',      next:'Apr 10'},
-    {cat:'INFLATION',id:'PCEPILFE',   label:'Core PCE MoM',      next:'Mar 28'},
-    {cat:'LABOR',    id:'PAYEMS',     label:'Nonfarm Payrolls',   next:'Apr 4'},
-    {cat:'LABOR',    id:'UNRATE',     label:'Unemployment Rate',  next:'Apr 4'},
-    {cat:'LABOR',    id:'ICSA',       label:'Initial Claims',     next:'Mar 13'},
-    {cat:'GROWTH',   id:'GDP',        label:'GDP QoQ Ann.',       next:'Mar 27'},
-    {cat:'GROWTH',   id:'INDPRO',     label:'Industrial Prod.',   next:'Mar 14'},
-    {cat:'GROWTH',   id:'RETAILSMNSA',label:'Retail Sales MoM',  next:'Mar 17'},
-    {cat:'RATES',    id:'FEDFUNDS',   label:'Fed Funds Rate',     next:'Mar 19'},
+    {cat:'INFLATION',id:'CPIAUCSL',   label:'CPI MoM'},
+    {cat:'INFLATION',id:'CPILFESL',   label:'Core CPI MoM'},
+    {cat:'INFLATION',id:'PCEPILFE',   label:'Core PCE MoM'},
+    {cat:'LABOR',    id:'PAYEMS',     label:'Nonfarm Payrolls'},
+    {cat:'LABOR',    id:'UNRATE',     label:'Unemployment Rate'},
+    {cat:'LABOR',    id:'ICSA',       label:'Initial Claims'},
+    {cat:'GROWTH',   id:'GDP',        label:'GDP QoQ Ann.'},
+    {cat:'GROWTH',   id:'INDPRO',     label:'Industrial Prod.'},
+    {cat:'GROWTH',   id:'RETAILSMNSA',label:'Retail Sales MoM'},
+    {cat:'RATES',    id:'FEDFUNDS',   label:'Fed Funds Rate'},
     {cat:'HOUSING',  id:'MORTGAGE30US',label:'30Y Mortgage Rate'},
   ];
   const catColors={INFLATION:'#3a2a00',LABOR:'#0a2a0a',GROWTH:'#0a1a3a',RATES:'#2a0a2a',HOUSING:'#1a2a2a'};
@@ -1995,9 +1895,27 @@ const cbCards=D.macro.centralBanks.map(cb=>`
 
   return buildTabs('macro-tabs',[
     {id:'macro-cal',  label:'CALENDAR',      content:calTab},
-    {id:'macro-cb',   label:'CENTRAL BANKS', content:cbTab},
+    {id:'macro-cb', label:'CENTRAL BANKS', content:cbTabContent},
     {id:'macro-econ', label:'ECON / FRED',   content:econTab},
-  ]);
+    {id:'macro-cal-links', label:'EXT CALENDARS', content:`
+      <div style="padding:6px 8px;overflow-y:auto;height:100%">
+        <div class="sl" style="margin-bottom:6px">ECONOMIC CALENDAR — EXTERNAL</div>
+        <div style="font-size:9px;color:#555;margin-bottom:8px">Full calendars with forecasts, historical actuals, and alerts — updated in real time</div>
+        ${[
+          ['Investing.com',   'https://www.investing.com/economic-calendar/',          'Most complete free calendar · filter by country/impact · email alerts'],
+          ['ForexFactory',    'https://www.forexfactory.com/calendar',                 'Minute-by-minute release tracking · market impact color coding'],
+          ['Econoday',        'https://mam.econoday.com/p/us-economic-calendar.asp',   'Consensus forecasts · historical data · Fed indicator tracker'],
+          ['Trading Economics','https://tradingeconomics.com/calendar',                'Global macro calendar · 200+ countries · API available'],
+          ['Bloomberg',       'https://www.bloomberg.com/markets/economic-calendar',   'Bloomberg economic calendar · institutional-grade'],
+        ].map(([n,u,d])=>`
+          <div onclick="window.open('${u}','_blank')"
+               style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505;margin-bottom:3px"
+               onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor='#111'">
+            <div style="color:var(--amber);font-size:10px;font-weight:600;min-width:140px">${n}</div>
+            <div style="color:#444;font-size:9px;flex:1">${d}</div>
+            <div style="color:#333;font-size:9px">↗</div>
+          </div>`).join('')}
+      </div>`}]);
 }
 
 
@@ -3811,12 +3729,16 @@ function rHOME(){
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
             <span style="color:var(--text-dim)">${cb.name}</span>
             <span style="color:var(--amber);font-weight:600">${cb.rate}</span>
-            <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#444'};font-size:9px">${cb.bias}</span>
             <span style="font-size:9px;color:#333">${_cbNextBadge(cb.next)}</span>
           </div>`).join('')}
+        <div onclick="window.open('https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html','_blank')"
+             style="padding:3px 8px;font-size:9px;color:#3aaa3a;cursor:pointer;border-top:1px solid #111;margin-top:2px"
+             onmouseover="this.style.color='#66cc66'" onmouseout="this.style.color='#3aaa3a'">
+          ↗ CME FedWatch — live implied probabilities
+        </div>
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
-          ${['EQ','FX','CMDTY','MACRO','EARN','ECON','VOL'].map(p=>`
+          ${['EQ','FX','CMDTY','MACRO','ECON','VOL','SCRN'].map(p=>`
           <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid #333;color:#888;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#666'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">${p}</div>`).join('')}
         </div>
       </div>
@@ -4263,21 +4185,19 @@ function rHELP(){
     {cmd:'HOME',  desc:'Market Overview',         detail:'UST 2Y · UST 10Y · 2s10s spread · SPX · Nasdaq · VIX · DXY · WTI · Gold · CB rates · News feed'},
     {cmd:'HEAT',  desc:'Visual Heatmap',          detail:'SECTOR: 11 GICS sectors by 1D % · CURVE: UST bars by tenor colored by 1D change'},
     {cmd:'FI',    desc:'Fixed Income Monitor',    detail:'Full UST curve 1M→30Y · Yield / duration / price · 1D/1W/1M Δ · 2s10s · 3m10y · 5s30s spreads · NORMAL/FLAT/INVERTED regime'},
-    {cmd:'MACRO', desc:'Macro Calendar & CBs',    detail:'Economic events · Actual vs forecast · HIGH/MED/LOW impact · 6 central banks: FED ECB BOJ BOE PBOC RBA · Rate bias & outlook'},
-    {cmd:'SCRN',  desc:'Equity Screener',         detail:'85 US stocks across GICS sectors · Filter: sector / mkt cap / P/E / div yield / price / 1D% · Sort columns · Live FMP/AV enrichment'},
-    {cmd:'EQS',      desc:'Equity Search',          detail:'Search any NYSE/NASDAQ ticker or company name · Live FMP pull · Price · Market cap · P/E · Revenue · Net income · Margins · Intraday sparkline · 3Y income statement'},
-    {cmd:'ALERTS',desc:'Price & Macro Alerts',    detail:'D.alerts.rules array · Threshold triggers on price / yield / spread · D.alerts.fired log · Coming soon: browser notifications'},
+    {cmd:'MACRO', desc:'Macro Calendar & CBs',    detail:'Economic events · Actual vs forecast · HIGH/MED/LOW impact · FRED live data · Central bank links · External calendar links'},
+    {cmd:'SCRN',  desc:'Equity Screener',         detail:'16 Finviz preset screens: Momentum / Fundamental / Sector / Special Situations · Opens Finviz with filters pre-applied · Live data'},
   ];
 
   const panels = [
     {cmd:'EQ',      desc:'Equity Monitor',    detail:'Index table: SPX Nasdaq Dow Russell VIX · Sector heatmap grid · 1D / 1W returns'},
-    {cmd:'FX',      desc:'FX & Rates',        detail:'G10 + DXY + EM pairs · 1D/1W/1M changes · Vol level: LOW / MOD / HIGH'},
-    {cmd:'CMDTY',   desc:'Commodities',       detail:'Energy · Metals · Agriculture · Spot price · 1D% change · Curve'},
+    {cmd:'FX',      desc:'FX & Rates',        detail:'G10 + DXY + EM pairs · Spot price · 1D change · Vol level: LOW / MOD / HIGH · FX Calculator'},
+    {cmd:'CMDTY',   desc:'Commodities',       detail:'Energy · Metals · Agriculture · Spot price · 1D% change · Live Yahoo Finance'},
     {cmd:'NEWS',    desc:'News Terminal',     detail:'12 headlines · Filter: macro eq energy credit geo · Click headline for full story'},
     {cmd:'INFL',    desc:'Inflation Monitor', detail:'TIPS breakevens 5Y/10Y/30Y/5Y5Y · CPI PCE Core PCE · Breakeven curve chart'},
     {cmd:'AUCTION', desc:'Treasury Auctions', detail:'Bid-to-cover · Tail bp · Indirect / Direct / Dealer split · Weak flag (red)'},
-    {cmd:'VOL',     desc:'Volatility & Risk', detail:'VIX · VVIX · MOVE · SKEW · 2s10s inversion · MOVE 60-day history chart'},
-    {cmd:'EQS',    desc:'Equity Search',      detail:'Type ticker or company name · FMP autocomplete · Batch pulls quote/profile/income/ratios · Intraday 5min sparkline · 3Y income statement'},
+    {cmd:'VOL',     desc:'Volatility & Risk', detail:'VIX spot · VVIX live (Yahoo) · Regime: LOW/MOD/ELEVATED/HIGH/EXTREME · Options flow external links'},
+    {cmd:'EQS',    desc:'Equity Search',      detail:'Search any NYSE/NASDAQ ticker · Live Yahoo Finance data · Price · market cap · 52W range · Intraday chart · News'},
   ];
 
   const search = [
@@ -5401,8 +5321,14 @@ function showAccessPanel(){
   if(existing){ existing.remove(); return; }
   const overlay = document.createElement('div');
   overlay.id = 'acc-panel-overlay';
+  // Position relative to button, accounting for body zoom
+  const _accBtn = document.getElementById('acc-btn');
+  const _bz = parseFloat(document.body.style.zoom) || 1;
+  const _rect = _accBtn ? _accBtn.getBoundingClientRect() : {right: window.innerWidth-12, bottom: 36};
+  const _panRight = Math.round(window.innerWidth - _rect.right);
+  const _panTop = Math.round(_rect.bottom + 4);
   Object.assign(overlay.style, {
-    position:'fixed', right:'12px', top:'36px', width:'340px', zIndex:'99999',
+    position:'fixed', right:_panRight+'px', top:_panTop+'px', width:'340px', zIndex:'99999',
     background:'#070707', border:'1px solid #333', boxShadow:'0 12px 40px rgba(0,0,0,.95)',
     fontFamily:'var(--font)', fontSize:'11px', color:'#c8c8c8',
   });
@@ -5410,7 +5336,6 @@ function showAccessPanel(){
   document.body.appendChild(overlay);
   // Counter-zoom so panel appears at true viewport scale regardless of body zoom
   const bz = parseFloat(document.body.style.zoom) || 1;
-  overlay.style.zoom = (1/bz).toFixed(4);
 
   // Event delegation — one listener on the panel handles everything
   overlay.addEventListener('click', e => {

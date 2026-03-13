@@ -63,58 +63,42 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* ── SHORTCUT BAR ── */
 #shortcuts{
-  height:32px;background:#060606;border-bottom:1px solid #1a1a1a;
-  display:flex;align-items:stretch;padding:0;gap:0;z-index:1999;overflow:visible;
+  height:36px;background:#080808;border-bottom:1px solid #222;
+  display:flex;align-items:center;padding:0 6px;gap:3px;z-index:1999;overflow:visible;
 }
-/* HOME — amber/gold, separated by a gap */
+/* shared base for all panel buttons */
+.scbtn-home,.scbtn-market,.scbtn-rates,.scbtn-macro,.scbtn-tool{
+  border:1px solid transparent;
+  font-family:var(--font);font-size:11px;font-weight:600;
+  padding:0 11px;cursor:pointer;height:26px;white-space:nowrap;letter-spacing:.8px;
+  border-radius:2px;flex:1;min-width:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .1s,color .1s,border-color .1s;
+}
+/* HOME — amber */
 .scbtn-home{
-  background:transparent;border:none;border-right:2px solid #2a2000;
-  color:#b07800;font-family:var(--font);font-size:12px;font-weight:700;
-  padding:0 16px 0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:1px;
-  margin-right:8px;border-right-width:0;
-  position:relative;
+  color:#d4950a;background:#1a1200;border-color:#3a2800;font-size:12px;font-weight:700;letter-spacing:1.2px;
 }
-.scbtn-home::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:#2a2000;}
-.scbtn-home:hover{color:var(--amber);background:#0f0a00}
-/* Market data group — blue tint */
-.scbtn-market{
-  background:transparent;border:none;
-  color:#5a7a9a;font-family:var(--font);font-size:11px;
-  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
-  border-bottom:2px solid transparent;
-}
-.scbtn-market:hover{color:#88bbdd;background:#050a0f;border-bottom-color:#1a3a5a}
-/* Fixed income / rates — green tint */
-.scbtn-rates{
-  background:transparent;border:none;
-  color:#3a7a5a;font-family:var(--font);font-size:11px;
-  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
-  border-bottom:2px solid transparent;
-}
-.scbtn-rates:hover{color:#55bb88;background:#050f0a;border-bottom-color:#1a4a2a}
-/* Macro / news group — muted orange */
-.scbtn-macro{
-  background:transparent;border:none;
-  color:#7a5a2a;font-family:var(--font);font-size:11px;
-  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
-  border-bottom:2px solid transparent;
-}
-.scbtn-macro:hover{color:#cc9944;background:#0f0a05;border-bottom-color:#4a3010}
-/* Tools group — muted cyan */
-.scbtn-tool{
-  background:transparent;border:none;
-  color:#2a6a7a;font-family:var(--font);font-size:11px;
-  padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;
-  border-bottom:2px solid transparent;
-}
-.scbtn-tool:hover{color:#44aacc;background:#05090f;border-bottom-color:#1a4a5a}
+.scbtn-home:hover{color:#ffbb33;background:#251900;border-color:#6a4800;}
+/* Market — blue */
+.scbtn-market{color:#7aabcc;background:#080e14;border-color:#1a3048;}
+.scbtn-market:hover{color:#aad4f0;background:#0d1825;border-color:#2a5080;}
+/* Rates — green */
+.scbtn-rates{color:#5aaa7a;background:#070e0a;border-color:#163022;}
+.scbtn-rates:hover{color:#88ddaa;background:#0c1a10;border-color:#2a6040;}
+/* Macro/News — orange */
+.scbtn-macro{color:#cc9944;background:#110d04;border-color:#3a2c0e;}
+.scbtn-macro:hover{color:#ffcc66;background:#1c1508;border-color:#6a5020;}
+/* Tools — cyan */
+.scbtn-tool{color:#44a0bb;background:#06090d;border-color:#122030;}
+.scbtn-tool:hover{color:#66ccee;background:#0b1520;border-color:#205070;}
 /* divider between groups */
-.sc-div{width:1px;background:#1a1a1a;margin:6px 4px;flex-shrink:0}
-/* legacy .scbtn fallback */
-.scbtn{background:transparent;border:none;color:var(--text-dim);font-family:var(--font);font-size:11px;padding:0 12px;cursor:pointer;height:100%;white-space:nowrap;letter-spacing:.5px;}
-.scbtn:hover{color:var(--amber);background:var(--bg2)}
+.sc-div{width:1px;background:#252525;margin:4px 3px;flex-shrink:0;height:20px;align-self:center;}
+/* legacy .scbtn fallback (ACCESS button) */
+.scbtn{background:#0a0a0a;border:1px solid #252525;color:#707070;font-family:var(--font);font-size:10px;padding:0 10px;cursor:pointer;height:26px;white-space:nowrap;letter-spacing:.5px;border-radius:2px;}
+.scbtn:hover{color:var(--amber);background:#111;border-color:#444;}
 .scbtn .k{display:none}
-#sc-right{margin-left:auto;color:#5a5a5a;font-size:9px;white-space:nowrap;flex-shrink:0;padding:0 8px;align-self:center}
+#sc-right{display:flex;align-items:center;gap:0;margin-left:6px;flex-shrink:0;}
 
 /* ── WORKSPACE ── */
 #workspace{
@@ -172,7 +156,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   color:#555;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
   flex-shrink:0;margin-left:2px;border-radius:2px;
 }
-.wh-fs:hover{background:#1a1a00;color:var(--amber);border-color:#3a2a00}
+.wh-fs:hover{background:#1a1a00;color:var(--amber);border-color:#cc8800}
 .wh-refresh{
   width:20px;height:20px;background:#0a0a0a;border:1px solid #333;
   color:#444;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -227,14 +211,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* Regime badge */
 .regime{display:inline-block;padding:1px 5px;font-size:9px;font-weight:600;letter-spacing:1px;border:1px solid}
 .regime.normal{color:var(--green);border-color:#003300}
-.regime.flat{color:var(--amber);border-color:#3a2a00}
+.regime.flat{color:var(--amber);border-color:#cc8800}
 .regime.inverted{color:var(--red);border-color:#3a0000}
 
 /* Toggle btns */
 .tr-row{display:flex;gap:3px;margin-bottom:4px;flex-wrap:wrap}
 .tbtn{background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);
       font-family:var(--font);font-size:9px;padding:2px 6px;cursor:pointer}
-.tbtn.active{color:var(--amber);border-color:#3a2a00;background:#1a1000}
+.tbtn.active{color:var(--amber);border-color:#cc8800;background:#1a1000}
 .tbtn:hover{color:var(--text)}
 
 /* Heatmap cells */
@@ -315,7 +299,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 #search-type-badge.t-equity  {color:#00c853;border-color:#003318;background:#001a0a}
 #search-type-badge.t-bond    {color:#00acc1;border-color:#00232a;background:#001318}
-#search-type-badge.t-fx      {color:#ffab00;border-color:#3a2a00;background:#1a1000}
+#search-type-badge.t-fx      {color:#ffab00;border-color:#cc8800;background:#1a1000}
 #search-type-badge.t-macro   {color:#7b1fa2;border-color:#1e0033;background:#0d0018}
 #search-type-badge.t-cmdty   {color:#e65100;border-color:#3a1400;background:#1a0800}
 #search-type-badge.t-command {color:#b8b8b8;border-color:#2e2e2e;background:#111}
@@ -339,10 +323,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ac-badge{font-size:8px;font-weight:600;letter-spacing:.5px;padding:0 4px;border:1px solid;flex-shrink:0}
 .ac-badge.equity  {color:#00c853;border-color:#003318}
 .ac-badge.bond    {color:#00acc1;border-color:#00232a}
-.ac-badge.fx      {color:#ffab00;border-color:#3a2a00}
+.ac-badge.fx      {color:#ffab00;border-color:#cc8800}
 .ac-badge.macro   {color:#7b1fa2;border-color:#1e0033}
 .ac-badge.cmdty   {color:#e65100;border-color:#3a1400}
-.ac-badge.command {color:#888;border-color:#2a2a2a}
+.ac-badge.command {color:#888;border-color:#555}
 .ac-badge.filing  {color:#e53935;border-color:#3a0000}
 .ac-sep{padding:2px 8px;font-size:8px;color:#222;letter-spacing:1px;background:#050505;border-bottom:1px solid #0d0d0d}
 
@@ -351,7 +335,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .sr-row>div{padding:3px 6px;font-size:10px}
 .sr-row:hover>div{background:var(--bg2)}
 .sr-hdr>div{font-size:8px;color:#333;padding:2px 6px;border-bottom:1px solid var(--border)}
-.no-match{padding:14px;text-align:center;color:#2a2a2a;font-size:10px;letter-spacing:1px}
+.no-match{padding:14px;text-align:center;color:#555;font-size:10px;letter-spacing:1px}
 
 
 /* ── SCREENER ── */
@@ -366,22 +350,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   background:var(--bg3);border:1px solid var(--border2);color:var(--text-bright);
   font-family:var(--font);font-size:11px;padding:3px 6px;width:88px;outline:none;
 }
-.scrn-input:focus{border-color:#3a2a00}
+.scrn-input:focus{border-color:#cc8800}
 .scrn-select{
   background:var(--bg3);border:1px solid var(--border2);color:var(--text-bright);
   font-family:var(--font);font-size:11px;padding:3px 5px;width:110px;outline:none;
   -webkit-appearance:none;appearance:none;cursor:pointer;
 }
-.scrn-select:focus{border-color:#3a2a00}
+.scrn-select:focus{border-color:#cc8800}
 .scrn-btn{
   background:var(--bg3);border:1px solid var(--border2);color:var(--amber);
   font-family:var(--font);font-size:10px;font-weight:600;letter-spacing:1px;
   padding:4px 10px;cursor:pointer;height:26px;white-space:nowrap;align-self:flex-end;
 }
-.scrn-btn:hover{background:#1a1000;border-color:#3a2a00}
+.scrn-btn:hover{background:#1a1000;border-color:#cc8800}
 .scrn-btn.run{color:#000;background:var(--amber);border-color:var(--amber)}
 .scrn-btn.run:hover{background:#cc8800;border-color:#cc8800}
-.scrn-btn:disabled{color:#2a2a2a;background:var(--bg2);border-color:var(--border);cursor:default}
+.scrn-btn:disabled{color:#555;background:var(--bg2);border-color:var(--border);cursor:default}
 #scrn-status{
   flex-shrink:0;padding:3px 8px;font-size:10px;color:var(--text-mid);
   border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;
@@ -416,7 +400,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   background:transparent;border:1px solid var(--border);color:var(--text-dim);
   font-family:var(--font);font-size:8px;padding:1px 6px;cursor:pointer;height:22px;
 }
-.scrn-preset:hover{color:var(--amber);border-color:#3a2a00;background:#0d0800}
+.scrn-preset:hover{color:var(--amber);border-color:#cc8800;background:#0d0800}
 
 
 /* ── HOME PANEL ── */
@@ -437,9 +421,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #home-news{flex:1;overflow-y:auto;padding:4px 0;min-height:0}
 .home-news-row{display:flex;gap:8px;align-items:baseline;padding:3px 8px;border-bottom:1px solid #0a0a0a;cursor:pointer}
 .home-news-row:hover{background:var(--bg2)}
-.home-news-ts{color:#2a2a2a;font-size:8px;flex-shrink:0;width:34px}
+.home-news-ts{color:#666;font-size:9px;flex-shrink:0;width:34px}
 .home-news-src{color:var(--text-dim);font-size:8px;flex-shrink:0;width:28px}
-.home-news-tag{font-size:7px;font-weight:600;padding:0 3px;border:1px solid;flex-shrink:0}
+.home-news-tag{font-size:9px;font-weight:600;padding:0 3px;border:1px solid;flex-shrink:0}
 .home-news-hl{font-size:9px;color:var(--text);line-height:1.4;flex:1}
 #home-bottom{flex-shrink:0;display:flex;gap:0;border-top:1px solid var(--border)}
 .home-stat{flex:1;padding:4px 8px;border-right:1px solid var(--border);font-size:9px}
@@ -484,7 +468,7 @@ canvas{display:block}
     </div>
     <div id="livebadge">● LIVE</div>
     <div id="clock">--:--:--</div>
-    <div id="fomc-countdown" style="font-size:9px;color:#3a2a00;letter-spacing:1px;padding:0 6px;border-left:1px solid #1a1a1a"></div>
+    <div id="fomc-countdown" style="font-size:9px;color:#cc8800;letter-spacing:1px;padding:0 6px;border-left:1px solid #1a1a1a"></div>
   </div>
 </div>
 
@@ -510,14 +494,14 @@ canvas{display:block}
   <button class="scbtn-tool" onclick="OW('WATCH')" title="Watchlist">WATCH</button>
   <button class="scbtn-tool" onclick="OW('CHART','SPY');setTimeout(loadChartData,300)" title="Chart">CHART</button>
   <button class="scbtn-tool" onclick="OW('SCRN')" title="Screener">SCRN</button>
-  <div id="sc-right" style="display:flex;align-items:center;gap:0;margin-left:auto">
-    <button class="scbtn" onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (Ctrl+K)" style="color:#4a4a4a;border-left:1px solid #1a1a1a;height:32px">⌨ ACCESS</button>
+  <div id="sc-right">
+    <button class="scbtn" onclick="showAccessPanel()" id="acc-btn" title="Accessibility Settings (Ctrl+K)">⌨ ACCESS</button>
   </div>
 </div>
 
 
 <!-- STATUS BAR -->
-<div id="status-bar" style="height:16px;background:#050505;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.5px;overflow:hidden;white-space:nowrap;color:#2a2a2a"></div>
+<div id="status-bar" style="height:16px;background:#050505;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.5px;overflow:hidden;white-space:nowrap;color:#555"></div>
 
 <!-- TICKER TAPE -->
 <div id="ticker-tape"><div id="ticker-inner"><span class="ti"><span class="ti-sym">SPX</span><span class="ti-px">—</span><span class="ti-up">loading...</span></span></div></div>
@@ -910,7 +894,7 @@ function renderW(cmd,key,extra){
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
     case'WATCH':  b.innerHTML=rWATCH();setTimeout(()=>initWATCH(),60);break;
     case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
-    default:      b.innerHTML=`<div style="color:#2a2a2a;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MACRO NEWS INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN CB ROTATION LADDER WATCH CHART</div>`;
+    default:      b.innerHTML=`<div style="color:#555;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MACRO NEWS INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN CB ROTATION LADDER WATCH CHART</div>`;
   }
 }
 
@@ -973,7 +957,7 @@ function rFI(){
   const fmtAucDate=s=>{if(!s||s==='—')return'—';const p=s.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0].slice(2)}`:s;};
   const arows=D.fixedIncome.auctions.map(a=>`
     <tr>
-      <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:8px;color:#2a6a2a;margin-left:3px">●</span>':''}</td>
+      <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:9px;color:#3aaa3a;margin-left:3px">●</span>':''}</td>
       <td class="w">${fmtAucDate(a.mat)}</td><td class="w" style="${a.weak?'color:var(--red)':''}">${fmtAucDate(a.auction)}</td>
       <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield?a.yield.toFixed(3):'—'}</td>
       <td class="${a.btc<2.35?'dn':a.btc>2.7?'up':'w'}">${a.btc?a.btc.toFixed(2):'—'}</td>
@@ -1022,7 +1006,7 @@ function rFI(){
     <div style="padding:4px 6px">
       <div style="font-size:10px;color:#707070;margin-bottom:4px">DV01 = $/bp PER $1M FACE · SHOCK = LOSS ON +10bp / +100bp PARALLEL SHIFT</div>
       <table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D Δ</th><th>MOD DUR</th><th>DV01 $/bp</th><th>+10bp P&L</th><th>+100bp P&L</th></tr></thead><tbody>${lrows}</tbody></table>
-      <div style="margin-top:6px;padding:5px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">
+      <div style="margin-top:6px;padding:5px;border:1px solid #1a1a1a;font-size:9px;color:#555">
         Duration approximated for bullet bonds at par. Convexity not included — actual losses on large moves will be slightly less than linear.
       </div>
     </div>`;
@@ -1250,7 +1234,7 @@ function rEQ(){
       style="background:${bg};border:1px solid rgba(255,255,255,0.02);padding:3px 1px;cursor:pointer;min-width:0;
              display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px"
       onmouseover="this.style.borderColor='#555'" onmouseout="this.style.borderColor='rgba(255,255,255,0.02)'">
-      <div style="font-size:8px;color:var(--amber);font-weight:600;letter-spacing:.2px;white-space:nowrap">${st.t}</div>
+      <div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.2px;white-space:nowrap">${st.t}</div>
       <div style="font-size:7.5px;color:${vc};font-weight:600">${val>=0?'+':''}${val}%</div>
     </div>`;
   };
@@ -1262,9 +1246,9 @@ function rEQ(){
     const abbr   = secAbbr[sec.etf] || sec.etf;
     return `<div style="margin-bottom:4px">
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;padding:1px 0;border-bottom:1px solid #111">
-        <span style="font-size:8px;color:#666;letter-spacing:.6px;font-weight:600;min-width:30px">${abbr}</span>
-        <span style="font-size:8px;color:${secCol};font-weight:700">${secPct>=0?'+':''}${secPct.toFixed(2)}%</span>
-        <span style="font-size:7px;color:#2a2a2a;margin-left:auto">${sec.etf}</span>
+        <span style="font-size:9px;color:#666;letter-spacing:.6px;font-weight:600;min-width:30px">${abbr}</span>
+        <span style="font-size:9px;color:${secCol};font-weight:700">${secPct>=0?'+':''}${secPct.toFixed(2)}%</span>
+        <span style="font-size:9px;color:#555;margin-left:auto">${sec.etf}</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:1px">${tiles}</div>
     </div>`;
@@ -1274,7 +1258,7 @@ function rEQ(){
     <div style="padding:4px 6px;overflow-y:auto;max-height:100%;min-height:0">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
         <div class="sl" style="margin:0">S&P 500 HEATMAP — ${D.equities.sectors.length?'LIVE ETF PROXY':'LOADING…'}</div>
-        <span style="font-size:8px;color:#444">Click ticker → EQS detail</span>
+        <span style="font-size:9px;color:#444">Click ticker → EQS detail</span>
       </div>
       <table class="t" style="margin-bottom:5px;font-size:9px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
       ${hmSectors}
@@ -1325,14 +1309,14 @@ function rEQ(){
     const d=_parseEarnDate(e.date);
     const isPast=d && d<_now && (_now-d)>3600000*12;
     const rowStyle=isPast?'opacity:0.35':'';
-    const dateBadge=isPast?`${e.date} <span style="color:var(--red);font-size:8px">PAST</span>`:e.date;
+    const dateBadge=isPast?`${e.date} <span style="color:var(--red);font-size:9px">PAST</span>`:e.date;
     return `<tr style="${rowStyle}">
       <td style="color:#555;font-size:9px">${dateBadge}</td>
       <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
       <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
-      <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:8px;padding:1px 4px">${e.time}</td>
+      <td style="background:${e.time==='BMO'?'#1a2a1a':'#1a1a2a'};color:#888;font-size:9px;padding:1px 4px">${e.time}</td>
       <td style="color:#888">$${e.eps_est}</td>
-      <td style="color:#2a2a2a;font-size:9px">${e.mktcap}</td>
+      <td style="color:#555;font-size:9px">${e.mktcap}</td>
     </tr>`;
   }).join('');
 
@@ -1358,8 +1342,8 @@ function rFX(){
         <td>${vol}</td></tr>`;
     }).join('');
     return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th><th style="color:#383838">1W ref</th><th style="color:#383838">1M ref</th></tr></thead><tbody>${rows}</tbody></table>
-      <div style="font-size:8px;color:#2a2a2a;padding:2px 4px">● 1D live · 1W/1M reference values</div>`;
+      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th><th style="color:#666">1W ref</th><th style="color:#666">1M ref</th></tr></thead><tbody>${rows}</tbody></table>
+      <div style="font-size:9px;color:#555;padding:2px 4px">● 1D live · 1W/1M reference values</div>`;
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
   const em=D.fx.filter(f=>f.type==='em');
@@ -1495,7 +1479,7 @@ function rINFL(){
   });
   const be = beData.map(b=>`<tr>
     <td>${b.tenor}</td>
-    <td style="color:var(--amber);font-weight:600">${b.be!=null?b.be.toFixed(2)+'%':'<span style=\"color:#2a2a2a\">—</span>'}</td>
+    <td style="color:var(--amber);font-weight:600">${b.be!=null?b.be.toFixed(2)+'%':'<span style=\"color:#555\">—</span>'}</td>
     <td class="${b.d1!=null?(b.d1>0?'dn':b.d1<0?'up':'neu'):'neu'}">${b.d1!=null?(b.d1>0?'+':'')+b.d1.toFixed(3):'—'}</td>
   </tr>`).join('');
 
@@ -1505,7 +1489,7 @@ function rINFL(){
     {label:'Core CPI MoM', d:corecpi,  note:'Ex food & energy'},
     {label:'Core PCE MoM', d:pce,      note:'Fed preferred measure'},
   ].map(g => {
-    if(!g.d) return `<tr><td style="color:var(--text-dim)">${g.label}</td><td colspan="4" style="color:#2a2a2a">LOADING...</td></tr>`;
+    if(!g.d) return `<tr><td style="color:var(--text-dim)">${g.label}</td><td colspan="4" style="color:#555">LOADING...</td></tr>`;
     const col = g.d.val > 0.3 ? 'var(--red)' : g.d.val > 0.2 ? 'var(--amber)' : 'var(--green)';
     const chgCol = g.d.chg > 0 ? 'var(--red)' : 'var(--green)'; // inflation: up=bad
     return `<tr>
@@ -1513,7 +1497,7 @@ function rINFL(){
       <td style="color:${col};font-weight:600">${g.d.val.toFixed(2)}%</td>
       <td style="color:#555">${g.d.prev.toFixed(2)}%</td>
       <td style="color:${chgCol}">${g.d.chg>=0?'+':''}${g.d.chg.toFixed(3)}</td>
-      <td style="color:#2a2a2a;font-size:9px">${g.d.date} &nbsp;·&nbsp; ${g.note}</td>
+      <td style="color:#555;font-size:9px">${g.d.date} &nbsp;·&nbsp; ${g.note}</td>
     </tr>`;
   }).join('');
 
@@ -1577,10 +1561,10 @@ function drawInfl(){
 function rAUCTION(){
   const fmtD=s=>{if(!s||s==='—')return'—';const p=s.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0].slice(2)}`:s;};
   const isLive = D.fixedIncome.auctions.some(a=>a.live);
-  const liveBadge = isLive ? '<span style="font-size:9px;color:#2a6a2a;margin-left:6px">● LIVE · fiscaldata.treasury.gov</span>' : '<span style="font-size:9px;color:#505050;margin-left:6px">STATIC FALLBACK</span>';
+  const liveBadge = isLive ? '<span style="font-size:9px;color:#3aaa3a;margin-left:6px">● LIVE · fiscaldata.treasury.gov</span>' : '<span style="font-size:9px;color:#505050;margin-left:6px">STATIC FALLBACK</span>';
   const rows=D.fixedIncome.auctions.map(a=>`
     <tr>
-      <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:8px;color:#2a6a2a;margin-left:3px">●</span>':''}</td>
+      <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:9px;color:#3aaa3a;margin-left:3px">●</span>':''}</td>
       <td class="w">${fmtD(a.mat)}</td><td class="w" style="${a.weak?'color:var(--red)':''}">${fmtD(a.auction)}</td>
       <td class="hl" style="${a.weak?'color:var(--red)':''}">${a.yield?a.yield.toFixed(3):'—'}</td>
       <td class="${a.btc<2.35?'dn':a.btc>2.7?'up':'w'}">${a.btc?a.btc.toFixed(2):'—'}</td>
@@ -1624,9 +1608,9 @@ function rVOL(){
       <div class="sl">VOL INDICES</div>
       <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
         <tr><td style="color:var(--amber)">VIX</td><td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td><td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td><td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td><td style="color:#333;font-size:9px">S&P 500 30D implied</td></tr>
-        <tr><td style="color:var(--amber)">VVIX</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">Vol-of-vol index</td></tr>
-        <tr><td style="color:var(--amber)">MOVE</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">ICE BofA Treasury vol index</td></tr>
-        <tr><td style="color:var(--amber)">SKEW</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#333">NO FREE API</td><td style="color:#404040;font-size:9px">CBOE tail risk index</td></tr>
+        <tr><td style="color:var(--amber)">VVIX</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#555">NO FREE API</td><td style="color:#666;font-size:9px">Vol-of-vol index</td></tr>
+        <tr><td style="color:var(--amber)">MOVE</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#555">NO FREE API</td><td style="color:#666;font-size:9px">ICE BofA Treasury vol index</td></tr>
+        <tr><td style="color:var(--amber)">SKEW</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#555">NO FREE API</td><td style="color:#666;font-size:9px">CBOE tail risk index</td></tr>
       </tbody></table>
       <div class="sl" style="margin-top:6px">1Y VIX HISTORY</div>
       <canvas id="vol-hist-c" height="80" style="width:100%">
@@ -1664,9 +1648,9 @@ function rOPTIONS(){
     <div class="sl">SENTIMENT — LIVE</div>
     <div class="sf" style="margin-bottom:8px">
       <div class="si"><span class="sil">VIX</span><span class="siv" style="color:${vixLevel.c}">${vixStr}</span><span class="sim" style="color:${vixLevel.c}">${vixLevel.l}</span></div>
-      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#2a2a2a">NO FREE API</span></div>
-      <div class="si"><span class="sil">VVIX</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#2a2a2a">NO FREE API</span></div>
-      <div class="si"><span class="sil">SKEW</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#2a2a2a">NO FREE API</span></div>
+      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#555">NO FREE API</span></div>
+      <div class="si"><span class="sil">VVIX</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#555">NO FREE API</span></div>
+      <div class="si"><span class="sil">SKEW</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#555">NO FREE API</span></div>
     </div>
     <div class="sl" style="margin-top:8px">OPTIONS FLOW — EXTERNAL DATA SOURCES</div>
     <div style="font-size:9px;color:#444;padding:4px 0 8px">Live flow data requires a paid subscription. Links below open in new tab.</div>
@@ -1716,11 +1700,11 @@ function rEARN(){
       <td style="color:#555;font-size:9px">${e.date}</td>
       <td style="color:var(--amber);font-weight:600;cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${e.sym}'),100)">${e.sym}</td>
       <td style="color:var(--text-dim);font-size:9px">${e.name}</td>
-      <td style="background:${timeCol};color:#888;font-size:8px;padding:1px 4px;text-align:center">${e.time}</td>
+      <td style="background:${timeCol};color:#888;font-size:9px;padding:1px 4px;text-align:center">${e.time}</td>
       <td style="color:#888">$${e.eps_est}</td>
       <td style="color:${e.eps_act?'var(--amber)':'#2a2a2a'}">${e.eps_act?'$'+e.eps_act:'—'}</td>
       <td style="color:${beatCol};font-size:9px">${beatTxt}</td>
-      <td style="color:#2a2a2a;font-size:9px">${e.mktcap}</td>
+      <td style="color:#555;font-size:9px">${e.mktcap}</td>
     </tr>`;
   }).join('');
 
@@ -1771,7 +1755,7 @@ function rECON(){
     const chgTxt = chg===null?'—':((chg>0?'+':'')+chg.toFixed(2));
     const date = d?.date || '—';
     return `<tr>
-      <td><span style="background:${catColors[r.cat]||'#1a1a1a'};color:#888;font-size:8px;padding:1px 5px;letter-spacing:.5px">${r.cat}</span></td>
+      <td><span style="background:${catColors[r.cat]||'#1a1a1a'};color:#888;font-size:9px;padding:1px 5px;letter-spacing:.5px">${r.cat}</span></td>
       <td style="color:var(--text-dim)">${r.label}</td>
       <td style="color:var(--amber);font-weight:600">${val}</td>
       <td style="color:#555">${prev}</td>
@@ -1795,7 +1779,7 @@ function rECON(){
       <thead><tr><th>CATEGORY</th><th>INDICATOR</th><th>LATEST</th><th>PREVIOUS</th><th>CHG</th><th>RELEASE DATE</th><th>FREQ</th><th>NEXT RELEASE</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    ${!hasData?`<div style="color:#3a2a00;font-size:9px;padding:8px;margin-top:8px;border:1px solid #2a1a00">⟳ FRED DATA LOADING — REFRESH IN 30s IF EMPTY</div>`:''}`;
+    ${!hasData?`<div style="color:#cc8800;font-size:9px;padding:8px;margin-top:8px;border:1px solid #2a1a00">⟳ FRED DATA LOADING — REFRESH IN 30s IF EMPTY</div>`:''}`;
 }
 
 
@@ -1830,7 +1814,7 @@ function rROTATION(){
     const col1D = s.d1>0?'var(--green)':s.d1<0?'var(--red)':'#444';
     const momentum = s.d1>0.5?'▲▲':s.d1>0?'▲':s.d1<-0.5?'▼▼':'▼';
     const momCol = s.d1>0?'var(--green)':'var(--red)';
-    const w1str = s.w1!=null ? `<span style="color:${s.w1>0?'var(--green)':s.w1<0?'var(--red)':'#444'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</span>` : '<span style="color:#2a2a2a">—</span>';
+    const w1str = s.w1!=null ? `<span style="color:${s.w1>0?'var(--green)':s.w1<0?'var(--red)':'#444'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</span>` : '<span style="color:#555">—</span>';
     return `<tr>
       <td style="color:${rankCol};font-weight:600;width:24px">#${rank}</td>
       <td style="color:var(--text-dim)">${s.name}</td>
@@ -1942,7 +1926,7 @@ function rLADDER(){
       <thead><tr><th>TENOR</th><th>YIELD</th><th>1D Δ</th><th>MOD DUR</th><th>DV01 $/bp</th><th>+10bp P&L</th><th>+100bp P&L</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <div style="margin-top:8px;padding:6px;border:1px solid #1a1a1a;font-size:9px;color:#2a2a2a">
+    <div style="margin-top:8px;padding:6px;border:1px solid #1a1a1a;font-size:9px;color:#555">
       Duration calculated as modified duration for bullet bond at par. DV01 per $1M face. Convexity not included — actual losses on large moves will be slightly less than linear estimate.
     </div>`;
 }
@@ -1983,7 +1967,7 @@ function rMACRO(){
         <div style="color:#707070;font-size:9px;white-space:nowrap">${e.date||''}</div>
         <div style="color:#606060;font-size:9px;white-space:nowrap">${e.time||'—'}</div>
         <div style="width:14px;text-align:center">${impDot(e.impact)}</div>
-        <div style="color:#505050;font-size:8px;width:22px;font-weight:600">${e.cty}</div>
+        <div style="color:#505050;font-size:9px;width:22px;font-weight:600">${e.cty}</div>
         <div style="flex:1;font-size:10px;color:#a0a0a0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.event}</div>
         <div style="width:52px;text-align:right;color:#606060;font-size:9px">${e.prev||'—'}</div>
         <div style="width:52px;text-align:right;color:#888;font-size:9px;font-weight:600">${e.fore||'—'}</div>
@@ -1994,7 +1978,7 @@ function rMACRO(){
         <div style="color:#707070;font-size:9px;white-space:nowrap">${e.date||''}</div>
         <div style="color:#606060;font-size:9px;white-space:nowrap">${e.time||'—'}</div>
         <div style="width:14px;text-align:center">${impDot(e.impact)}</div>
-        <div style="color:#505050;font-size:8px;width:22px;font-weight:600">${e.cty}</div>
+        <div style="color:#505050;font-size:9px;width:22px;font-weight:600">${e.cty}</div>
         <div style="flex:1;font-size:10px;color:#707070;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.event}</div>
         <div style="width:52px;text-align:right;color:#555;font-size:9px">${e.prev||'—'}</div>
         <div style="width:52px;text-align:right;color:${actCol};font-size:10px;font-weight:700">${e.act||'—'}</div>
@@ -2004,32 +1988,20 @@ function rMACRO(){
 
   // Group header labels differ for past vs upcoming
   const calTab = `<div style="padding:4px 6px">
-    <div style="display:grid;grid-template-columns:50px 42px 14px 22px 1fr 52px 52px;font-size:8px;color:#555;padding:3px 0 3px 6px;border-bottom:1px solid #1a1a1a;margin-bottom:2px;letter-spacing:.5px">
+    <div style="display:grid;grid-template-columns:50px 42px 14px 22px 1fr 52px 52px;font-size:9px;color:#555;padding:3px 0 3px 6px;border-bottom:1px solid #1a1a1a;margin-bottom:2px;letter-spacing:.5px">
       <span>DATE</span><span>TIME</span><span style="text-align:center">IMP</span><span>CTY</span><span>EVENT</span><span style="text-align:right">PREV</span><span style="text-align:right">FCST / ACT</span>
     </div>
-    <div style="font-size:8px;color:#444;padding:2px 6px 4px;display:flex;gap:14px;border-bottom:1px solid #111;margin-bottom:3px">
+    <div style="font-size:9px;color:#444;padding:2px 6px 4px;display:flex;gap:14px;border-bottom:1px solid #111;margin-bottom:3px">
       <span>${impDot('HIGH')} HIGH IMPACT</span>
       <span>${impDot('MED')} MED IMPACT</span>
       <span>${impDot('LOW')} LOW IMPACT</span>
-      <span style="margin-left:auto;color:#2a6a2a">GREEN = BEAT &nbsp;</span><span style="color:#5a1a1a">RED = MISS</span>
+      <span style="margin-left:auto;color:#3aaa3a">GREEN = BEAT &nbsp;</span><span style="color:#cc5555">RED = MISS</span>
     </div>
     ${calRows}
   </div>`;
 
   // ── CENTRAL BANKS TAB ──
-  const _cbNextBadge=(next)=>{
-  if(!next) return '<span style="color:#333">—</span>';
-  const parts=next.match(/(\w+)\s+(\d+)/);
-  if(!parts) return `<span style="color:#666">${next}</span>`;
-  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const now=new Date();
-  const yr=now.getFullYear();
-  const d=new Date(yr,months[parts[1]]??0,parseInt(parts[2]));
-  const isPast=d<now && (now-d)>86400000;
-  return isPast
-    ? `<span style="color:#333;text-decoration:line-through">${next}</span> <span style="color:var(--red);font-size:8px">PAST</span>`
-    : `<span style="color:${(now-d)>-604800000?'var(--amber)':'#666'}">${next}</span>`;
-};
+  
 const cbCards=D.macro.centralBanks.map(cb=>`
     <div style="border:1px solid var(--border);padding:8px;background:var(--bg2)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
@@ -2068,7 +2040,7 @@ const cbCards=D.macro.centralBanks.map(cb=>`
     const chg=d?d.chg:null;
     const chgCol=chg===null?'#333':chg>0?'var(--green)':'var(--red)';
     return`<tr>
-      <td><span style="background:${catColors[r.cat]||'#1a1a1a'};color:#888;font-size:8px;padding:1px 5px">${r.cat}</span></td>
+      <td><span style="background:${catColors[r.cat]||'#1a1a1a'};color:#888;font-size:9px;padding:1px 5px">${r.cat}</span></td>
       <td style="color:var(--text-dim)">${r.label}</td>
       <td style="color:var(--amber);font-weight:600">${val}</td>
       <td style="color:#555">${prev}</td>
@@ -2267,10 +2239,10 @@ async function fetchEQS(ticker){
           onmouseover="this.style.borderColor='#333';this.style.background='#0d0d0d'"
           onmouseout="this.style.borderColor='#1a1a1a';this.style.background='#060606'">
           <div style="font-size:10px;color:var(--amber);font-weight:600;margin-bottom:2px">${l.name} ↗</div>
-          <div style="font-size:8px;color:#555">${l.desc}</div>
+          <div style="font-size:9px;color:#555">${l.desc}</div>
         </a>`).join('')}
       </div>
-      <div style="margin-top:10px;font-size:8px;color:#2a2a2a;border-top:1px solid #0d0d0d;padding-top:6px">
+      <div style="margin-top:10px;font-size:9px;color:#555;border-top:1px solid #0d0d0d;padding-top:6px">
         Links open in a new tab · Not investment advice
       </div>
     </div>`;
@@ -2356,7 +2328,7 @@ function buildFilingsTab(ticker, edgarInfo, currency, companyName){
     <a href="${c.url}" target="_blank" rel="noopener" style="display:block;padding:8px 10px;border:1px solid ${c.border};background:${c.bg};text-decoration:none;transition:border-color .15s"
        onmouseover="this.style.borderColor='${c.color}'" onmouseout="this.style.borderColor='${c.border}'">
       <div style="color:${c.color};font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:2px">${c.icon} ${c.label} ↗</div>
-      <div style="color:#2a2a2a;font-size:9px;line-height:1.4">${c.desc}</div>
+      <div style="color:#555;font-size:9px;line-height:1.4">${c.desc}</div>
     </a>`).join('');
 
   // Filing type reference table
@@ -2374,13 +2346,13 @@ function buildFilingsTab(ticker, edgarInfo, currency, companyName){
     <td style="color:var(--amber);font-weight:600;white-space:nowrap">${f.form}</td>
     <td style="color:#444;font-size:9px;white-space:nowrap">${f.freq}</td>
     <td style="color:var(--text-dim);font-size:9px">${f.desc}</td>
-    <td style="text-align:center"><a href="${byCIK(f.form)}" target="_blank" rel="noopener" style="color:var(--amber);font-size:8px;letter-spacing:.3px;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--amber)'">VIEW ↗</a></td>
+    <td style="text-align:center"><a href="${byCIK(f.form)}" target="_blank" rel="noopener" style="color:var(--amber);font-size:9px;letter-spacing:.3px;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--amber)'">VIEW ↗</a></td>
   </tr>`).join('');
 
   return `<div style="padding:6px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <div class="sl" style="margin:0">SEC EDGAR — ${ticker.toUpperCase()}</div>
-      ${cik ? `<span style="color:#2a2a2a;font-size:9px">CIK: ${String(cik).padStart(10,'0')}</span>` : '<span style="color:#1a1a1a;font-size:9px">CIK NOT RESOLVED — USING TICKER SEARCH</span>'}
+      ${cik ? `<span style="color:#555;font-size:9px">CIK: ${String(cik).padStart(10,'0')}</span>` : '<span style="color:#1a1a1a;font-size:9px">CIK NOT RESOLVED — USING TICKER SEARCH</span>'}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px">${cardHtml}</div>
     <div class="sl">FILING TYPE REFERENCE</div>
@@ -2580,11 +2552,11 @@ function updateStatusBar(){
     ? new Date(FETCH_STATE.lastRefresh).toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})
     : '--:--:--';
 
-  let html = `<span style="color:#2e4a2e">LIVE &nbsp;|&nbsp; REFRESHED: ${ts}</span>`;
-  if(pending.length) html += ` &nbsp;<span style="color:#3a2a00">⟳ FETCHING: ${pending.join(' ')}</span>`;
+  let html = `<span style="color:#4aaa4a">LIVE &nbsp;|&nbsp; REFRESHED: ${ts}</span>`;
+  if(pending.length) html += ` &nbsp;<span style="color:#cc8800">⟳ FETCHING: ${pending.join(' ')}</span>`;
   if(stale.length)   html += ` &nbsp;<span style="color:var(--red)">⚠ STALE: ${stale.join(' ')}</span>`;
   if(!stale.length && !pending.length && !FETCH_STATE.lastRefresh)
-    html += ` &nbsp;<span style="color:#2a2a2a">ADD API KEYS TO FETCH_STATE CONFIG TO ENABLE LIVE DATA</span>`;
+    html += ` &nbsp;<span style="color:#555">ADD API KEYS TO FETCH_STATE CONFIG TO ENABLE LIVE DATA</span>`;
   el.innerHTML = html;
 }
 
@@ -3017,7 +2989,7 @@ function rNEWS(){
   if(!news.length){
     return `<div style="padding:8px">
       <div class="news-filters">${filterBar}</div>
-      <div style="color:#2a2a2a;font-size:10px;padding:16px 0;text-align:center">
+      <div style="color:#555;font-size:10px;padding:16px 0;text-align:center">
         LOADING NEWS FEEDS…<br><span style="font-size:9px;color:#1a1a1a">Sources: Yahoo Finance · WSJ · CNBC · NBC</span>
       </div>
     </div>`;
@@ -3075,7 +3047,7 @@ function openNewsDetail(i){
       <span style="margin-left:auto">${linkHtml}</span>
     </div>
     <div style="font-size:13px;font-weight:600;color:var(--text-bright);line-height:1.4;margin-bottom:10px">${n.hl}</div>
-    <div style="font-size:10px;color:var(--text-dim);line-height:1.7;border-top:1px solid #111;padding-top:8px">${n.detail||'<span style="color:#2a2a2a">No summary available. Click the link above to read the full article.</span>'}</div>`;
+    <div style="font-size:10px;color:var(--text-dim);line-height:1.7;border-top:1px solid #111;padding-top:8px">${n.detail||'<span style="color:#555">No summary available. Click the link above to read the full article.</span>'}</div>`;
 }
 
 function newsCloseDetail(){
@@ -3925,13 +3897,13 @@ function scrnRenderTable(){
   tbody.innerHTML = rows.map(r=>{
     const chgCol = r.chg > 0 ? 'var(--green)' : r.chg < 0 ? 'var(--red)' : 'var(--text-dim)';
     const chgSign = r.chg > 0 ? '+' : '';
-    const peStr = r.pe != null ? r.pe.toFixed(1) : '<span style="color:#2a2a2a">—</span>';
-    const fwdStr = r.fwdPe != null ? r.fwdPe.toFixed(1) : '<span style="color:#2a2a2a">—</span>';
-    const divStr = r.div > 0 ? r.div.toFixed(2)+'%' : '<span style="color:#2a2a2a">—</span>';
+    const peStr = r.pe != null ? r.pe.toFixed(1) : '<span style="color:#555">—</span>';
+    const fwdStr = r.fwdPe != null ? r.fwdPe.toFixed(1) : '<span style="color:#555">—</span>';
+    const divStr = r.div > 0 ? r.div.toFixed(2)+'%' : '<span style="color:#555">—</span>';
     const volStr = r.vol >= 1e6 ? (r.vol/1e6).toFixed(1)+'M' : (r.vol/1e3).toFixed(0)+'K';
     const mcapStr = r.mcap >= 1000 ? (r.mcap/1000).toFixed(2)+'T' : r.mcap.toFixed(0)+'B';
-    const pxStr = r.px!=null ? '$'+r.px.toFixed(2) : '<span style="color:#2a2a2a">—</span>';
-    const chgTxt = r.chg!=null ? chgSign+r.chg.toFixed(2)+'%' : '<span style="color:#2a2a2a">—</span>';
+    const pxStr = r.px!=null ? '$'+r.px.toFixed(2) : '<span style="color:#555">—</span>';
+    const chgTxt = r.chg!=null ? chgSign+r.chg.toFixed(2)+'%' : '<span style="color:#555">—</span>';
     return `<tr>
       <td onclick="OW('EQS','${r.sym}')" style="color:var(--amber);cursor:pointer">${r.sym}</td>
       <td style="text-align:left;color:var(--text-mid);max-width:140px;overflow:hidden;text-overflow:ellipsis">${r.name}</td>
@@ -4118,7 +4090,7 @@ function buildMarketSummary(){
 
     // If core data not yet loaded, show loading state
     if(spx.val==null && vix.val==null){
-      return `<div style="padding:6px 10px;font-size:10px;color:#2a2a2a;letter-spacing:1px;border-bottom:1px solid var(--border);background:var(--bg1)">
+      return `<div style="padding:6px 10px;font-size:10px;color:#555;letter-spacing:1px;border-bottom:1px solid var(--border);background:var(--bg1)">
         LOADING MARKET DATA…
       </div>`;
     }
@@ -4163,10 +4135,24 @@ function buildMarketSummary(){
       ${summaryText}
     </div>`;
   }catch(e){
-    return `<div style="padding:5px 10px;font-size:9px;color:#2a2a2a;border-bottom:1px solid var(--border)">
+    return `<div style="padding:5px 10px;font-size:9px;color:#555;border-bottom:1px solid var(--border)">
       MARKET SUMMARY LOADING…
     </div>`;
   }
+}
+
+function _cbNextBadge(next){
+  if(!next) return '<span style="color:#333">—</span>';
+  const parts=next.match(/(\w+)\s+(\d+)/);
+  if(!parts) return `<span style="color:#666">${next}</span>`;
+  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const now=new Date();
+  const yr=now.getFullYear();
+  const d=new Date(yr,months[parts[1]]??0,parseInt(parts[2]));
+  const isPast=d<now && (now-d)>86400000;
+  return isPast
+    ? `<span style="color:#333;text-decoration:line-through">${next}</span> <span style="color:var(--red);font-size:9px">PAST</span>`
+    : `<span style="color:${(now-d)>-604800000?'var(--amber)':'#666'}">${next}</span>`;
 }
 
 function rHOME(){
@@ -4197,7 +4183,7 @@ function rHOME(){
   const isWeekend = dayOfWeek==='Sat'||dayOfWeek==='Sun';
   const mktStatus = isWeekend ? {txt:'CLOSED — WEEKEND', col:'#444'} : mktOpen ? {txt:'● MARKET OPEN', col:'var(--green)'} : {txt:'○ MARKET CLOSED', col:'#555'};
 
-  const _n = (v,d=2,pre='',suf='') => v!=null ? pre+v.toFixed(d)+suf : '<span style="color:#2a2a2a">—</span>';
+  const _n = (v,d=2,pre='',suf='') => v!=null ? pre+v.toFixed(d)+suf : '<span style="color:#555">—</span>';
   const _nc = (v,d=2) => v!=null ? (v>0?'+':'')+v.toFixed(d) : '—';
   function tile(id,label,valFmt,chg,chgFmt,meta,cmd,extra){
     const _chg = chg ?? 0;
@@ -4265,7 +4251,7 @@ function rHOME(){
     <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)">
       <span style="color:var(--amber);font-size:11px;font-weight:600;letter-spacing:2px">◈ TERMINAL</span>
       <span style="font-size:10px;color:${mktStatus.col};letter-spacing:1px">${mktStatus.txt}</span>
-      <span id="home-clock" style="color:#2a2a2a;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
+      <span id="home-clock" style="color:#555;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
     </div>
     <!-- DAILY SUMMARY -->
     ${buildMarketSummary()}
@@ -4289,21 +4275,21 @@ function rHOME(){
       <span style="color:#555;font-size:9px;flex-shrink:0">ADV <span style="color:${adCol};font-weight:600">${advSectors}</span> &nbsp;/&nbsp; DEC <span style="color:${adCol==='var(--green)'?'var(--red)':'var(--green)'};font-weight:600">${decSectors}</span></span>
       <span style="color:#222;flex-shrink:0">|</span>
       <span style="color:#707070;font-size:9px;flex-shrink:0">SPX LEVELS</span>
-      ${spxLevels.map(l=>`<span style="font-size:9px;flex-shrink:0"><span style="color:#444">${l.label}</span>&nbsp;<span style="color:${l.col};font-weight:600">${l.val}</span></span>`).join('<span style="color:#1a1a1a;flex-shrink:0">&nbsp;·&nbsp;</span>')}
+      ${spxLevels.map(l=>`<span style="font-size:9px;flex-shrink:0"><span style="color:#888">${l.label}</span>&nbsp;<span style="color:${l.col};font-weight:600">${l.val}</span></span>`).join('<span style="color:#1a1a1a;flex-shrink:0">&nbsp;·&nbsp;</span>')}
     </div>
     <!-- MAIN BODY — 3 column grid -->
     <div style="display:grid;grid-template-columns:1fr 1fr 220px;flex:1;min-height:0;overflow:hidden">
       <!-- COL 1: NEWS -->
       <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);min-height:0">
         <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between">
-          <span>LIVE NEWS</span><span style="color:#2a2a2a">CLICK FOR DETAIL</span>
+          <span>LIVE NEWS</span><span style="color:#555">CLICK FOR DETAIL</span>
         </div>
         <div id="home-news" style="flex:1;overflow-y:auto">${newsHtml}</div>
       </div>
       <!-- COL 2: EVENTS + EARNINGS + OPTIONS -->
       <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);min-height:0;overflow-y:auto">
         <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0">UPCOMING HIGH-IMPACT EVENTS</div>
-        ${upcomingEvents || '<div style="color:#2a2a2a;font-size:9px;padding:6px 8px">NO UPCOMING EVENTS</div>'}
+        ${upcomingEvents || '<div style="color:#555;font-size:9px;padding:6px 8px">NO UPCOMING EVENTS</div>'}
         <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;margin-top:4px">EARNINGS CALENDAR</div>
         ${earningsRows}
 
@@ -4316,12 +4302,12 @@ function rHOME(){
             <span style="color:var(--text-dim)">${cb.name}</span>
             <span style="color:var(--amber);font-weight:600">${cb.rate}</span>
             <span style="color:${cb.bias==='CUT'?'var(--green)':cb.bias==='HIKE'?'var(--red)':'#444'};font-size:9px">${cb.bias}</span>
-            <span style="font-size:8px;color:#333">${_cbNextBadge(cb.next)}</span>
+            <span style="font-size:9px;color:#333">${_cbNextBadge(cb.next)}</span>
           </div>`).join('')}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
           ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','VOL'].map(p=>`
-          <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid var(--border);color:#444;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#333'" onmouseout="this.style.color='#444';this.style.borderColor='var(--border)'">${p}</div>`).join('')}
+          <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid #333;color:#888;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#666'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">${p}</div>`).join('')}
         </div>
       </div>
     </div>
@@ -4404,7 +4390,7 @@ function rHEAT(mode){
   return `<div id="heat-wrap">
     <div id="heat-tabs">${tabs}</div>
     <div id="heat-canvas-wrap">
-      <div id="heat-subtitle" style="font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px">${modeLabel[mode]||''}</div>
+      <div id="heat-subtitle" style="font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px">${modeLabel[mode]||''}</div>
       <canvas id="heat-canvas" style="width:100%;display:block"></canvas>
       <div id="heat-legend"></div>
       <div id="heat-detail" style="margin-top:6px;font-size:9px;color:var(--text-dim)"></div>
@@ -4475,7 +4461,7 @@ function drawHeatSector(){
   // Legend
   const leg=document.getElementById('heat-legend'); if(!leg)return;
   leg.innerHTML=`
-    <span style="color:var(--text-dim);font-size:8px">SCALE: 1D CHANGE &nbsp;</span>
+    <span style="color:var(--text-dim);font-size:9px">SCALE: 1D CHANGE &nbsp;</span>
     ${[-2,-1,0,1,2].map(v=>`<div class="heat-leg-item">
       <div class="heat-leg-swatch" style="background:${heatColor(v,-2,2)}"></div>
       <span style="color:var(--text-dim)">${v>0?'+':''}${v}%</span>
@@ -4674,7 +4660,7 @@ function rWATCH(){
           </tr>`).join('')}
         </tbody>
       </table>
-      ${WL.length===0?'<div style="padding:24px;text-align:center;color:#444;font-size:11px">No tickers in watchlist.<br><span style="font-size:9px;color:#2a2a2a">Type a ticker above and press Enter to add.</span></div>':''}
+      ${WL.length===0?'<div style="padding:24px;text-align:center;color:#444;font-size:11px">No tickers in watchlist.<br><span style="font-size:9px;color:#555">Type a ticker above and press Enter to add.</span></div>':''}
     </div>
     <div style="padding:5px 10px;border-top:1px solid #111;font-size:9px;color:#333;flex-shrink:0;display:flex;justify-content:space-between">
       <span>★ to favorite from any EQS panel · prices refresh every 60s</span>
@@ -4809,7 +4795,7 @@ function rHELP(){
   return `
     <div style="padding:2px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px">
       <div style="font-size:18px;font-weight:600;color:var(--amber);letter-spacing:4px">TERMINAL</div>
-      <div style="font-size:9px;color:#2a2a2a;letter-spacing:2px;margin-top:3px">COMMAND DIRECTORY · v3.3 · TYPE ANY COMMAND OR SYMBOL IN THE SEARCH BAR</div>
+      <div style="font-size:9px;color:#555;letter-spacing:2px;margin-top:3px">COMMAND DIRECTORY · v3.3 · TYPE ANY COMMAND OR SYMBOL IN THE SEARCH BAR</div>
     </div>
 
     <div class="sl" style="color:var(--amber);letter-spacing:2px;margin-bottom:4px">◈ CORE COMMANDS</div>
@@ -5385,13 +5371,13 @@ function rCHART(ticker){
     <div id="chart-stats-bar" style="display:flex;gap:12px;padding:3px 8px;font-size:9px;color:#333;border-bottom:1px solid #0a0a0a;flex-shrink:0;background:#040404"></div>
     <div style="flex:1;position:relative;min-height:0">
       <canvas id="chart-canvas" style="width:100%;height:100%"></canvas>
-      <div id="chart-loader" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#2a2a2a;font-size:11px;letter-spacing:2px">LOADING...</div>
+      <div id="chart-loader" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#555;font-size:11px;letter-spacing:2px">LOADING...</div>
     </div>
     <div id="chart-vol-container" style="height:50px;position:relative;flex-shrink:0;border-top:1px solid #0a0a0a">
       <canvas id="chart-vol-canvas" style="width:100%;height:100%"></canvas>
-      <div style="position:absolute;top:2px;left:6px;font-size:8px;color:#1e1e1e;letter-spacing:.5px">VOLUME</div>
+      <div style="position:absolute;top:2px;left:6px;font-size:9px;color:#1e1e1e;letter-spacing:.5px">VOLUME</div>
     </div>
-    <div id="chart-crosshair-bar" style="height:16px;font-size:9px;color:#444;padding:0 8px;display:flex;gap:12px;align-items:center;flex-shrink:0;background:#040404"></div>
+    <div id="chart-crosshair-bar" style="height:16px;font-size:9px;color:#666;padding:0 8px;display:flex;gap:12px;align-items:center;flex-shrink:0;background:#040404"></div>
   </div>`;
 }
 
@@ -5742,12 +5728,12 @@ window.addEventListener('load',()=>{
     const body=document.getElementById('wb-'+diagKey);
     let rows='';
     for(const t of tests){
-      body.innerHTML=rows+`<div><span style="color:#3a2a00">⟳ ${t.name}...</span></div>`;
+      body.innerHTML=rows+`<div><span style="color:#cc8800">⟳ ${t.name}...</span></div>`;
       try{ const res=await t.fn(); rows+=`<div><span style="color:var(--green)">✓</span> <span style="color:#a0a0a0">${t.name}</span> — <span style="color:#88bb88">${res}</span></div>`; }
       catch(e){ rows+=`<div><span style="color:var(--red)">✗</span> <span style="color:#a0a0a0">${t.name}</span> — <span style="color:#5a2a2a">${e.message}</span></div>`; }
       body.innerHTML=rows;
     }
-    body.innerHTML=rows+'<div style="margin-top:8px;color:#2a2a2a;font-size:9px;letter-spacing:1px">✓ = LIVE DATA AVAILABLE &nbsp;|&nbsp; ✗ = SOURCE UNAVAILABLE FROM YOUR NETWORK</div>';
+    body.innerHTML=rows+'<div style="margin-top:8px;color:#555;font-size:9px;letter-spacing:1px">✓ = LIVE DATA AVAILABLE &nbsp;|&nbsp; ✗ = SOURCE UNAVAILABLE FROM YOUR NETWORK</div>';
   }
 
 // ═══════════════════════════════════════════

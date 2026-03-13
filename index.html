@@ -23,22 +23,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* ── TICKER TAPE ── */
 #ticker-tape{
-  height:20px;background:#050505;border-bottom:1px solid #111;
+  height:26px;background:#040404;border-bottom:1px solid #151515;
   overflow:hidden;white-space:nowrap;position:relative;
 }
 #ticker-inner{
-  display:inline-block;
-  animation:tickerScroll 90s linear infinite;
-  padding-left:100%;
+  display:flex;align-items:center;
+  position:absolute;top:0;left:0;height:100%;
+  will-change:transform;
 }
 #ticker-inner:hover{animation-play-state:paused}
 @keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.ti{display:inline-block;margin:0 16px;font-size:10px;line-height:20px;letter-spacing:.5px}
-.ti-sym{color:#555;margin-right:4px}
-.ti-px{color:#888;margin-right:3px}
+.ti{display:inline-flex;align-items:center;margin:0 14px;font-size:11px;line-height:26px;letter-spacing:.4px;flex-shrink:0}
+.ti-sym{color:#666;margin-right:5px}
+.ti-px{color:#999;margin-right:4px}
 .ti-up{color:#00c853}
 .ti-dn{color:#e53935}
-.ti-sep{color:#1a1a1a;margin:0 4px}
+.ti-sep{color:#1e1e1e;margin:0 2px;flex-shrink:0}
 
 /* ── TOPBAR ── */
 #topbar{
@@ -54,10 +54,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 #cmdbar::placeholder{color:var(--text-dim)}
 #topright{display:flex;align-items:center;gap:10px}
-#mktstrip{display:flex;gap:8px}
-.strip-item{display:flex;gap:4px;font-size:11px;white-space:nowrap}
-.strip-name{color:#888}
-.strip-val{color:var(--text-bright)}
+#mktstrip-live{display:flex;align-items:center;font-size:10px;letter-spacing:.5px;white-space:nowrap;font-family:var(--font)}
+#live-fetching-text{color:#cc8800;margin-left:10px}
 #clock{color:#a0a0a0;font-size:11px;white-space:nowrap}
 #livebadge{color:var(--green);font-size:10px;border:1px solid #1a3a1a;padding:1px 5px;background:#0a1a0a}
 
@@ -458,15 +456,12 @@ canvas{display:block}
     <div id="search-type-badge"></div>
   </div>
   <div id="topright">
-    <div id="mktstrip">
-      <div class="strip-item"><span class="strip-name">SPX</span><span class="strip-val" id="s-spx">4868</span></div>
-      <div class="strip-item"><span class="strip-name">UST10</span><span class="strip-val" id="s-ust">4.52</span></div>
-      <div class="strip-item"><span class="strip-name">DXY</span><span class="strip-val" id="s-dxy">103.4</span></div>
-      <div class="strip-item"><span class="strip-name">WTI</span><span class="strip-val" id="s-wti">78.4</span></div>
-      <div class="strip-item"><span class="strip-name">GOLD</span><span class="strip-val" id="s-gld">2888</span></div>
-      <div class="strip-item"><span class="strip-name">VIX</span><span class="strip-val" id="s-vix">14.8</span></div>
+    <div id="mktstrip-live">
+      <span id="live-status-text"><span style="color:#4aaa4a">● LIVE</span></span>
+      <span id="live-refresh-text" style="color:#555;margin-left:10px">REFRESHED: --:--:--</span>
+      <span id="live-fetching-text"></span>
     </div>
-    <div id="livebadge">● LIVE</div>
+    <div id="livebadge" style="display:none">● LIVE</div>
     <div id="clock">--:--:--</div>
     <div id="fomc-countdown" style="font-size:9px;color:#cc8800;letter-spacing:1px;padding:0 6px;border-left:1px solid #1a1a1a"></div>
   </div>
@@ -2544,19 +2539,30 @@ function markPending(source){
 }
 
 function updateStatusBar(){
-  const el = document.getElementById('status-bar');
-  if(!el) return;
   const stale = [...FETCH_STATE.staleSources];
   const pending = [...FETCH_STATE.pendingSources];
   const ts = FETCH_STATE.lastRefresh
     ? new Date(FETCH_STATE.lastRefresh).toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})
     : '--:--:--';
 
+  // Update topbar live status
+  const refreshEl  = document.getElementById('live-refresh-text');
+  const fetchingEl = document.getElementById('live-fetching-text');
+  const statusEl   = document.getElementById('live-status-text');
+  if(refreshEl)  refreshEl.textContent = 'REFRESHED: ' + ts;
+  if(fetchingEl) fetchingEl.innerHTML  = pending.length
+    ? ` &nbsp;<span style="color:#cc8800">⟳ FETCHING: ${pending.join(' ')}</span>`
+    : (stale.length ? ` &nbsp;<span style="color:var(--red)">⚠ STALE: ${stale.join(' ')}</span>` : '');
+  if(statusEl) statusEl.innerHTML = FETCH_STATE.lastRefresh
+    ? '<span style="color:#4aaa4a">● LIVE</span>'
+    : '<span style="color:#555">● INIT</span>';
+
+  // Also keep the small status-bar strip in sync (secondary display)
+  const el = document.getElementById('status-bar');
+  if(!el) return;
   let html = `<span style="color:#4aaa4a">LIVE &nbsp;|&nbsp; REFRESHED: ${ts}</span>`;
   if(pending.length) html += ` &nbsp;<span style="color:#cc8800">⟳ FETCHING: ${pending.join(' ')}</span>`;
   if(stale.length)   html += ` &nbsp;<span style="color:var(--red)">⚠ STALE: ${stale.join(' ')}</span>`;
-  if(!stale.length && !pending.length && !FETCH_STATE.lastRefresh)
-    html += ` &nbsp;<span style="color:#555">ADD API KEYS TO FETCH_STATE CONFIG TO ENABLE LIVE DATA</span>`;
   el.innerHTML = html;
 }
 
@@ -3097,14 +3103,6 @@ async function pollAll(){
 }
 
 function refreshOpenWindows(){
-  // Update top strip from D (same logic as before but reading live D)
-  document.getElementById('s-spx').textContent = D.equities.indices[0].val.toFixed(1);
-  document.getElementById('s-ust').textContent = D.fixedIncome.treasuries[8].yield.toFixed(2);
-  document.getElementById('s-dxy').textContent = D.fx[0].val.toFixed(1);
-  document.getElementById('s-wti').textContent = D.commodities.energy[0].spot.toFixed(1);
-  document.getElementById('s-gld').textContent = D.commodities.metals[0].spot.toFixed(0);
-  document.getElementById('s-vix').textContent = D.equities.indices[4].val.toFixed(1);
-
   // Re-render open panels that depend on live data
   const livePanels = ['FI','TREAS','EQ','FX','CMDTY','INFL','VOL','AUCTION'];
   livePanels.forEach(cmd=>{
@@ -5250,14 +5248,7 @@ function arrange(){ arrangeAuto(); }
 // Proxies tried in order until one works
 // yfFetch + yfFetchHistory — use proxyFetch (allorigins) defined above
 const YF_SYMBOLS = {
-  strip: [
-    {sym:'^GSPC',    id:'s-spx', fmt:v=>v.toFixed(1)},
-    {sym:'^IRX',     id:'s-ust', fmt:v=>v.toFixed(2)},
-    {sym:'DX-Y.NYB', id:'s-dxy', fmt:v=>v.toFixed(1)},
-    {sym:'CL=F',     id:'s-wti', fmt:v=>v.toFixed(1)},
-    {sym:'GC=F',     id:'s-gld', fmt:v=>v.toFixed(0)},
-    {sym:'^VIX',     id:'s-vix', fmt:v=>v.toFixed(1)},
-  ],
+  strip: [], // mktstrip removed — data pushed directly via pollAllUpgraded
   ticker: ['^GSPC','^IXIC','^DJI','^RUT','^VIX','^IRX',
            'AAPL','MSFT','NVDA','TSLA','META','AMZN','GOOGL',
            'GC=F','CL=F','SI=F','BTC-USD','ETH-USD',
@@ -5297,25 +5288,48 @@ async function yfFetchHistory(sym, range, interval){
 
 
 async function fetchYahooStrip(){
-  const results=await Promise.allSettled(YF_SYMBOLS.strip.map(s=>yfFetch(s.sym)));
-  results.forEach((r,i)=>{
-    if(r.status!=='fulfilled'||!r.value) return;
-    const cfg=YF_SYMBOLS.strip[i];
-    const q=r.value;
-    const el=document.getElementById(cfg.id);
-    if(!el) return;
-    el.textContent=cfg.fmt(q.price);
-    const up=q.chg>=0;
-    el.style.color=up?'var(--green)':'var(--red)';
-    // also push into D for panel refreshes
-    if(cfg.id==='s-spx'){D.equities.indices[0].val=q.price;D.equities.indices[0].pct=q.pct;}
-    if(cfg.id==='s-vix'){D.equities.indices[4].val=q.price;}
-  });
+  // strip array is empty (mktstrip removed); this is a no-op kept for call-site compatibility
   markFresh('YF');
 }
 
+// Seamless ticker: two identical strips side-by-side, JS scroll via rAF
+// When strip A scrolls fully off-screen, it's teleported to the right — no flash
+let _tickerX = 0;
+let _tickerRAF = null;
+let _tickerPaused = false;
+const TICKER_PX_PER_SEC = 55; // scroll speed
+
+function _tickerFrame(ts){
+  const inner = document.getElementById('ticker-inner');
+  if(!inner || !inner._stripW){ _tickerRAF = requestAnimationFrame(_tickerFrame); return; }
+  if(!_tickerPaused){
+    const dt = inner._lastTs ? (ts - inner._lastTs) / 1000 : 0;
+    inner._lastTs = ts;
+    _tickerX -= TICKER_PX_PER_SEC * dt;
+    // When the first strip has fully scrolled out, jump back by one strip width
+    if(_tickerX <= -inner._stripW) _tickerX += inner._stripW;
+    inner.style.transform = `translateX(${_tickerX}px)`;
+  } else {
+    inner._lastTs = ts;
+  }
+  _tickerRAF = requestAnimationFrame(_tickerFrame);
+}
+
+function _tickerBuildHTML(valid){
+  let html = '';
+  for(const q of valid){
+    const up = q.chg >= 0;
+    const arrow = up ? '▲' : '▼';
+    const cls = up ? 'ti-up' : 'ti-dn';
+    const label = q.sym.replace('=X','').replace('-USD',' USD').replace('^','').replace('=F','');
+    const isEquity = !q.sym.startsWith('^') && !q.sym.endsWith('=F') && !q.sym.endsWith('=X');
+    const clickable = isEquity ? `style="cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${q.sym}'),100)"` : '';
+    html += `<span class="ti" ${clickable}><span class="ti-sym" style="${isEquity?'color:var(--amber)':''}">${label}</span><span class="ti-px">${q.price.toFixed(q.price>100?1:3)}</span><span class="${cls}">${arrow}${Math.abs(q.pct).toFixed(2)}%</span></span><span class="ti-sep">│</span>`;
+  }
+  return html;
+}
+
 async function buildTickerTape(){
-  // fetch sequentially in small batches to avoid overwhelming the proxy
   const syms = YF_SYMBOLS.ticker;
   const valid = [];
   for(let i=0; i<syms.length; i+=4){
@@ -5325,19 +5339,27 @@ async function buildTickerTape(){
     if(i+4<syms.length) await new Promise(res=>setTimeout(res,500));
   }
   if(!valid.length) return;
-  let html='';
-  for(const q of valid){
-    const up=q.chg>=0;
-    const arrow=up?'▲':'▼';
-    const cls=up?'ti-up':'ti-dn';
-    const label=q.sym.replace('=X','').replace('-USD',' USD').replace('^','').replace('=F','');
-    // Determine if this is an equity we can look up vs an index/commodity
-    const isEquity = !q.sym.startsWith('^') && !q.sym.endsWith('=F') && !q.sym.endsWith('=X');
-    const clickable = isEquity ? `style="cursor:pointer" onclick="OW('EQS');setTimeout(()=>fetchEQS('${q.sym}'),100)"` : '';
-    html+=`<span class="ti" ${clickable}><span class="ti-sym" style="${isEquity?'color:var(--amber)':''}">${label}</span><span class="ti-px">${q.price.toFixed(q.price>100?1:3)}</span><span class="${cls}">${arrow}${Math.abs(q.pct).toFixed(2)}%</span></span><span class="ti-sep">|</span>`;
-  }
-  const inner=document.getElementById('ticker-inner');
-  if(inner) inner.innerHTML=html+html; // duplicate for seamless loop
+
+  const inner = document.getElementById('ticker-inner');
+  if(!inner) return;
+
+  // Build one strip, duplicate it for seamless loop
+  const stripHTML = _tickerBuildHTML(valid);
+  inner.innerHTML = stripHTML + stripHTML;
+
+  // Pause on hover
+  inner.onmouseenter = () => { _tickerPaused = true; };
+  inner.onmouseleave = () => { _tickerPaused = false; };
+
+  // Measure half-width (one strip) after DOM paint
+  requestAnimationFrame(()=>{
+    inner._stripW = inner.scrollWidth / 2;
+    // Clamp X to valid range after update
+    if(_tickerX < -inner._stripW) _tickerX = 0;
+    if(!_tickerRAF){
+      _tickerRAF = requestAnimationFrame(_tickerFrame);
+    }
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -5762,7 +5784,7 @@ function accApply(){
   const panel = document.getElementById('acc-panel-overlay');
   if(panel) panel.style.zoom = counterZ;
   const btn = document.getElementById('acc-btn');
-  if(btn){ btn.style.zoom = counterZ; btn.style.top = (50 * z) + 'px'; btn.style.right = '0px'; }
+  if(btn){ btn.style.zoom = counterZ; }
 
   // Bold
   body.style.fontWeight = ACC.boldText ? '600' : '';

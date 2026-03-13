@@ -2575,29 +2575,41 @@ function updateStatusBar(){
 // CORE FETCH HELPER — allorigins proxy
 // ═══════════════════════════════════════════
 async function proxyFetch(url, timeoutMs=10000){
+  // Proxy list ordered by reliability for github.io origin (March 2026)
+  // allorigins /get returns JSON wrapper: {contents:'...', status:{...}}
   const proxies = [
-    `https://corsproxy.io/?${encodeURIComponent(url)}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    `https://thingproxy.freeboard.io/fetch/${url}`,
-    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-    `https://cors.eu.org/${url}`,
+    { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, unwrap: true },
+    { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, unwrap: false },
+    { url: `https://corsproxy.io/?url=${encodeURIComponent(url)}`, unwrap: false },
+    { url: `https://cors.eu.org/${url}`, unwrap: false },
   ];
   let lastErr;
-  for(const proxied of proxies){
+  for(const proxy of proxies){
     try{
-      const r = await fetch(proxied, {signal: AbortSignal.timeout(timeoutMs)});
+      const r = await fetch(proxy.url, {signal: AbortSignal.timeout(timeoutMs)});
       if(!r.ok) throw new Error(`HTTP ${r.status}`);
-      // Peek at first bytes — if it starts with "Edge" or "Too Many" it's a proxy error page
-      const clone = r.clone();
-      const peek = await clone.text();
-      if(peek.startsWith('Edge') || peek.startsWith('Too Many') || peek.startsWith('error') || peek.startsWith('<!DOCTYPE') || peek.startsWith('<html')){
-        throw new Error(`Proxy error: ${peek.slice(0,40)}`);
+      let text;
+      if(proxy.unwrap){
+        // allorigins /get wraps response in JSON: {"contents":"...","status":{...}}
+        const json = await r.json();
+        if(!json.contents) throw new Error('allorigins: no contents');
+        text = json.contents;
+      } else {
+        text = await r.text();
       }
-      // Return a Response from the text so callers can still .json() or .text() it
-      return new Response(peek, {status:200, headers:{'Content-Type': r.headers.get('Content-Type')||'application/json'}});
+      // Skip proxy error pages
+      const t = text.trimStart();
+      if(t.startsWith('Edge') || t.startsWith('Too Many') || t.startsWith('Access denied') ||
+         t.startsWith('<!DOCTYPE') || t.startsWith('<html') || t.startsWith('error')){
+        throw new Error(`Proxy error page: ${t.slice(0,50)}`);
+      }
+      return new Response(text, {
+        status: 200,
+        headers: {'Content-Type': 'application/json'}
+      });
     }catch(e){ lastErr=e; continue; }
   }
-  throw lastErr;
+  throw lastErr || new Error('All proxies failed');
 }
 
 // Keep apiFetch stub so existing EQS window code doesn't break
@@ -2694,8 +2706,7 @@ async function fetchTreasuryAuctions(){
   const url = `https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/auctions_query?fields=${fields}&filter=security_type:in:(Bill,Note,Bond)&sort=-auction_date&page[size]=60`;
 
   try {
-    const r = await fetch(url, {signal: AbortSignal.timeout(12000)});
-    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const r = await proxyFetch(url, 12000);
     const d = await r.json();
     if(!d?.data?.length) throw new Error('empty response');
 
@@ -2961,8 +2972,7 @@ async function fetchFREDData(){
   for(const s of series){
     try{
       const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${s.id}&api_key=${API_KEYS.FRED}&sort_order=desc&limit=2&file_type=json`;
-      const r = await fetch(url, {signal: AbortSignal.timeout(10000)});
-      if(!r.ok) throw new Error(`FRED HTTP ${r.status}`);
+      const r = await proxyFetch(url, 10000);
       const data = await r.json();
       const obs = data?.observations?.filter(o=>o.value!='.');
       if(obs && obs.length){
@@ -5690,13 +5700,13 @@ window.addEventListener('load',()=>{
 
   async function runNetworkTest(){
     const tests = [
-      {name:'allorigins → Yahoo SPY', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('bad payload'); return 'SPY $'+p;})},
+      {name:'proxy → Yahoo SPY', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('bad payload'); return 'SPY $'+p;})},
       {name:'open.er-api.com FX',     fn:()=>fetch('https://open.er-api.com/v6/latest/USD',{signal:AbortSignal.timeout(8000)}).then(r=>r.json()).then(d=>{if(d.result!=='success')throw new Error('bad'); return 'EUR='+d.rates.EUR.toFixed(4);})},
-      {name:'Yahoo ^TNX (10Y Treasury)', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?interval=1d&range=5d',8000).then(r=>r.text()).then(t=>{let d;try{d=JSON.parse(t);}catch(e){throw new Error('proxy returned non-JSON: '+t.slice(0,40));}const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;if(!p)throw new Error('no data');return '10Y='+p+'%';})},
+      {name:'proxy → Yahoo ^TNX (10Y)', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?interval=1d&range=5d',8000).then(r=>r.text()).then(t=>{let d;try{d=JSON.parse(t);}catch(e){throw new Error('proxy returned non-JSON: '+t.slice(0,40));}const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;if(!p)throw new Error('no data');return '10Y='+p+'%';})},
       {name:'allorigins → MktWatch RSS',fn:()=>proxyFetch('https://finance.yahoo.com/rss/topstories',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
       {name:'NBC News Business RSS',     fn:()=>proxyFetch('https://feeds.nbcnews.com/nbcnews/public/business',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
       {name:'allorigins → Yahoo RSS',  fn:()=>proxyFetch('https://finance.yahoo.com/rss/topstories',9000).then(r=>r.text()).then(t=>{const x=new DOMParser().parseFromString(t,'text/xml');const items=x.querySelectorAll('item');if(!items.length)throw new Error('no items');return items.length+' items';})},
-      {name:'FRED API (St. Louis Fed)',  fn:()=>fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key=${API_KEYS.FRED}&sort_order=desc&limit=1&file_type=json`,{signal:AbortSignal.timeout(8000)}).then(r=>r.json()).then(d=>{const v=d?.observations?.[0]?.value;if(!v)throw new Error('no data');return 'FEDFUNDS='+v+'%';})},
+      {name:'FRED via proxy',  fn:()=>proxyFetch(`https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key=${API_KEYS.FRED}&sort_order=desc&limit=1&file_type=json`,8000).then(r=>r.json()).then(d=>{const v=d?.observations?.[0]?.value;if(!v)throw new Error('no data');return 'FEDFUNDS='+v+'%';})},
     ];
     const diagKey='NETTEST';
     if(WR[diagKey]) CW(diagKey);

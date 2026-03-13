@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TERMINAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
-@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+/* fonts loaded via <link> in <head> for non-blocking render */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#000;--bg1:#0a0a0a;--bg2:#0f0f0f;--bg3:#141414;--bg4:#1a1a1a;
@@ -650,7 +652,7 @@ const D = {
     centralBanks:[
       {name:'FED',  rate:'4.25-4.50%',lastChg:'-25bp Dec-25',next:'Mar 19',bias:'HOLD',outlook:'CAUTIOUS'},
       {name:'ECB',  rate:'2.40%',      lastChg:'-25bp Mar-26',next:'Apr 14',bias:'CUT', outlook:'EASING'},
-      {name:'BOJ',  rate:'0.50%',      lastChg:'HOLD Mar-26', next:'May 01',bias:'HOLD',outlook:'CAUTIOUS'},
+      {name:'BOJ',  rate:'0.50%',      lastChg:'HOLD Mar-26',bias:'HOLD',outlook:'CAUTIOUS'},
       {name:'BOE',  rate:'4.50%',      lastChg:'-25bp Feb-26',next:'May 07',bias:'CUT', outlook:'EASING'},
       {name:'PBOC', rate:'3.10%',      lastChg:'-10bp Jan-26',next:'Apr 15',bias:'CUT', outlook:'EASING'},
       {name:'RBA',  rate:'4.10%',      lastChg:'-25bp Feb-26',next:'Apr 01',bias:'CUT', outlook:'EASING'},
@@ -793,7 +795,6 @@ function refreshWin(winKey, cmd, extra){
     case'INFL':  b.innerHTML=rINFL();  setTimeout(()=>drawInfl(),40); break;
     case'AUCTION':b.innerHTML=rAUCTION();break;
     case'VOL':   b.innerHTML=rVOL();   setTimeout(drawVOL,40); break;
-    case'OPTIONS':b.innerHTML=rOPTIONS();break;
     case'EARN':  b.innerHTML=rEARN();  break;
     case'ECON':  b.innerHTML=rECON();  break;
     case'HOME':
@@ -865,7 +866,6 @@ function renderW(cmd,key,extra){
     case'VOL':    b.innerHTML=rVOL();setTimeout(()=>drawVOL(),30);break;
     case'EQS':    b.innerHTML=rEQS(extra);setTimeout(()=>{if(extra)fetchEQS(extra.toUpperCase())},30);break;
     case'CHART':  b.innerHTML=rCHART(extra);setTimeout(()=>loadChartData(),60);break;
-    case'OPTIONS':b.innerHTML=rOPTIONS();break;
     case'EARN':   b.innerHTML=rEARN();break;
     case'ECON':   b.innerHTML=rECON();break;
     case'ROTATION':b.innerHTML=rROTATION();setTimeout(()=>drawRotation(),40);break;
@@ -879,7 +879,7 @@ function renderW(cmd,key,extra){
       break;
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
     case'WATCH':  b.innerHTML=rWATCH();setTimeout(()=>initWATCH(),60);break;
-    case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
+    case'SCRN':   b.innerHTML=rSCRN();break;
     default:      b.innerHTML=`<div style="color:#555;padding:8px;font-size:10px">Unknown command: <span style="color:var(--amber)">${cmd}</span><br><br>Available: FI EQ FX CMDTY MACRO NEWS INFL AUCTION VOL EQS OPTIONS EARN ECON HELP HOME HEAT SCRN CB ROTATION LADDER WATCH CHART</div>`;
   }
 }
@@ -955,11 +955,6 @@ function rFI(){
     <div style="padding:4px 6px">
       <div style="font-size:10px;color:#707070;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC)</div>
       <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${arows}</tbody></table>
-      <div class="sf" style="margin-top:6px">
-        <div class="si"><span class="sil">AVG BTC (2Y)</span><span class="siv">2.64</span></div>
-        <div class="si"><span class="sil">AVG BTC (10Y)</span><span class="siv">2.52</span></div>
-        <div class="si"><span class="sil">AVG BTC (30Y)</span><span class="siv">2.28</span></div>
-      </div>
     </div>`;
 
   // ── TAB 4: LADDER ──
@@ -1327,7 +1322,7 @@ function rFX(){
         <td>${vol}</td></tr>`;
     }).join('');
     return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th><th style="color:#666">1W ref</th><th style="color:#666">1M ref</th></tr></thead><tbody>${rows}</tbody></table>
+      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th></tr></thead><tbody>${rows}</tbody></table>
       <div style="font-size:9px;color:#555;padding:2px 4px">● 1D live · 1W/1M reference values</div>`;
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
@@ -1593,12 +1588,8 @@ function rVOL(){
       <div class="sl">VOL INDICES</div>
       <table class="t"><thead><tr><th>INDEX</th><th>LAST</th><th>1D</th><th>LEVEL</th><th>NOTE</th></tr></thead><tbody>
         <tr><td style="color:var(--amber)">VIX</td><td style="color:${regime.c};font-weight:600">${vix.toFixed(2)}</td><td class="${vixC>=0?'dn':'up'}">${vixC>=0?'+':''}${vixC.toFixed(2)}</td><td style="color:${regime.c}">${regime.l.split('—')[0].trim()}</td><td style="color:#333;font-size:9px">S&P 500 30D implied</td></tr>
-        <tr><td style="color:var(--amber)">VVIX</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#555">NO FREE API</td><td style="color:#666;font-size:9px">Vol-of-vol index</td></tr>
-        <tr><td style="color:var(--amber)">MOVE</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#555">NO FREE API</td><td style="color:#666;font-size:9px">ICE BofA Treasury vol index</td></tr>
-        <tr><td style="color:var(--amber)">SKEW</td><td style="color:#444">—</td><td class="neu">—</td><td class="neu" style="color:#555">NO FREE API</td><td style="color:#666;font-size:9px">CBOE tail risk index</td></tr>
+        <tr><td style="color:var(--amber)">VVIX</td><td id="vvix-val" style="color:var(--amber)">—</td><td id="vvix-chg" class="neu">—</td><td id="vvix-lvl" class="neu" style="color:#555">—</td><td style="color:#666;font-size:9px">Vol-of-vol index ● Yahoo</td></tr>
       </tbody></table>
-      <div class="sl" style="margin-top:6px">1Y VIX HISTORY</div>
-      <canvas id="vol-hist-c" height="80" style="width:100%">
     </div>`;
 
   return buildTabs('vol-tabs',[
@@ -1608,73 +1599,34 @@ function rVOL(){
 }
 
 
-function rOPTIONS(){
-  const vix = D.equities.indices[4]?.val || 0;
-  const vixLevel = vix<15?{l:'LOW',c:'var(--green)'}:vix<20?{l:'MODERATE',c:'var(--amber)'}:vix<30?{l:'ELEVATED',c:'#ff6f00'}:{l:'EXTREME',c:'var(--red)'};
-  const vixStr = vix>0 ? vix.toFixed(2) : '—';
-
-  const links = [
-    {name:'Unusual Whales',   url:'https://unusualwhales.com',         desc:'Unusual options flow · dark pool prints · political trades'},
-    {name:'Market Chameleon', url:'https://marketchameleon.com',       desc:'IV rank · earnings vol · options screener'},
-    {name:'Barchart Options', url:'https://barchart.com/options',      desc:'Most active · unusual volume · IV percentile'},
-    {name:'SpotGamma',        url:'https://spotgamma.com',             desc:'GEX · dealer positioning · key gamma levels'},
-    {name:'CBOE Data',        url:'https://cboe.com/us/options/market_statistics/', desc:'Official P/C ratio · volume by exchange'},
-    {name:'OptionsFlow.io',   url:'https://optionflow.io',             desc:'Real-time flow scanner · sweep detector'},
-  ];
-
-  const linkRows = links.map(l=>`
-    <tr onclick="window.open('${l.url}','_blank')" style="cursor:pointer">
-      <td style="color:var(--amber);font-weight:600">${l.name}</td>
-      <td style="color:#666;font-size:9px">${l.desc}</td>
-      <td style="color:#333;font-size:9px">${l.url.replace('https://','')}</td>
-    </tr>`).join('');
-
-  return`
-    <div class="sl">SENTIMENT — LIVE</div>
-    <div class="sf" style="margin-bottom:8px">
-      <div class="si"><span class="sil">VIX</span><span class="siv" style="color:${vixLevel.c}">${vixStr}</span><span class="sim" style="color:${vixLevel.c}">${vixLevel.l}</span></div>
-      <div class="si"><span class="sil">P/C RATIO</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#555">NO FREE API</span></div>
-      <div class="si"><span class="sil">VVIX</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#555">NO FREE API</span></div>
-      <div class="si"><span class="sil">SKEW</span><span class="siv" style="color:#707070">—</span><span class="sim" style="color:#555">NO FREE API</span></div>
-    </div>
-    <div class="sl" style="margin-top:8px">OPTIONS FLOW — EXTERNAL DATA SOURCES</div>
-    <div style="font-size:9px;color:#444;padding:4px 0 8px">Live flow data requires a paid subscription. Links below open in new tab.</div>
-    <div class="tw">
-      <table class="t">
-        <thead><tr><th>SOURCE</th><th>DESCRIPTION</th><th>URL</th></tr></thead>
-        <tbody>${linkRows}</tbody>
-      </table>
-    </div>`;
-}
-
 // ═══════════════════════════════════════════
 // RENDER: EARNINGS CALENDAR
 // ═══════════════════════════════════════════
 function rEARN(){
   const earnings = [
     // Week of Mar 10
-    {date:'Mar 10',sym:'ORCL', name:'Oracle Corp',        eps_est:'1.48', eps_act:'1.47',rev_est:'14.4B',beat:false,time:'AMC', mktcap:'360B'},
-    {date:'Mar 11',sym:'ADBE', name:'Adobe Inc',          eps_est:'4.97', eps_act:'5.08',rev_est:'5.8B', beat:true, time:'AMC', mktcap:'195B'},
-    {date:'Mar 12',sym:'ULTA', name:'Ulta Beauty',        eps_est:'7.12', eps_act:null, rev_est:'3.5B',  beat:null, time:'AMC', mktcap:'18B'},
-    {date:'Mar 13',sym:'DKS',  name:'Dick\'s Sporting',   eps_est:'3.60', eps_act:null, rev_est:'3.9B',  beat:null, time:'BMO', mktcap:'19B'},
+    {date:'Mar 10',sym:'ORCL', name:'Oracle Corp',        eps_est:'1.48', eps_act:'1.47',beat:false,time:'AMC'},
+    {date:'Mar 11',sym:'ADBE', name:'Adobe Inc',          eps_est:'4.97', eps_act:'5.08', beat:true, time:'AMC'},
+    {date:'Mar 12',sym:'ULTA', name:'Ulta Beauty',        eps_est:'7.12', eps_act:null, rev_est:'3.5B',  beat:null, time:'AMC'},
+    {date:'Mar 13',sym:'DKS',  name:'Dick\'s Sporting',   eps_est:'3.60', eps_act:null, rev_est:'3.9B',  beat:null, time:'BMO'},
     // Week of Mar 17
-    {date:'Mar 18',sym:'GIS',  name:'General Mills',      eps_est:'0.97', eps_act:null, rev_est:'4.8B',  beat:null, time:'BMO', mktcap:'31B'},
-    {date:'Mar 19',sym:'MU',   name:'Micron Technology',  eps_est:'1.43', eps_act:null, rev_est:'8.0B',  beat:null, time:'AMC', mktcap:'104B'},
-    {date:'Mar 20',sym:'NKE',  name:'Nike Inc',           eps_est:'0.29', eps_act:null, rev_est:'11.0B', beat:null, time:'AMC', mktcap:'106B'},
-    {date:'Mar 21',sym:'FDX',  name:'FedEx Corp',         eps_est:'3.96', eps_act:null, rev_est:'22.1B', beat:null, time:'AMC', mktcap:'58B'},
-    {date:'Mar 25',sym:'KB',   name:'KB Home',            eps_est:'1.55', eps_act:null, rev_est:'1.5B',  beat:null, time:'AMC', mktcap:'4B'},
-    {date:'Mar 26',sym:'GME',  name:'GameStop Corp',      eps_est:'0.08', eps_act:null, rev_est:'0.9B',  beat:null, time:'AMC', mktcap:'12B'},
-    {date:'Mar 27',sym:'PAYX', name:'Paychex Inc',        eps_est:'1.36', eps_act:null, rev_est:'1.5B',  beat:null, time:'BMO', mktcap:'48B'},
-    {date:'Apr 11',sym:'JPM',  name:'JPMorgan Chase',     eps_est:'4.61', eps_act:null, rev_est:'43.8B', beat:null, time:'BMO', mktcap:'720B'},
-    {date:'Apr 11',sym:'WFC',  name:'Wells Fargo',        eps_est:'1.23', eps_act:null, rev_est:'20.6B', beat:null, time:'BMO', mktcap:'255B'},
-    {date:'Apr 14',sym:'GS',   name:'Goldman Sachs',      eps_est:'11.44',eps_act:null, rev_est:'14.8B', beat:null, time:'BMO', mktcap:'185B'},
-    {date:'Apr 22',sym:'TSLA', name:'Tesla Inc',          eps_est:'0.48', eps_act:null, rev_est:'24.2B', beat:null, time:'AMC', mktcap:'890B'},
-    {date:'Apr 23',sym:'META', name:'Meta Platforms',     eps_est:'6.72', eps_act:null, rev_est:'41.3B', beat:null, time:'AMC', mktcap:'1.5T'},
-    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',       eps_est:'2.01', eps_act:null, rev_est:'89.4B', beat:null, time:'AMC', mktcap:'2.1T'},
-    {date:'Apr 25',sym:'MSFT', name:'Microsoft Corp',     eps_est:'3.22', eps_act:null, rev_est:'68.8B', beat:null, time:'AMC', mktcap:'3.1T'},
-    {date:'Apr 29',sym:'AAPL', name:'Apple Inc',          eps_est:'1.62', eps_act:null, rev_est:'94.5B', beat:null, time:'AMC', mktcap:'3.4T'},
-    {date:'Apr 30',sym:'AMZN', name:'Amazon.com',         eps_est:'1.36', eps_act:null, rev_est:'187.4B',beat:null, time:'AMC', mktcap:'2.2T'},
-    {date:'May 1', sym:'NVDA', name:'Nvidia Corp',        eps_est:'0.88', eps_act:null, rev_est:'43.2B', beat:null, time:'AMC', mktcap:'2.8T'},
+    {date:'Mar 18',sym:'GIS',  name:'General Mills',      eps_est:'0.97', eps_act:null, rev_est:'4.8B',  beat:null, time:'BMO'},
+    {date:'Mar 19',sym:'MU',   name:'Micron Technology',  eps_est:'1.43', eps_act:null, rev_est:'8.0B',  beat:null, time:'AMC'},
+    {date:'Mar 20',sym:'NKE',  name:'Nike Inc',           eps_est:'0.29', eps_act:null, rev_est:'11.0B', beat:null, time:'AMC'},
+    {date:'Mar 21',sym:'FDX',  name:'FedEx Corp',         eps_est:'3.96', eps_act:null, rev_est:'22.1B', beat:null, time:'AMC'},
+    {date:'Mar 25',sym:'KB',   name:'KB Home',            eps_est:'1.55', eps_act:null, rev_est:'1.5B',  beat:null, time:'AMC'},
+    {date:'Mar 26',sym:'GME',  name:'GameStop Corp',      eps_est:'0.08', eps_act:null, rev_est:'0.9B',  beat:null, time:'AMC'},
+    {date:'Mar 27',sym:'PAYX', name:'Paychex Inc',        eps_est:'1.36', eps_act:null, rev_est:'1.5B',  beat:null, time:'BMO'},
+    {date:'Apr 11',sym:'JPM',  name:'JPMorgan Chase',     eps_est:'4.61', eps_act:null, rev_est:'43.8B', beat:null, time:'BMO'},
+    {date:'Apr 11',sym:'WFC',  name:'Wells Fargo',        eps_est:'1.23', eps_act:null, rev_est:'20.6B', beat:null, time:'BMO'},
+    {date:'Apr 14',sym:'GS',   name:'Goldman Sachs',      eps_est:'11.44',eps_act:null, rev_est:'14.8B', beat:null, time:'BMO'},
+    {date:'Apr 22',sym:'TSLA', name:'Tesla Inc',          eps_est:'0.48', eps_act:null, rev_est:'24.2B', beat:null, time:'AMC'},
+    {date:'Apr 23',sym:'META', name:'Meta Platforms',     eps_est:'6.72', eps_act:null, rev_est:'41.3B', beat:null, time:'AMC'},
+    {date:'Apr 24',sym:'GOOGL',name:'Alphabet Inc',       eps_est:'2.01', eps_act:null, rev_est:'89.4B', beat:null, time:'AMC'},
+    {date:'Apr 25',sym:'MSFT', name:'Microsoft Corp',     eps_est:'3.22', eps_act:null, rev_est:'68.8B', beat:null, time:'AMC'},
+    {date:'Apr 29',sym:'AAPL', name:'Apple Inc',          eps_est:'1.62', eps_act:null, rev_est:'94.5B', beat:null, time:'AMC'},
+    {date:'Apr 30',sym:'AMZN', name:'Amazon.com',         eps_est:'1.36', eps_act:null, rev_est:'187.4B',beat:null, time:'AMC'},
+    {date:'May 1', sym:'NVDA', name:'Nvidia Corp',        eps_est:'0.88', eps_act:null, rev_est:'43.2B', beat:null, time:'AMC'},
   ];
 
   const rows = earnings.map(e=>{
@@ -1754,13 +1706,13 @@ function rECON(){
   return`
     <div class="sf" style="margin-bottom:6px">
       <div class="si"><span class="sil">DATA SOURCE</span><span class="siv" style="color:${hasData?'var(--green)':'var(--red)'}">${hasData?'FRED LIVE':'FRED PENDING'}</span></div>
-      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">Mar 19, 2026</span></div>
-      <div class="si"><span class="sil">CB DATA</span><span class="siv" style="color:#444;font-size:9px">Manually maintained</span></div>
+      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">${D.macro.centralBanks.find(b=>b.name==='FED')?.next||'—'}</span></div>
+      <div class="si"><span class="sil">CB DATA</span><span class="siv" style="color:#555;font-size:9px">Manual · updated each meeting</span></div>
       <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
     </div>
     <div class="sl">KEY ECONOMIC RELEASES — LIVE FRED DATA</div>
     <table class="t">
-      <thead><tr><th>CATEGORY</th><th>INDICATOR</th><th>LATEST</th><th>PREVIOUS</th><th>CHG</th><th>RELEASE DATE</th><th>FREQ</th><th>NEXT RELEASE</th></tr></thead>
+      <thead><tr><th>CATEGORY</th><th>INDICATOR</th><th>LATEST</th><th>PREVIOUS</th><th>CHG</th><th>RELEASE DATE</th><th>FREQ</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     ${!hasData?`<div style="color:#cc8800;font-size:9px;padding:8px;margin-top:8px;border:1px solid #2a1a00">⟳ FRED DATA LOADING — REFRESH IN 30s IF EMPTY</div>`:''}`;
@@ -1798,7 +1750,6 @@ function rROTATION(){
     const col1D = s.d1>0?'var(--green)':s.d1<0?'var(--red)':'#444';
     const momentum = s.d1>0.5?'▲▲':s.d1>0?'▲':s.d1<-0.5?'▼▼':'▼';
     const momCol = s.d1>0?'var(--green)':'var(--red)';
-    const w1str = s.w1!=null ? `<span style="color:${s.w1>0?'var(--green)':s.w1<0?'var(--red)':'#444'}">${s.w1>0?'+':''}${s.w1.toFixed(2)}%</span>` : '<span style="color:#555">—</span>';
     return `<tr>
       <td style="color:${rankCol};font-weight:600;width:24px">#${rank}</td>
       <td style="color:var(--text-dim)">${s.name}</td>
@@ -1935,7 +1886,7 @@ function rMACRO(){
     if(!d) return true;
     const ageMs=_calNow-d;
     if(ageMs<0) return true;           // future: always show
-    if(e.act!==null) return ageMs < 14*86400000; // past with actual: keep 14 days
+    if(e.act!==null) return ageMs < 7*86400000; // past with actual: keep 7 days
     return true;                       // pending: always show
   });
   const calRows=calFiltered.map(e=>{
@@ -2014,7 +1965,7 @@ const cbCards=D.macro.centralBanks.map(cb=>`
     {cat:'GROWTH',   id:'INDPRO',     label:'Industrial Prod.',   next:'Mar 14'},
     {cat:'GROWTH',   id:'RETAILSMNSA',label:'Retail Sales MoM',  next:'Mar 17'},
     {cat:'RATES',    id:'FEDFUNDS',   label:'Fed Funds Rate',     next:'Mar 19'},
-    {cat:'HOUSING',  id:'MORTGAGE30US',label:'30Y Mortgage Rate', next:'Mar 13'},
+    {cat:'HOUSING',  id:'MORTGAGE30US',label:'30Y Mortgage Rate'},
   ];
   const catColors={INFLATION:'#3a2a00',LABOR:'#0a2a0a',GROWTH:'#0a1a3a',RATES:'#2a0a2a',HOUSING:'#1a2a2a'};
   const econRows=releases.map(r=>{
@@ -2036,7 +1987,7 @@ const cbCards=D.macro.centralBanks.map(cb=>`
   const econTab=`<div style="padding:4px 6px">
     <div class="sf" style="margin-bottom:6px">
       <div class="si"><span class="sil">FRED DATA</span><span class="siv" style="color:${Object.keys(fred).length>0?'var(--green)':'var(--red)'}">${Object.keys(fred).length>0?'LIVE':'LOADING'}</span></div>
-      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">Mar 19, 2026</span></div>
+      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">${D.macro.centralBanks.find(b=>b.name==='FED')?.next||'—'}</span></div>
       <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
     </div>
     <table class="t"><thead><tr><th>CAT</th><th>INDICATOR</th><th>LATEST ●</th><th>PREV</th><th>CHG</th><th>RELEASE DATE</th></tr></thead><tbody>${econRows}</tbody></table>
@@ -2413,9 +2364,6 @@ function drawEQSCanvas(canvasId, pts, up){
 }
 
 
-let leafletMap = null;
-
-// ── Geopolitical hotspots with market relevance ──
 function updateClock(){
   const now = new Date();
   document.getElementById('clock').textContent=now.toLocaleTimeString('en-US',{hour12:false,timeZone:'America/Denver'})+' MT';
@@ -3116,7 +3064,6 @@ function buildSearchCorpus(){
     {key:'INFL',    label:'Inflation Monitor',           meta:'Breakevens, CPI, PCE, FRED live'},
     {key:'AUCTION', label:'Auction Monitor',             meta:'T-bill & note auctions'},
     {key:'VOL',     label:'Volatility & Risk',           meta:'VIX, MOVE, SKEW, term structure'},
-    {key:'OPTIONS', label:'Options Flow & Sentiment',    meta:'Unusual activity, P/C ratio, VIX term'},
     {key:'EARN',    label:'Earnings Calendar',           meta:'Upcoming reports, EPS estimates'},
     {key:'ECON',    label:'Economic Releases — FRED',    meta:'CPI, NFP, GDP, PCE live data'},
     {key:'HEAT',    label:'Heatmap — Sector / Curve',   meta:'2 visual modes'},
@@ -3157,16 +3104,11 @@ function buildSearchCorpus(){
       action:()=>OW('FI')});
   });
 
-  // Equities — screener universe (broad)
-  const allEquities = new Map();
-  if(typeof SCRN_UNIVERSE !== 'undefined'){
-    SCRN_UNIVERSE.forEach(r=>{
-      allEquities.set(r.sym, {key:r.sym, label:r.name,
-        meta:`${r.sector} · $${r.px.toFixed(2)}`,
-        type:'equity', action:()=>OW('EQS',r.sym)});
-    });
-  }
-  allEquities.forEach(e=>C.push(e));
+  // Equities — from WATCH list only (SCRN_UNIVERSE removed)
+  (D.watchlist||[]).forEach(w=>{
+    C.push({key:w.sym, label:w.sym+' — '+(w.name||w.sym),
+      meta:'WATCHLIST', type:'equity', action:()=>OW('EQS',w.sym)});
+  });
 
   // FX pairs
   D.fx.forEach(f=>{
@@ -3258,7 +3200,7 @@ function resolveQuery(raw) {
     matches:[]};
 
   // 6. Panel command pass-through
-  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB','ROTATION','LADDER','OPTIONS','EARN','ECON','WATCH','CHART'];
+  const panelCmds = ['FI','EQ','FX','CMDTY','MACRO','NEWS','INFL','AUCTION','VOL','EQS','HELP','HEAT','SCRN','CB','ROTATION','LADDER','EARN','ECON','WATCH','CHART'];
   if(panelCmds.includes(first)){
     return {type:'command', target:first, extra:rest||null,
       entry:{key:first, label:first, meta:'', type:'command', action:()=>OW(first, rest||null)},
@@ -3462,506 +3404,179 @@ function fxSetPair(pairName){
 // SCREENER
 // ═══════════════════════════════════════════
 
-// ── Static US stock universe (100 liquid names across sectors) ──
-// Used as fallback + base dataset; ~200 liquid US names across all GICS sectors
-// Fields: sym, name, sector, mcap($B), pe, fwdPe, div(%), px, chg(1D%), vol, beta, roe(%), pb, evEbitda
-const SCRN_UNIVERSE = [
-  // ── Technology ──
-  {sym:'AAPL', name:'Apple Inc',           sector:'Technology',   mcap:2840,pe:29.4,fwdPe:26.8,div:0.52,px:184.4, chg:+0.48,vol:52e6,beta:1.24,roe:147,pb:45.2,evEbitda:22.4},
-  {sym:'MSFT', name:'Microsoft Corp',      sector:'Technology',   mcap:3010,pe:36.8,fwdPe:31.4,div:0.72,px:404.9, chg:+0.61,vol:22e6,beta:0.90,roe:42,pb:13.2,evEbitda:28.4},
-  {sym:'NVDA', name:'NVIDIA Corp',         sector:'Technology',   mcap:1520,pe:65.4,fwdPe:28.2,div:0.04,px:613.4, chg:+1.36,vol:44e6,beta:1.98,roe:88,pb:22.4,evEbitda:48.4},
-  {sym:'GOOGL',name:'Alphabet Inc',        sector:'Technology',   mcap:1740,pe:25.2,fwdPe:21.8,div:0.0, px:140.9, chg:+0.22,vol:28e6,beta:1.04,roe:24,pb:6.2, evEbitda:14.8},
-  {sym:'META', name:'Meta Platforms',      sector:'Technology',   mcap:1180,pe:24.1,fwdPe:20.4,div:0.0, px:460.2, chg:+0.88,vol:18e6,beta:1.22,roe:34,pb:8.4, evEbitda:16.2},
-  {sym:'AMZN', name:'Amazon.com',          sector:'Technology',   mcap:1820,pe:78.4,fwdPe:38.2,div:0.0, px:178.2, chg:-0.14,vol:34e6,beta:1.28,roe:18,pb:9.8, evEbitda:22.8},
-  {sym:'TSLA', name:'Tesla Inc',           sector:'Technology',   mcap:622, pe:49.8,fwdPe:64.2,div:0.0, px:196.4, chg:-1.88,vol:88e6,beta:2.18,roe:18,pb:8.4, evEbitda:44.2},
-  {sym:'AVGO', name:'Broadcom Inc',        sector:'Technology',   mcap:488, pe:32.4,fwdPe:22.1,div:1.84,px:1114.0,chg:+0.44,vol:4.2e6,beta:1.14,roe:22,pb:11.4,evEbitda:28.8},
-  {sym:'ORCL', name:'Oracle Corp',         sector:'Technology',   mcap:318, pe:29.8,fwdPe:24.4,div:0.40,px:115.8, chg:-0.22,vol:8.8e6,beta:0.98,roe:88,pb:null,evEbitda:22.4},
-  {sym:'CRM',  name:'Salesforce Inc',      sector:'Technology',   mcap:278, pe:58.4,fwdPe:28.8,div:0.0, px:284.4, chg:+0.14,vol:5.2e6,beta:1.28,roe:10,pb:4.8, evEbitda:28.4},
-  {sym:'AMD',  name:'Advanced Micro Devs', sector:'Technology',   mcap:244, pe:214, fwdPe:24.8,div:0.0, px:149.8, chg:-0.88,vol:42e6,beta:1.98,roe:4,pb:3.8,  evEbitda:32.4},
-  {sym:'INTC', name:'Intel Corp',          sector:'Technology',   mcap:184, pe:null,fwdPe:18.4,div:0.50,px:43.4,  chg:-1.22,vol:34e6,beta:0.88,roe:null,pb:1.2,evEbitda:null},
-  {sym:'QCOM', name:'Qualcomm Inc',        sector:'Technology',   mcap:194, pe:18.4,fwdPe:15.2,div:3.28,px:168.4, chg:+0.34,vol:9.4e6,beta:1.24,roe:44,pb:8.4, evEbitda:14.8},
-  {sym:'NOW',  name:'ServiceNow',          sector:'Technology',   mcap:154, pe:78.4,fwdPe:44.2,div:0.0, px:744.8, chg:+0.66,vol:1.8e6,beta:1.08,roe:24,pb:18.4,evEbitda:54.2},
-  {sym:'ADBE', name:'Adobe Inc',           sector:'Technology',   mcap:222, pe:44.2,fwdPe:24.8,div:0.0, px:498.4, chg:-0.44,vol:2.8e6,beta:1.24,roe:38,pb:18.4,evEbitda:28.4},
-  {sym:'INTU', name:'Intuit Inc',          sector:'Technology',   mcap:178, pe:58.4,fwdPe:36.8,div:0.64,px:614.8, chg:+0.18,vol:2.2e6,beta:1.18,roe:20,pb:11.4,evEbitda:44.2},
-  {sym:'AMAT', name:'Applied Materials',   sector:'Technology',   mcap:148, pe:22.4,fwdPe:18.4,div:0.88,px:172.4, chg:+0.44,vol:7.8e6,beta:1.44,roe:44,pb:8.8, evEbitda:18.4},
-  {sym:'MU',   name:'Micron Technology',   sector:'Technology',   mcap:128, pe:18.4,fwdPe:14.8,div:0.44,px:114.8, chg:+0.88,vol:18e6,beta:1.48,roe:22,pb:2.4, evEbitda:8.4},
-  {sym:'LRCX', name:'Lam Research',        sector:'Technology',   mcap:118, pe:28.4,fwdPe:22.4,div:1.08,px:878.4, chg:+0.22,vol:2.2e6,beta:1.48,roe:68,pb:18.4,evEbitda:22.4},
-  {sym:'KLAC', name:'KLA Corp',            sector:'Technology',   mcap:108, pe:28.4,fwdPe:24.8,div:0.88,px:748.4, chg:+0.14,vol:1.4e6,beta:1.28,roe:88,pb:22.4,evEbitda:22.4},
-  {sym:'SNPS', name:'Synopsys Inc',        sector:'Technology',   mcap:84,  pe:44.4,fwdPe:34.8,div:0.0, px:544.4, chg:+0.14,vol:1.2e6,beta:0.88,roe:22,pb:11.4,evEbitda:34.8},
-  {sym:'PANW', name:'Palo Alto Networks',  sector:'Technology',   mcap:118, pe:null,fwdPe:34.8,div:0.0, px:178.4, chg:+0.88,vol:6.8e6,beta:1.08,roe:24,pb:28.4,evEbitda:88.4},
-  {sym:'CRWD', name:'CrowdStrike',         sector:'Technology',   mcap:84,  pe:null,fwdPe:64.8,div:0.0, px:354.4, chg:+1.22,vol:4.8e6,beta:1.28,roe:18,pb:28.4,evEbitda:88.4},
-  {sym:'FTNT', name:'Fortinet Inc',        sector:'Technology',   mcap:58,  pe:44.4,fwdPe:34.8,div:0.0, px:74.4,  chg:+0.44,vol:9.8e6,beta:1.18,roe:88,pb:28.4,evEbitda:34.8},
-  // ── Financials ──
-  {sym:'JPM',  name:'JPMorgan Chase',      sector:'Financials',   mcap:491, pe:11.2,fwdPe:10.8,div:2.68,px:170.1, chg:-0.26,vol:8.8e6,beta:1.08,roe:18,pb:1.8, evEbitda:null},
-  {sym:'BAC',  name:'Bank of America',     sector:'Financials',   mcap:288, pe:12.4,fwdPe:10.2,div:2.78,px:36.8,  chg:-0.44,vol:44e6,beta:1.38,roe:12,pb:1.2, evEbitda:null},
-  {sym:'WFC',  name:'Wells Fargo',         sector:'Financials',   mcap:198, pe:11.8,fwdPe:10.4,div:3.12,px:52.4,  chg:+0.18,vol:22e6,beta:1.28,roe:12,pb:1.4, evEbitda:null},
-  {sym:'GS',   name:'Goldman Sachs',       sector:'Financials',   mcap:124, pe:13.4,fwdPe:12.1,div:2.44,px:384.2, chg:+0.49,vol:2.8e6,beta:1.44,roe:12,pb:1.6, evEbitda:null},
-  {sym:'MS',   name:'Morgan Stanley',      sector:'Financials',   mcap:148, pe:17.4,fwdPe:14.8,div:3.44,px:88.4,  chg:+0.22,vol:9.2e6,beta:1.38,roe:14,pb:2.0, evEbitda:null},
-  {sym:'BLK',  name:'BlackRock Inc',       sector:'Financials',   mcap:122, pe:22.4,fwdPe:19.8,div:2.84,px:804.4, chg:+0.14,vol:0.8e6,beta:1.28,roe:18,pb:4.0, evEbitda:null},
-  {sym:'AXP',  name:'American Express',    sector:'Financials',   mcap:148, pe:19.8,fwdPe:17.2,div:1.22,px:204.8, chg:+0.38,vol:3.4e6,beta:1.24,roe:32,pb:6.4, evEbitda:null},
-  {sym:'C',    name:'Citigroup Inc',       sector:'Financials',   mcap:114, pe:14.8,fwdPe:9.4, div:3.44,px:58.4,  chg:-0.18,vol:18e6,beta:1.58,roe:8, pb:0.7, evEbitda:null},
-  {sym:'SCHW', name:'Charles Schwab',      sector:'Financials',   mcap:144, pe:28.4,fwdPe:22.4,div:1.88,px:72.4,  chg:-0.34,vol:8.8e6,beta:1.28,roe:8, pb:2.4, evEbitda:null},
-  {sym:'SPGI', name:'S&P Global',          sector:'Financials',   mcap:128, pe:42.4,fwdPe:34.8,div:0.88,px:424.8, chg:+0.44,vol:1.2e6,beta:1.08,roe:44,pb:18.4,evEbitda:28.4},
-  {sym:'CB',   name:'Chubb Ltd',           sector:'Financials',   mcap:108, pe:12.4,fwdPe:11.4,div:1.44,px:268.4, chg:+0.22,vol:2.2e6,beta:0.58,roe:12,pb:1.6, evEbitda:null},
-  {sym:'MMC',  name:'Marsh McLennan',      sector:'Financials',   mcap:98,  pe:28.4,fwdPe:24.8,div:1.44,px:194.8, chg:+0.14,vol:2.4e6,beta:0.88,roe:38,pb:11.4,evEbitda:24.8},
-  {sym:'ICE',  name:'Intercontinental Exch',sector:'Financials',  mcap:88,  pe:28.4,fwdPe:22.4,div:1.08,px:158.4, chg:+0.28,vol:3.4e6,beta:0.78,roe:12,pb:3.4, evEbitda:18.4},
-  {sym:'MCO',  name:'Moody Corp',       sector:'Financials',   mcap:78,  pe:44.4,fwdPe:38.8,div:0.88,px:428.4, chg:+0.18,vol:1.2e6,beta:1.28,roe:88,pb:28.4,evEbitda:38.4},
-  {sym:'USB',  name:'US Bancorp',          sector:'Financials',   mcap:68,  pe:12.4,fwdPe:10.8,div:4.48,px:44.4,  chg:-0.22,vol:8.8e6,beta:1.08,roe:12,pb:1.4, evEbitda:null},
-  {sym:'PNC',  name:'PNC Financial',       sector:'Financials',   mcap:68,  pe:12.4,fwdPe:11.4,div:3.88,px:164.4, chg:-0.14,vol:3.4e6,beta:1.18,roe:12,pb:1.4, evEbitda:null},
-  {sym:'TFC',  name:'Truist Financial',    sector:'Financials',   mcap:54,  pe:14.8,fwdPe:11.4,div:4.88,px:38.4,  chg:-0.28,vol:8.8e6,beta:1.28,roe:8, pb:1.0, evEbitda:null},
-  {sym:'COF',  name:'Capital One',         sector:'Financials',   mcap:58,  pe:12.4,fwdPe:10.8,div:1.84,px:148.4, chg:+0.22,vol:3.8e6,beta:1.48,roe:12,pb:1.4, evEbitda:null},
-  // ── Healthcare ──
-  {sym:'LLY',  name:'Eli Lilly',           sector:'Healthcare',   mcap:724, pe:88.4,fwdPe:44.2,div:0.72,px:764.2, chg:+1.44,vol:3.8e6,beta:0.48,roe:88,pb:44.4,evEbitda:48.4},
-  {sym:'JNJ',  name:'Johnson & Johnson',   sector:'Healthcare',   mcap:388, pe:14.2,fwdPe:14.8,div:3.08,px:158.4, chg:-0.14,vol:7.8e6,beta:0.58,roe:22,pb:5.8, evEbitda:14.4},
-  {sym:'UNH',  name:'UnitedHealth Group',  sector:'Healthcare',   mcap:488, pe:22.4,fwdPe:19.8,div:1.44,px:524.8, chg:+0.22,vol:2.8e6,beta:0.68,roe:28,pb:6.4, evEbitda:14.8},
-  {sym:'ABBV', name:'AbbVie Inc',          sector:'Healthcare',   mcap:288, pe:44.4,fwdPe:14.2,div:3.88,px:162.4, chg:+0.44,vol:5.8e6,beta:0.58,roe:null,pb:null,evEbitda:12.4},
-  {sym:'MRK',  name:'Merck & Co',          sector:'Healthcare',   mcap:284, pe:18.4,fwdPe:14.8,div:2.44,px:112.4, chg:-0.22,vol:9.8e6,beta:0.48,roe:44,pb:8.4, evEbitda:12.4},
-  {sym:'TMO',  name:'Thermo Fisher',       sector:'Healthcare',   mcap:228, pe:34.4,fwdPe:28.8,div:0.28,px:584.8, chg:+0.14,vol:1.8e6,beta:0.68,roe:18,pb:6.4, evEbitda:22.8},
-  {sym:'ABT',  name:'Abbott Labs',         sector:'Healthcare',   mcap:188, pe:34.8,fwdPe:22.4,div:1.88,px:108.4, chg:+0.08,vol:5.8e6,beta:0.68,roe:18,pb:6.8, evEbitda:24.4},
-  {sym:'BMY',  name:'Bristol-Myers Squibb',sector:'Healthcare',   mcap:138, pe:12.4,fwdPe:8.4, div:4.88,px:62.4,  chg:-0.44,vol:12e6,beta:0.58,roe:28,pb:3.4, evEbitda:8.4},
-  {sym:'ISRG', name:'Intuitive Surgical',  sector:'Healthcare',   mcap:148, pe:74.4,fwdPe:58.4,div:0.0, px:408.4, chg:+0.88,vol:1.4e6,beta:1.08,roe:18,pb:13.4,evEbitda:54.4},
-  {sym:'VRTX', name:'Vertex Pharma',       sector:'Healthcare',   mcap:118, pe:32.4,fwdPe:28.4,div:0.0, px:454.8, chg:+0.22,vol:1.2e6,beta:0.48,roe:28,pb:8.8, evEbitda:24.4},
-  {sym:'REGN', name:'Regeneron Pharma',    sector:'Healthcare',   mcap:98,  pe:28.4,fwdPe:22.4,div:0.0, px:888.4, chg:+0.44,vol:0.8e6,beta:0.38,roe:22,pb:6.4, evEbitda:18.4},
-  {sym:'AMGN', name:'Amgen Inc',           sector:'Healthcare',   mcap:148, pe:18.4,fwdPe:14.8,div:3.28,px:278.4, chg:-0.08,vol:2.8e6,beta:0.58,roe:null,pb:null,evEbitda:12.4},
-  {sym:'GILD', name:'Gilead Sciences',     sector:'Healthcare',   mcap:98,  pe:28.4,fwdPe:12.4,div:3.88,px:78.4,  chg:+0.04,vol:7.8e6,beta:0.48,roe:28,pb:5.8, evEbitda:12.4},
-  {sym:'CI',   name:'Cigna Group',         sector:'Healthcare',   mcap:84,  pe:12.4,fwdPe:10.4,div:1.84,px:328.4, chg:-0.14,vol:2.4e6,beta:0.68,roe:14,pb:1.8, evEbitda:8.4},
-  {sym:'HCA',  name:'HCA Healthcare',      sector:'Healthcare',   mcap:78,  pe:14.4,fwdPe:12.4,div:0.88,px:284.4, chg:+0.22,vol:2.8e6,beta:1.08,roe:null,pb:null,evEbitda:8.4},
-  {sym:'MDT',  name:'Medtronic PLC',       sector:'Healthcare',   mcap:108, pe:22.4,fwdPe:15.4,div:3.44,px:82.4,  chg:-0.18,vol:7.8e6,beta:0.88,roe:8, pb:2.4, evEbitda:12.4},
-  {sym:'DHR',  name:'Danaher Corp',        sector:'Healthcare',   mcap:188, pe:44.4,fwdPe:34.8,div:0.44,px:248.4, chg:+0.14,vol:3.8e6,beta:0.78,roe:10,pb:4.4, evEbitda:28.4},
-  // ── Energy ──
-  {sym:'XOM',  name:'Exxon Mobil',         sector:'Energy',       mcap:414, pe:14.2,fwdPe:13.8,div:3.44,px:102.4, chg:+0.81,vol:18e6,beta:1.28,roe:18,pb:2.4, evEbitda:8.4},
-  {sym:'CVX',  name:'Chevron Corp',        sector:'Energy',       mcap:284, pe:13.8,fwdPe:13.2,div:4.12,px:148.8, chg:+0.64,vol:12e6,beta:1.18,roe:14,pb:2.0, evEbitda:8.4},
-  {sym:'COP',  name:'ConocoPhillips',      sector:'Energy',       mcap:148, pe:14.4,fwdPe:13.4,div:1.84,px:122.4, chg:+0.88,vol:8.8e6,beta:1.28,roe:18,pb:2.4, evEbitda:7.4},
-  {sym:'SLB',  name:'SLB (Schlumberger)',  sector:'Energy',       mcap:88,  pe:18.4,fwdPe:14.8,div:2.08,px:44.8,  chg:+1.22,vol:14e6,beta:1.48,roe:14,pb:2.8, evEbitda:8.8},
-  {sym:'EOG',  name:'EOG Resources',       sector:'Energy',       mcap:72,  pe:12.4,fwdPe:11.8,div:2.84,px:118.4, chg:+0.44,vol:5.8e6,beta:1.28,roe:22,pb:2.4, evEbitda:5.8},
-  {sym:'PSX',  name:'Phillips 66',         sector:'Energy',       mcap:62,  pe:8.4, fwdPe:8.8, div:3.44,px:138.8, chg:+0.22,vol:4.8e6,beta:1.38,roe:14,pb:2.2, evEbitda:6.4},
-  {sym:'PXD',  name:'Pioneer Natural Res', sector:'Energy',       mcap:58,  pe:12.4,fwdPe:11.4,div:4.88,px:228.4, chg:+0.44,vol:3.8e6,beta:1.18,roe:18,pb:2.0, evEbitda:6.4},
-  {sym:'OKE',  name:'ONEOK Inc',           sector:'Energy',       mcap:44,  pe:18.4,fwdPe:14.8,div:5.88,px:78.4,  chg:+0.22,vol:4.8e6,beta:1.38,roe:18,pb:3.8, evEbitda:11.4},
-  {sym:'KMI',  name:'Kinder Morgan',       sector:'Energy',       mcap:38,  pe:22.4,fwdPe:18.4,div:6.44,px:18.4,  chg:+0.14,vol:18e6,beta:0.98,roe:8, pb:1.4, evEbitda:9.4},
-  {sym:'WMB',  name:'Williams Companies',  sector:'Energy',       mcap:44,  pe:28.4,fwdPe:22.4,div:4.88,px:38.4,  chg:+0.34,vol:8.8e6,beta:1.08,roe:14,pb:3.4, evEbitda:11.4},
-  // ── Industrials ──
-  {sym:'CAT',  name:'Caterpillar Inc',     sector:'Industrials',  mcap:188, pe:18.4,fwdPe:16.8,div:1.84,px:354.8, chg:+0.44,vol:2.8e6,beta:1.18,roe:58,pb:9.4, evEbitda:14.4},
-  {sym:'RTX',  name:'RTX Corp',            sector:'Industrials',  mcap:148, pe:44.4,fwdPe:18.4,div:2.44,px:98.4,  chg:+0.18,vol:8.8e6,beta:1.08,roe:8, pb:3.4, evEbitda:14.4},
-  {sym:'HON',  name:'Honeywell Intl',      sector:'Industrials',  mcap:128, pe:24.4,fwdPe:22.4,div:2.08,px:198.4, chg:-0.14,vol:3.8e6,beta:0.98,roe:34,pb:8.4, evEbitda:18.4},
-  {sym:'UPS',  name:'United Parcel Svc',   sector:'Industrials',  mcap:122, pe:22.4,fwdPe:18.4,div:3.88,px:142.4, chg:-0.88,vol:4.8e6,beta:1.08,roe:44,pb:14.4,evEbitda:14.4},
-  {sym:'GE',   name:'GE Aerospace',        sector:'Industrials',  mcap:178, pe:32.4,fwdPe:28.8,div:0.32,px:162.4, chg:+1.44,vol:8.8e6,beta:1.28,roe:28,pb:9.4, evEbitda:24.4},
-  {sym:'LMT',  name:'Lockheed Martin',     sector:'Industrials',  mcap:114, pe:18.4,fwdPe:17.8,div:2.88,px:444.8, chg:+0.44,vol:1.8e6,beta:0.88,roe:88,pb:null,evEbitda:14.4},
-  {sym:'DE',   name:'Deere & Company',     sector:'Industrials',  mcap:112, pe:14.4,fwdPe:14.8,div:1.44,px:374.8, chg:-0.22,vol:2.4e6,beta:1.08,roe:38,pb:5.8, evEbitda:9.4},
-  {sym:'NOC',  name:'Northrop Grumman',    sector:'Industrials',  mcap:68,  pe:18.4,fwdPe:17.4,div:1.84,px:448.4, chg:+0.14,vol:0.8e6,beta:0.88,roe:28,pb:5.4, evEbitda:14.4},
-  {sym:'GD',   name:'General Dynamics',    sector:'Industrials',  mcap:74,  pe:18.4,fwdPe:17.8,div:2.08,px:268.4, chg:+0.22,vol:1.2e6,beta:0.78,roe:18,pb:3.8, evEbitda:11.4},
-  {sym:'FDX',  name:'FedEx Corp',          sector:'Industrials',  mcap:58,  pe:18.4,fwdPe:14.8,div:2.08,px:228.4, chg:-0.44,vol:2.4e6,beta:1.18,roe:14,pb:3.4, evEbitda:8.4},
-  {sym:'BA',   name:'Boeing Company',      sector:'Industrials',  mcap:114, pe:null,fwdPe:44.8,div:0.0, px:188.4, chg:-0.88,vol:9.8e6,beta:1.48,roe:null,pb:null,evEbitda:null},
-  {sym:'MMM',  name:'3M Company',          sector:'Industrials',  mcap:68,  pe:14.4,fwdPe:12.4,div:5.88,px:122.4, chg:-0.14,vol:5.8e6,beta:0.98,roe:28,pb:4.8, evEbitda:9.4},
-  {sym:'ETN',  name:'Eaton Corp',          sector:'Industrials',  mcap:98,  pe:28.4,fwdPe:24.8,div:1.44,px:244.4, chg:+0.44,vol:2.8e6,beta:1.18,roe:24,pb:6.8, evEbitda:22.4},
-  {sym:'PH',   name:'Parker-Hannifin',     sector:'Industrials',  mcap:78,  pe:22.4,fwdPe:19.8,div:1.24,px:604.4, chg:+0.22,vol:0.8e6,beta:1.18,roe:22,pb:5.4, evEbitda:16.4},
-  // ── Consumer Discretionary ──
-  {sym:'MCD',  name:"McDonald's Corp",     sector:'Cons Disc',    mcap:214, pe:24.4,fwdPe:22.4,div:2.44,px:288.4, chg:+0.08,vol:3.4e6,beta:0.88,roe:null,pb:null,evEbitda:18.4},
-  {sym:'NKE',  name:'Nike Inc',            sector:'Cons Disc',    mcap:148, pe:32.4,fwdPe:26.4,div:1.48,px:98.4,  chg:-0.44,vol:9.8e6,beta:1.08,roe:38,pb:12.4,evEbitda:22.4},
-  {sym:'SBUX', name:'Starbucks Corp',      sector:'Cons Disc',    mcap:94,  pe:28.4,fwdPe:22.4,div:2.44,px:82.4,  chg:-0.22,vol:8.8e6,beta:0.88,roe:null,pb:null,evEbitda:18.4},
-  {sym:'HD',   name:'Home Depot',          sector:'Cons Disc',    mcap:344, pe:24.4,fwdPe:22.8,div:2.44,px:342.4, chg:+0.14,vol:3.8e6,beta:1.08,roe:null,pb:null,evEbitda:18.4},
-  {sym:'TGT',  name:'Target Corp',         sector:'Cons Disc',    mcap:58,  pe:18.4,fwdPe:15.8,div:3.28,px:128.4, chg:-0.34,vol:4.8e6,beta:0.88,roe:28,pb:5.4, evEbitda:11.4},
-  {sym:'LOW',  name:"Lowe's Companies",    sector:'Cons Disc',    mcap:148, pe:22.4,fwdPe:19.8,div:1.88,px:224.4, chg:+0.08,vol:3.4e6,beta:1.08,roe:null,pb:null,evEbitda:16.4},
-  {sym:'TJX',  name:'TJX Companies',       sector:'Cons Disc',    mcap:118, pe:28.4,fwdPe:24.8,div:1.44,px:98.4,  chg:+0.14,vol:5.8e6,beta:0.88,roe:58,pb:16.4,evEbitda:18.4},
-  {sym:'BKNG', name:'Booking Holdings',    sector:'Cons Disc',    mcap:148, pe:28.4,fwdPe:22.4,div:0.0, px:3884.4,chg:+0.44,vol:0.4e6,beta:1.28,roe:88,pb:28.4,evEbitda:22.4},
-  {sym:'GM',   name:'General Motors',      sector:'Cons Disc',    mcap:54,  pe:5.8, fwdPe:5.4, div:1.08,px:38.4,  chg:-0.44,vol:14e6,beta:1.48,roe:14,pb:0.8, evEbitda:4.4},
-  {sym:'F',    name:'Ford Motor Company',  sector:'Cons Disc',    mcap:64,  pe:12.4,fwdPe:7.8, div:5.88,px:16.4,  chg:-0.22,vol:98e6,beta:1.68,roe:8, pb:1.2, evEbitda:6.4},
-  // ── Consumer Staples ──
-  {sym:'KO',   name:'Coca-Cola Co',        sector:'Cons Staples', mcap:254, pe:24.4,fwdPe:22.8,div:3.12,px:58.4,  chg:+0.08,vol:18e6,beta:0.58,roe:44,pb:10.4,evEbitda:22.4},
-  {sym:'PEP',  name:'PepsiCo Inc',         sector:'Cons Staples', mcap:224, pe:22.4,fwdPe:20.8,div:2.88,px:162.4, chg:-0.04,vol:5.8e6,beta:0.48,roe:44,pb:9.4, evEbitda:16.4},
-  {sym:'PG',   name:'Procter & Gamble',    sector:'Cons Staples', mcap:348, pe:26.4,fwdPe:24.8,div:2.44,px:144.4, chg:+0.04,vol:7.8e6,beta:0.48,roe:28,pb:7.8, evEbitda:18.4},
-  {sym:'COST', name:'Costco Wholesale',    sector:'Cons Staples', mcap:324, pe:48.4,fwdPe:44.8,div:0.68,px:728.4, chg:+0.44,vol:2.8e6,beta:0.78,roe:28,pb:13.4,evEbitda:34.4},
-  {sym:'WMT',  name:'Walmart Inc',         sector:'Cons Staples', mcap:548, pe:28.4,fwdPe:26.8,div:1.32,px:68.4,  chg:+0.22,vol:18e6,beta:0.58,roe:18,pb:5.4, evEbitda:18.4},
-  {sym:'PM',   name:'Philip Morris',       sector:'Cons Staples', mcap:158, pe:17.4,fwdPe:14.8,div:5.44,px:98.4,  chg:+0.44,vol:5.8e6,beta:0.78,roe:null,pb:null,evEbitda:12.4},
-  {sym:'MO',   name:'Altria Group',        sector:'Cons Staples', mcap:88,  pe:8.4, fwdPe:9.4, div:8.88,px:42.4,  chg:+0.22,vol:8.8e6,beta:0.58,roe:null,pb:null,evEbitda:9.4},
-  {sym:'MDLZ', name:'Mondelez Intl',       sector:'Cons Staples', mcap:88,  pe:22.4,fwdPe:18.4,div:2.88,px:64.4,  chg:-0.08,vol:5.8e6,beta:0.68,roe:14,pb:3.4, evEbitda:16.4},
-  {sym:'GIS',  name:'General Mills',       sector:'Cons Staples', mcap:38,  pe:14.4,fwdPe:12.4,div:4.08,px:64.4,  chg:-0.14,vol:4.8e6,beta:0.48,roe:24,pb:3.8, evEbitda:11.4},
-  {sym:'KHC',  name:'Kraft Heinz',         sector:'Cons Staples', mcap:38,  pe:14.4,fwdPe:10.4,div:5.44,px:32.4,  chg:-0.08,vol:9.8e6,beta:0.68,roe:4, pb:1.0, evEbitda:8.4},
-  {sym:'SYY',  name:'Sysco Corp',          sector:'Cons Staples', mcap:38,  pe:18.4,fwdPe:15.4,div:2.88,px:74.4,  chg:+0.04,vol:4.8e6,beta:1.08,roe:44,pb:8.4, evEbitda:12.4},
-  // ── Comm Services ──
-  {sym:'NFLX', name:'Netflix Inc',         sector:'Comm Svcs',    mcap:248, pe:48.4,fwdPe:34.4,div:0.0, px:578.4, chg:+0.88,vol:4.8e6,beta:1.28,roe:24,pb:11.4,evEbitda:34.4},
-  {sym:'DIS',  name:'Walt Disney Co',      sector:'Comm Svcs',    mcap:174, pe:78.4,fwdPe:24.4,div:0.0, px:94.4,  chg:-0.28,vol:9.8e6,beta:1.38,roe:4, pb:2.0, evEbitda:14.4},
-  {sym:'T',    name:'AT&T Inc',            sector:'Comm Svcs',    mcap:118, pe:14.4,fwdPe:8.4, div:6.88,px:16.8,  chg:+0.18,vol:68e6,beta:0.68,roe:8, pb:1.2, evEbitda:6.4},
-  {sym:'VZ',   name:'Verizon Comms',       sector:'Comm Svcs',    mcap:168, pe:14.8,fwdPe:8.8, div:6.44,px:40.4,  chg:-0.08,vol:22e6,beta:0.48,roe:12,pb:1.6, evEbitda:6.4},
-  {sym:'CMCSA',name:'Comcast Corp',        sector:'Comm Svcs',    mcap:168, pe:12.4,fwdPe:9.8, div:2.88,px:42.4,  chg:-0.22,vol:22e6,beta:0.88,roe:14,pb:2.0, evEbitda:7.4},
-  {sym:'CHTR', name:'Charter Comms',       sector:'Comm Svcs',    mcap:58,  pe:24.4,fwdPe:18.4,div:0.0, px:368.4, chg:-0.34,vol:1.2e6,beta:1.08,roe:8, pb:3.4, evEbitda:7.4},
-  {sym:'TMUS', name:'T-Mobile US',         sector:'Comm Svcs',    mcap:198, pe:22.4,fwdPe:18.4,div:1.88,px:168.4, chg:+0.22,vol:3.8e6,beta:0.58,roe:14,pb:3.4, evEbitda:9.4},
-  // ── Utilities ──
-  {sym:'NEE',  name:'NextEra Energy',      sector:'Utilities',    mcap:124, pe:22.4,fwdPe:19.8,div:2.88,px:58.4,  chg:-0.28,vol:14e6,beta:0.58,roe:12,pb:2.8, evEbitda:14.4},
-  {sym:'DUK',  name:'Duke Energy',         sector:'Utilities',    mcap:74,  pe:18.4,fwdPe:17.8,div:4.28,px:98.4,  chg:-0.14,vol:5.8e6,beta:0.48,roe:8, pb:1.6, evEbitda:12.4},
-  {sym:'SO',   name:'Southern Company',    sector:'Utilities',    mcap:72,  pe:22.4,fwdPe:18.8,div:4.08,px:68.4,  chg:+0.04,vol:7.8e6,beta:0.48,roe:8, pb:2.0, evEbitda:12.4},
-  {sym:'AEP',  name:'Amer Elec Power',     sector:'Utilities',    mcap:44,  pe:18.8,fwdPe:16.8,div:4.08,px:82.4,  chg:-0.08,vol:4.8e6,beta:0.48,roe:8, pb:1.6, evEbitda:11.4},
-  {sym:'EXC',  name:'Exelon Corp',         sector:'Utilities',    mcap:38,  pe:14.4,fwdPe:13.8,div:3.88,px:38.4,  chg:-0.18,vol:9.8e6,beta:0.48,roe:8, pb:1.4, evEbitda:9.4},
-  {sym:'XEL',  name:'Xcel Energy',         sector:'Utilities',    mcap:32,  pe:18.4,fwdPe:16.8,div:3.88,px:58.4,  chg:-0.14,vol:4.8e6,beta:0.48,roe:8, pb:2.0, evEbitda:11.4},
-  {sym:'ED',   name:'Consol Edison',       sector:'Utilities',    mcap:28,  pe:18.4,fwdPe:17.4,div:3.44,px:88.4,  chg:-0.08,vol:2.8e6,beta:0.38,roe:8, pb:1.6, evEbitda:11.4},
-  {sym:'AWK',  name:'Amer Water Works',    sector:'Utilities',    mcap:22,  pe:28.4,fwdPe:24.8,div:2.28,px:124.4, chg:-0.08,vol:1.8e6,beta:0.88,roe:12,pb:3.4, evEbitda:18.4},
-  // ── Real Estate ──
-  {sym:'AMT',  name:'American Tower',      sector:'Real Estate',  mcap:88,  pe:44.4,fwdPe:38.8,div:3.44,px:188.4, chg:-0.44,vol:3.8e6,beta:0.88,roe:14,pb:8.4, evEbitda:24.4},
-  {sym:'PLD',  name:'Prologis Inc',        sector:'Real Estate',  mcap:118, pe:44.4,fwdPe:28.4,div:2.88,px:128.4, chg:-0.22,vol:4.8e6,beta:1.08,roe:8, pb:3.8, evEbitda:22.4},
-  {sym:'EQIX', name:'Equinix Inc',         sector:'Real Estate',  mcap:78,  pe:88.4,fwdPe:68.4,div:2.08,px:824.8, chg:+0.14,vol:0.8e6,beta:0.78,roe:4, pb:7.4, evEbitda:28.4},
-  {sym:'CCI',  name:'Crown Castle',        sector:'Real Estate',  mcap:44,  pe:34.4,fwdPe:44.4,div:6.44,px:104.8, chg:-0.88,vol:3.8e6,beta:1.08,roe:8, pb:4.4, evEbitda:18.4},
-  {sym:'SPG',  name:'Simon Property',      sector:'Real Estate',  mcap:58,  pe:24.4,fwdPe:22.4,div:5.44,px:154.4, chg:-0.14,vol:2.8e6,beta:1.28,roe:28,pb:14.4,evEbitda:16.4},
-  {sym:'O',    name:'Realty Income',       sector:'Real Estate',  mcap:48,  pe:44.4,fwdPe:38.8,div:5.88,px:54.4,  chg:-0.28,vol:8.8e6,beta:0.88,roe:4, pb:2.4, evEbitda:16.4},
-  {sym:'WELL', name:'Welltower Inc',       sector:'Real Estate',  mcap:68,  pe:244, fwdPe:58.4,div:2.44,px:118.4, chg:-0.14,vol:3.8e6,beta:0.88,roe:4, pb:3.4, evEbitda:28.4},
-  // ── Materials ──
-  {sym:'LIN',  name:'Linde PLC',           sector:'Materials',    mcap:208, pe:34.4,fwdPe:28.8,div:1.44,px:442.4, chg:+0.22,vol:2.8e6,beta:0.78,roe:18,pb:6.4, evEbitda:22.4},
-  {sym:'APD',  name:'Air Products',        sector:'Materials',    mcap:54,  pe:18.4,fwdPe:17.8,div:2.88,px:244.4, chg:-0.14,vol:2.4e6,beta:0.88,roe:14,pb:2.8, evEbitda:14.4},
-  {sym:'FCX',  name:'Freeport-McMoRan',    sector:'Materials',    mcap:64,  pe:22.4,fwdPe:17.8,div:1.44,px:44.4,  chg:+0.44,vol:18e6,beta:1.68,roe:18,pb:2.8, evEbitda:8.4},
-  {sym:'NEM',  name:'Newmont Corp',        sector:'Materials',    mcap:48,  pe:null,fwdPe:14.8,div:4.44,px:38.4,  chg:+0.88,vol:14e6,beta:0.88,roe:8, pb:2.0, evEbitda:8.4},
-  {sym:'DOW',  name:'Dow Inc',             sector:'Materials',    mcap:38,  pe:22.4,fwdPe:14.4,div:5.88,px:52.4,  chg:-0.22,vol:8.8e6,beta:1.28,roe:14,pb:1.8, evEbitda:6.4},
-  {sym:'DD',   name:'DuPont de Nemours',   sector:'Materials',    mcap:32,  pe:28.4,fwdPe:18.8,div:1.44,px:74.4,  chg:+0.14,vol:3.8e6,beta:1.18,roe:8, pb:2.4, evEbitda:11.4},
-  {sym:'ECL',  name:'Ecolab Inc',          sector:'Materials',    mcap:58,  pe:44.4,fwdPe:36.8,div:0.88,px:204.4, chg:+0.14,vol:2.4e6,beta:0.88,roe:18,pb:7.8, evEbitda:28.4},
-  {sym:'PPG',  name:'PPG Industries',      sector:'Materials',    mcap:28,  pe:18.4,fwdPe:14.8,div:2.08,px:118.4, chg:-0.14,vol:2.8e6,beta:1.18,roe:18,pb:3.4, evEbitda:11.4},
-  {sym:'NUE',  name:'Nucor Corp',          sector:'Materials',    mcap:28,  pe:14.4,fwdPe:12.8,div:1.88,px:118.4, chg:+0.22,vol:2.8e6,beta:1.28,roe:18,pb:2.4, evEbitda:6.4},
+// ── Static US stock univers
+// ── Finviz deep-link screener presets ──
+// Replaces static SCRN_UNIVERSE — no data needed, Finviz has live fundamentals + technicals
+
+const FINVIZ_PRESETS = [
+  // ── MOMENTUM / TECHNICAL ──
+  {
+    group: 'MOMENTUM',
+    label: 'Large Cap Momentum',
+    desc: 'Cap >$10B · 1W price > 3% · SMA200 above',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_sma200_pa,ta_perf_1w_o3&o=-marketcap',
+  },
+  {
+    group: 'MOMENTUM',
+    label: 'RS Leaders (52W High)',
+    desc: 'Near 52-week high · Volume surge · Large cap',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_highlow52w_nh&o=-volume',
+  },
+  {
+    group: 'MOMENTUM',
+    label: 'High Volume Movers',
+    desc: '1D move >3% · Volume >2M · Any cap',
+    url: 'https://finviz.com/screener.ashx?v=111&f=ta_perf_1d_o3,sh_avgvol_o2000&o=-volume',
+  },
+  {
+    group: 'MOMENTUM',
+    label: 'Oversold Bounce Setup',
+    desc: 'RSI <30 · SMA50 above price · Large cap',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_rsi_os30,ta_sma50_pb&o=-marketcap',
+  },
+  // ── FUNDAMENTAL ──
+  {
+    group: 'FUNDAMENTAL',
+    label: 'Value — Low P/E',
+    desc: 'P/E <15 · Profitable · Cap >$2B',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,fa_pe_low,fa_epsyoy_pos&o=pe',
+  },
+  {
+    group: 'FUNDAMENTAL',
+    label: 'Growth — EPS Acceleration',
+    desc: 'EPS growth >25% · Revenue growth >15% · Any cap',
+    url: 'https://finviz.com/screener.ashx?v=111&f=fa_epsyoy_pos25,fa_salesqoq_o15&o=-epsyoy',
+  },
+  {
+    group: 'FUNDAMENTAL',
+    label: 'High Dividend Yield',
+    desc: 'Div yield >3% · Profitable · Large cap',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,fa_div_o3,fa_epsyoy_pos&o=-dividendyield',
+  },
+  {
+    group: 'FUNDAMENTAL',
+    label: 'Quality — High ROE',
+    desc: 'ROE >20% · Low debt · Cap >$5B',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_mid,fa_roe_o20,fa_debteq_u1&o=-roe',
+  },
+  // ── SECTOR ──
+  {
+    group: 'SECTOR',
+    label: 'Technology Leaders',
+    desc: 'Sector: Technology · Cap >$10B · SMA200 above',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,sec_technology,ta_sma200_pa&o=-marketcap',
+  },
+  {
+    group: 'SECTOR',
+    label: 'Financials — Banks',
+    desc: 'Industry: Banks · Cap >$2B · P/B <2',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,ind_moneycenterbanks,fa_pb_u2&o=-marketcap',
+  },
+  {
+    group: 'SECTOR',
+    label: 'Healthcare Biotech',
+    desc: 'Sector: Healthcare · Biotech / Pharma',
+    url: 'https://finviz.com/screener.ashx?v=111&f=sec_healthcare,ind_biotechnology&o=-marketcap',
+  },
+  {
+    group: 'SECTOR',
+    label: 'Energy — O&G',
+    desc: 'Sector: Energy · Cap >$1B · Positive EPS',
+    url: 'https://finviz.com/screener.ashx?v=111&f=sec_energy,cap_smallover,fa_epsyoy_pos&o=-marketcap',
+  },
+  // ── SPECIAL SITUATIONS ──
+  {
+    group: 'SPECIAL',
+    label: 'Earnings This Week',
+    desc: 'Reporting within 7 days · Cap >$1B',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,earningsdate_thisweek&o=-marketcap',
+  },
+  {
+    group: 'SPECIAL',
+    label: 'Insider Buying',
+    desc: 'Recent insider purchase · Cap >$500M',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_micro,it_insiderbuy&o=-marketcap',
+  },
+  {
+    group: 'SPECIAL',
+    label: 'Short Squeeze Candidates',
+    desc: 'Short float >20% · Volume surge · Positive momentum',
+    url: 'https://finviz.com/screener.ashx?v=111&f=sh_short_o20,ta_perf_1w_o5&o=-shortfloat',
+  },
+  {
+    group: 'SPECIAL',
+    label: 'New 52W Lows — Contrarian',
+    desc: 'Near 52-week low · Large cap · Analyst upgrade',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_highlow52w_nl&o=marketcap',
+  },
 ];
 
+const SCREENER_TOOLS = [
+  {name:'FINVIZ',       url:'https://finviz.com/screener.ashx',            desc:'60+ filters · fundamentals · technicals · free'},
+  {name:'TRADINGVIEW',  url:'https://www.tradingview.com/screener/',        desc:'Technical + fundamental · global markets · free tier'},
+  {name:'KOYFIN',       url:'https://app.koyfin.com/screener',             desc:'Macro + equity · clean UI · free tier'},
+  {name:'BARCHART',     url:'https://www.barchart.com/stocks/stocks-screener', desc:'Technical screener · options · free'},
+  {name:'STOCKANALYSIS',url:'https://stockanalysis.com/stocks/screener/',  desc:'Clean fundamental screener · free'},
+  {name:'SIMPLYWALL ST',url:'https://simplywall.st/discover/investing-ideas/screener', desc:'Visual fundamental analysis · quality scoring'},
+];
 
-// ── Screener state ──
-const SCRN_STATE = {
-  rawData:   [],       // full dataset (universe + any live-enriched)
-  filtered:  [],       // after filters applied
-  sortCol:   'mcap',
-  sortDir:   'desc',
-  isLoading: false,
-  lastFetch: null,
-  filters: {
-    sector:'ALL', mcapMin:'', peMax:'', divMin:'', pxMin:'', chgMin:'', chgMax:''
-  }
-};
-
-const SCRN_SECTORS = ['ALL','Technology','Financials','Healthcare','Energy',
-  'Industrials','Cons Disc','Cons Staples','Comm Svcs','Utilities','Real Estate','Materials'];
-
-// ── Render screener shell ──
 function rSCRN(){
-  const sectorOpts = SCRN_SECTORS.map(s=>
-    `<option value="${s}">${s}</option>`).join('');
-
-  return `<div id="scrn-wrap">
-    <div id="scrn-filters">
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">SECTOR</span>
-        <select class="scrn-select" id="sf-sector">
-          ${sectorOpts}
-        </select>
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">MKT CAP &gt; ($B)</span>
-        <input class="scrn-input" id="sf-mcap" type="number" placeholder="e.g. 10" min="0">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">PRICE &gt; ($)</span>
-        <input class="scrn-input" id="sf-px" type="number" placeholder="e.g. 50" min="0">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">1D CHG MIN (%)</span>
-        <input class="scrn-input" id="sf-chgmin" type="number" placeholder="e.g. -1" step="0.1">
-      </div>
-      <div class="scrn-fgroup">
-        <span class="scrn-flabel">1D CHG MAX (%)</span>
-        <input class="scrn-input" id="sf-chgmax" type="number" placeholder="e.g. 5" step="0.1">
-      </div>
-      <div class="scrn-sep"></div>
-      <div style="display:flex;flex-direction:column;gap:3px;align-self:flex-end">
-        <div class="scrn-presets">
-          <button class="scrn-preset" onclick="scrnPreset('momentum')">MOMENTUM</button>
-          <button class="scrn-preset" onclick="scrnPreset('largecap')">LARGE CAP</button>
-          <button class="scrn-preset" onclick="scrnClear()">CLEAR</button>
-        </div>
-        <div style="display:flex;gap:4px">
-          <button class="scrn-btn run" id="scrn-run-btn" onclick="scrnRun()">▶ RUN SCREEN</button>
-          <button class="scrn-btn" id="scrn-live-btn" onclick="scrnFetchLive()" title="Refresh live prices">⟳ LIVE</button>
-        </div>
-      </div>
-    </div>
-    <div id="scrn-status">
-      <span id="scrn-spinner">⟳ FETCHING…</span>
-      <span>RESULTS: <span id="scrn-count">—</span></span>
-      <span style="color:var(--border3)">|</span>
-      <span id="scrn-source">BASE DATASET · 200 US STOCKS</span>
-      <span style="color:var(--border3)">|</span>
-      <span style="color:#707070">S&P 500 + large/mid-cap NYSE &amp; NASDAQ &nbsp;|&nbsp; CLICK TICKER → EQS &nbsp;|&nbsp; CLICK HEADER → SORT</span>
-    </div>
-    <div id="scrn-table-wrap">
-      <table id="scrn-table">
-        <thead><tr>
-          <th data-col="sym"    onclick="scrnSort('sym')"   style="text-align:left">TICKER</th>
-          <th data-col="name"   onclick="scrnSort('name')"  style="text-align:left">NAME</th>
-          <th data-col="sector" onclick="scrnSort('sector')" style="text-align:left">SECTOR</th>
-          <th data-col="px"     onclick="scrnSort('px')">PRICE ●</th>
-          <th data-col="chg"    onclick="scrnSort('chg')">1D % ●</th>
-          <th data-col="mcap"   onclick="scrnSort('mcap')">MKT CAP</th>
-                      <th data-col="vol"    onclick="scrnSort('vol')">AVG VOL</th>
-    
-        </tr></thead>
-        <tbody id="scrn-tbody">
-          <tr><td colspan="7" class="scrn-no-results" style="color:#888">
-            SET FILTERS AND CLICK ▶ RUN SCREEN
-          </td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>`;
-}
-
-// ── Init: load state into inputs, restore previous filter values ──
-function initSCRN(){
-  const f = SCRN_STATE.filters;
-  const el = id => document.getElementById(id);
-  const sf = el('sf-sector'); if(sf) sf.value = f.sector;
-  ['mcap','pe','div','px','chgmin','chgmax','beta','pb','roe','evebitda'].forEach(k=>{
-    const inp = el('sf-'+k);
-    if(inp) inp.value = f[{chgmin:'chgMin',chgmax:'chgMax'}[k]||k] || '';
-  });
-  // If we already have results, re-render them
-  if(SCRN_STATE.filtered.length) scrnRenderTable();
-  // Update sort headers
-  scrnUpdateSortHeaders();
-  // Seed raw data from universe if empty
-  if(!SCRN_STATE.rawData.length)
-    SCRN_STATE.rawData = SCRN_UNIVERSE.map(r=>({...r}));
-}
-
-// ── Read filters from DOM ──
-function scrnReadFilters(){
-  const v = id => { const el=document.getElementById(id); return el?el.value.trim():''; };
-  SCRN_STATE.filters = {
-    sector:    v('sf-sector') || 'ALL',
-    mcapMin:   v('sf-mcap'),
-    pxMin:     v('sf-px'),
-    chgMin:    v('sf-chgmin'),
-    chgMax:    v('sf-chgmax'),
+  const groups = ['MOMENTUM','FUNDAMENTAL','SECTOR','SPECIAL'];
+  const groupColors = {
+    MOMENTUM:   {bg:'#060c14', border:'#0d2040', label:'#5a8abf', accent:'var(--blue)'},
+    FUNDAMENTAL:{bg:'#060e08', border:'#0d2814', label:'#5aaa7a', accent:'var(--green)'},
+    SECTOR:     {bg:'#0e0a04', border:'#2a1a04', label:'#cc9944', accent:'var(--amber)'},
+    SPECIAL:    {bg:'#0d0608', border:'#281020', label:'#a06ab0', accent:'#a06ab0'},
   };
-}
 
-// ── Apply filters in browser ──
-function scrnApplyFilters(data){
-  const f = SCRN_STATE.filters;
-  const n = v => v===''||v===null||v===undefined ? null : parseFloat(v);
-  const mcapMin = n(f.mcapMin);
-  const pxMin   = n(f.pxMin);
-  const chgMin     = n(f.chgMin);
-  const chgMax     = n(f.chgMax);
-
-  // Deduplicate by symbol first
-  const seen = new Set();
-  const deduped = data.filter(r=>{ if(seen.has(r.sym)) return false; seen.add(r.sym); return true; });
-
-  return deduped.filter(r=>{
-    if(f.sector !== 'ALL' && r.sector !== f.sector) return false;
-    if(mcapMin !== null && (r.mcap == null || r.mcap < mcapMin)) return false;
-    if(pxMin   !== null && (r.px   == null || r.px   < pxMin))   return false;
-    if(chgMin     !== null && (r.chg      == null || r.chg      < chgMin))     return false;
-    if(chgMax     !== null && (r.chg      == null || r.chg      > chgMax))     return false;
-    return true;
-  });
-}
-
-// ── Sort ──
-function scrnSort(col){
-  if(SCRN_STATE.sortCol === col){
-    SCRN_STATE.sortDir = SCRN_STATE.sortDir==='desc'?'asc':'desc';
-  } else {
-    SCRN_STATE.sortCol = col;
-    SCRN_STATE.sortDir = ['sym','name','sector'].includes(col) ? 'asc' : 'desc';
-  }
-  scrnApplySortAndRender();
-}
-
-function scrnApplySortAndRender(){
-  const col = SCRN_STATE.sortCol;
-  const dir = SCRN_STATE.sortDir;
-  SCRN_STATE.filtered.sort((a,b)=>{
-    const av = a[col], bv = b[col];
-    if(av == null && bv == null) return 0;
-    if(av == null) return 1;
-    if(bv == null) return -1;
-    if(typeof av === 'string') return dir==='asc' ? av.localeCompare(bv) : bv.localeCompare(av);
-    return dir==='asc' ? av-bv : bv-av;
-  });
-  scrnRenderTable();
-  scrnUpdateSortHeaders();
-}
-
-function scrnUpdateSortHeaders(){
-  document.querySelectorAll('#scrn-table th').forEach(th=>{
-    th.classList.remove('sort-asc','sort-desc');
-    if(th.dataset.col === SCRN_STATE.sortCol)
-      th.classList.add('sort-'+SCRN_STATE.sortDir);
-  });
-}
-
-// ── Render results table ──
-function scrnRenderTable(){
-  const tbody = document.getElementById('scrn-tbody');
-  if(!tbody) return;
-  const rows = SCRN_STATE.filtered.slice(0,200);
-  const countEl = document.getElementById('scrn-count');
-  if(countEl) countEl.textContent = SCRN_STATE.filtered.length + (SCRN_STATE.filtered.length>200?' (showing 200)':'');
-
-  if(!rows.length){
-    tbody.innerHTML=`<tr><td colspan="7" class="scrn-no-results">◈ NO RESULTS MATCH FILTERS</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = rows.map(r=>{
-    const chgCol = r.chg > 0 ? 'var(--green)' : r.chg < 0 ? 'var(--red)' : 'var(--text-dim)';
-    const chgSign = r.chg > 0 ? '+' : '';
-    const volStr = r.vol >= 1e6 ? (r.vol/1e6).toFixed(1)+'M' : (r.vol/1e3).toFixed(0)+'K';
-    const mcapStr = r.mcap >= 1000 ? (r.mcap/1000).toFixed(2)+'T' : r.mcap.toFixed(0)+'B';
-    const pxStr = r.px!=null ? '$'+r.px.toFixed(2) : '<span style="color:#555">—</span>';
-    const chgTxt = r.chg!=null ? chgSign+r.chg.toFixed(2)+'%' : '<span style="color:#555">—</span>';
-    return `<tr>
-      <td onclick="OW('EQS','${r.sym}')" style="color:var(--amber);cursor:pointer">${r.sym}</td>
-      <td style="text-align:left;color:var(--text-mid);max-width:140px;overflow:hidden;text-overflow:ellipsis">${r.name}</td>
-      <td style="text-align:left;color:var(--text-dim)">${r.sector}</td>
-      <td>${pxStr}</td>
-      <td style="color:${chgCol}">${chgTxt}</td>
-      <td>$${mcapStr}</td>
-      <td style="color:var(--text-dim)">${volStr}</td>
-      <td style="color:${r.beta!=null?(r.beta>1.5?'var(--red)':r.beta<0.8?'var(--green)':'var(--text-mid)'):'#333'}">${r.beta!=null?r.beta.toFixed(2):'<span style="color:#333">—</span>'}</td>
-    </tr>`;
+  const presetCards = groups.map(g => {
+    const gColor = groupColors[g];
+    const presets = FINVIZ_PRESETS.filter(p => p.group === g);
+    const cards = presets.map(p => `
+      <div onclick="window.open('${p.url}','_blank')"
+           style="background:${gColor.bg};border:1px solid ${gColor.border};padding:8px 10px;cursor:pointer;transition:border-color 0.15s"
+           onmouseover="this.style.borderColor='${gColor.label}'" onmouseout="this.style.borderColor='${gColor.border}'">
+        <div style="color:${gColor.label};font-size:10px;font-weight:600;letter-spacing:0.8px;margin-bottom:3px">↗ ${p.label}</div>
+        <div style="color:#555;font-size:9px;line-height:1.4">${p.desc}</div>
+      </div>`).join('');
+    return `
+      <div>
+        <div style="font-size:9px;color:${gColor.label};letter-spacing:1.5px;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid ${gColor.border}">${g}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${cards}</div>
+      </div>`;
   }).join('');
+
+  const toolRows = SCREENER_TOOLS.map(t => `
+    <div onclick="window.open('${t.url}','_blank')"
+         style="display:flex;align-items:center;gap:12px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505"
+         onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor='#111'">
+      <div style="color:var(--amber);font-size:10px;font-weight:600;letter-spacing:0.8px;min-width:110px">${t.name}</div>
+      <div style="color:#555;font-size:9px">${t.desc}</div>
+      <div style="margin-left:auto;color:#333;font-size:9px">↗</div>
+    </div>`).join('');
+
+  return `
+    <div style="padding:6px 8px;overflow-y:auto;height:100%">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #111">
+        <div class="sl" style="margin:0">EQUITY SCREENER — FINVIZ PRESETS</div>
+        <div style="font-size:9px;color:#555">Click any preset to open in Finviz with filters pre-applied</div>
+        <div style="margin-left:auto;font-size:9px;color:#3aaa3a">● LIVE DATA VIA FINVIZ</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        ${presetCards}
+      </div>
+
+      <div class="sl" style="margin-bottom:6px">SCREENER TOOLS — EXTERNAL</div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        ${toolRows}
+      </div>
+
+      <div style="margin-top:8px;padding:5px 8px;border:1px solid #1a1a1a;font-size:9px;color:#444;line-height:1.5">
+        All presets open Finviz with filters pre-applied · Free account not required for most screens · Data is live from Finviz servers
+      </div>
+    </div>`;
 }
-
-// ── Run screen ──
-function scrnRun(){
-  scrnReadFilters();
-  if(!SCRN_STATE.rawData.length)
-    SCRN_STATE.rawData = SCRN_UNIVERSE.map(r=>({...r}));
-  SCRN_STATE.filtered = scrnApplyFilters(SCRN_STATE.rawData);
-  scrnApplySortAndRender();
-}
-
-// ── Presets ──
-function scrnPreset(name){
-  scrnClear();
-  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
-  switch(name){
-    case 'momentum':
-      set('sf-chgmin','0.5'); set('sf-mcap','10'); break;
-    case 'largecap':
-      set('sf-mcap','200'); break;
-  }
-  scrnRun();
-}
-
-function scrnClear(){
-  ['sf-mcap','sf-px','sf-chgmin','sf-chgmax'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  const sec=document.getElementById('sf-sector'); if(sec) sec.value='ALL';
-}
-
-// ── Live data fetch (FMP or AV, rate-limited) ──
-async function scrnFetchLive(){
-  const btn = document.getElementById('scrn-live-btn');
-  const spinner = document.getElementById('scrn-spinner');
-  const src = document.getElementById('scrn-source');
-  if(SCRN_STATE.isLoading) return;
-  SCRN_STATE.isLoading = true;
-  if(btn){btn.disabled=true;btn.textContent='⟳ LOADING';}
-  if(src) src.textContent = 'FETCHING LIVE PRICES…';
-  // Batch Yahoo Finance price fetch for visible rows
-  const tickers = [...new Set((SCRN_STATE.filtered.length?SCRN_STATE.filtered:SCRN_STATE.rawData).map(s=>s.sym))].slice(0,40);
-  const BATCH=5; let updated=0;
-  try{
-    for(let i=0;i<tickers.length;i+=BATCH){
-      const batch=tickers.slice(i,i+BATCH);
-      await Promise.allSettled(batch.map(async sym=>{
-        try{
-          const url=`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`;
-          const r=await proxyFetch(url,8000);
-          const d=await r.json();
-          const m=d?.chart?.result?.[0]?.meta;
-          if(!m) return;
-          const price=m.regularMarketPrice;
-          const prev=m.chartPreviousClose||price;
-          const chg=+((price-prev)/prev*100).toFixed(2);
-          const row=SCRN_UNIVERSE.find(s=>s.sym===sym);
-          if(row){row.px=+price.toFixed(2);row.chg=chg; updated++;}
-        }catch(e){}
-      }));
-      await new Promise(r=>setTimeout(r,250));
-    }
-    if(src) src.textContent=`LIVE PRICES UPDATED · ${updated} tickers`;
-    renderSCRN();
-  }finally{
-    SCRN_STATE.isLoading=false;
-    if(btn){btn.disabled=false;btn.textContent='⟳ LIVE';}
-  }
-
-  if(SCRN_STATE.isLoading) return;
-  SCRN_STATE.isLoading = true;
-  if(btn) btn.disabled = true;
-  if(spinner) spinner.style.display = 'inline';
-
-  try {
-    let enriched = 0;
-
-    if(API_KEYS.FMP){
-      // FMP batch quote — free tier supports comma-separated symbols
-      // Split into chunks of 20 to stay well within rate limits
-      const syms = SCRN_UNIVERSE.map(r=>r.sym);
-      const dedupedSyms = [...new Set(syms)];
-      const chunks = [];
-      for(let i=0; i<dedupedSyms.length; i+=20) chunks.push(dedupedSyms.slice(i,i+20));
-
-      for(const chunk of chunks){
-        const url = `https://financialmodelingprep.com/api/v3/quote/${chunk.join(',')}?apikey=${API_KEYS.FMP}`;
-        const data = await apiFetch(url, 'SCRN');
-        if(Array.isArray(data)){
-          const bySymbol = {};
-          data.forEach(q=>{ bySymbol[q.symbol]=q; });
-          SCRN_UNIVERSE.forEach((row,i)=>{
-            const q = bySymbol[row.sym];
-            if(!q) return;
-            SCRN_STATE.rawData[i] = {
-              ...row,
-              px:   q.price ?? row.px,
-              chg:  q.changesPercentage ?? row.chg,
-              pe:   q.pe ?? row.pe,
-              mcap: q.marketCap ? q.marketCap/1e9 : row.mcap,
-              vol:  q.volume ?? row.vol,
-            };
-            enriched++;
-          });
-        }
-        // Polite delay between chunks — FMP free tier: 250 req/day
-        await new Promise(r=>setTimeout(r, 300));
-      }
-
-    } else if(API_KEYS.ALPHA_VANTAGE){
-      // AV free tier: 25 req/day, 5/min — only fetch first 20 symbols
-      const limited = [...new Set(SCRN_UNIVERSE.map(r=>r.sym))].slice(0,20);
-      for(const sym of limited){
-        const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${sym}&apikey=${API_KEYS.ALPHA_VANTAGE}`;
-        const data = await apiFetch(url, 'SCRN');
-        const q = data?.['Global Quote'];
-        if(q){
-          const idx = SCRN_STATE.rawData.findIndex(r=>r.sym===sym);
-          if(idx>=0){
-            SCRN_STATE.rawData[idx].px  = parseFloat(q['05. price']) || SCRN_STATE.rawData[idx].px;
-            SCRN_STATE.rawData[idx].chg = parseFloat(q['10. change percent']) || SCRN_STATE.rawData[idx].chg;
-            enriched++;
-          }
-        }
-        // AV rate limit: 5 req/min → 12s between calls
-        await new Promise(r=>setTimeout(r, 12500));
-      }
-    }
-
-    SCRN_STATE.lastFetch = new Date();
-    if(src) src.textContent = `LIVE DATA · ${enriched} SYMBOLS ENRICHED · ${SCRN_STATE.lastFetch.toLocaleTimeString('en-US',{hour12:false})}`;
-    // Re-run filter with enriched data
-    scrnRun();
-
-  } finally {
-    SCRN_STATE.isLoading = false;
-    if(btn) btn.disabled = false;
-    if(spinner) spinner.style.display = 'none';
-  }
-}
-
 // ═══════════════════════════════════════════
 // HOME — Market Overview Dashboard
 // ═══════════════════════════════════════════
@@ -4201,7 +3816,7 @@ function rHOME(){
           </div>`).join('')}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
-          ${['EQ','FX','CMDTY','MACRO','OPTIONS','EARN','ECON','VOL'].map(p=>`
+          ${['EQ','FX','CMDTY','MACRO','EARN','ECON','VOL'].map(p=>`
           <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid #333;color:#888;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#666'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">${p}</div>`).join('')}
         </div>
       </div>
@@ -5604,6 +5219,16 @@ async function pollAllUpgraded(){
 
   await new Promise(r=>setTimeout(r,400));
   await fetchEquityIndices();
+  // Fetch VVIX live (Yahoo Finance ^VVIX)
+  yfFetch('^VVIX').then(q=>{
+    if(!q) return;
+    const el = document.getElementById('vvix-val');
+    const ec = document.getElementById('vvix-chg');
+    const el2 = document.getElementById('vvix-lvl');
+    if(el) el.textContent = q.price.toFixed(2);
+    if(ec){ ec.textContent=(q.chg>=0?'+':'')+q.chg.toFixed(2); ec.className=q.chg>=0?'dn':'up'; }
+    if(el2){ el2.textContent = q.price>130?'EXTREME':q.price>110?'HIGH':q.price>90?'ELEVATED':'NORMAL'; el2.style.color=q.price>130?'var(--red)':q.price>110?'#ff6f00':q.price>90?'var(--amber)':'var(--green)'; }
+  }).catch(()=>{});
 
   await new Promise(r=>setTimeout(r,400));
   await fetchSectorETFs();

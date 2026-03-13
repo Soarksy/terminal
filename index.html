@@ -179,7 +179,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   flex-shrink:0;margin-left:2px;border-radius:2px;
 }
 .wh-refresh:hover{background:#001a0a;color:var(--green);border-color:#1a3a1a}
-.wb{flex:1;overflow:auto;font-size:11px;padding:6px}
+.wb{flex:1;overflow:auto;font-size:11px;padding:6px;position:relative}
 .wb:has(.ptabs-container){overflow:hidden;padding:0}
 .wr{position:absolute;bottom:0;right:0;width:10px;height:10px;cursor:se-resize;
     background:linear-gradient(135deg,transparent 50%,#222 50%)}
@@ -758,12 +758,14 @@ function getSpawnPos(sz){
 }
 
 const WTITLES={
+  HOME:'MARKET OVERVIEW',
   FI:'TREASURY MONITOR',EQ:'EQUITY MONITOR',FX:'FX & RATES',CMDTY:'COMMODITIES & ENERGY',
   MACRO:'MACRO CALENDAR & CB',NEWS:'NEWS TERMINAL',
   INFL:'INFLATION MONITOR',AUCTION:'AUCTION MONITOR',
   VOL:'VOLATILITY & RISK',EQS:'EQUITY SEARCH',CHART:'PRICE CHART'
 };
 const WSIZES={
+  HOME:[1100,640],
   FI:[680,400],EQ:[700,440],FX:[580,360],CMDTY:[600,380],
   MACRO:[720,420],NEWS:[560,460],SPREAD:[620,400],INFL:[580,380],AUCTION:[780,260],
   VOL:[460,300],EQS:[620,560],CHART:[680,420]
@@ -824,7 +826,19 @@ function refreshWin(winKey, cmd, extra){
     case'OPTIONS':b.innerHTML=rOPTIONS();break;
     case'EARN':  b.innerHTML=rEARN();  break;
     case'ECON':  b.innerHTML=rECON();  break;
-    case'HOME':  b.innerHTML=rHOME();  setTimeout(()=>initHOME(),30); break;
+    case'HOME':
+      try{
+        b.innerHTML=rHOME();
+      }catch(e){
+        console.error('[rHOME crash]', e);
+        b.innerHTML=`<div style="padding:20px;color:red;font-family:monospace;font-size:11px">
+          <div style="color:#ff4444;margin-bottom:8px">HOME RENDER ERROR</div>
+          <div style="color:#888">${e.message}</div>
+          <div style="color:#555;margin-top:6px;font-size:9px">${(e.stack||'').split('\n').slice(0,4).join('<br>')}</div>
+        </div>`;
+      }
+      setTimeout(()=>{try{initHOME();}catch(e){console.error('[initHOME crash]',e);}},30);
+      break;
     case'ROTATION':b.innerHTML=rROTATION();setTimeout(()=>drawRotation(),40);break;
     case'LADDER':b.innerHTML=rLADDER();break;
     default: break;
@@ -888,7 +902,11 @@ function renderW(cmd,key,extra){
     case'LADDER': b.innerHTML=rLADDER();break;
     case'HELP':   b.innerHTML=rHELP();break;
     case'SRCH':   b.innerHTML=rSRCH(extra);break;
-    case'HOME':   b.innerHTML=rHOME();setTimeout(()=>initHOME(),30);break;
+    case'HOME':
+      try{ b.innerHTML=rHOME(); }
+      catch(e){ console.error('[rHOME crash]',e); b.innerHTML=`<pre style="color:red;padding:10px;font-size:10px">${e.message}\n${e.stack||''}</pre>`; }
+      setTimeout(()=>{try{initHOME();}catch(e){console.error('[initHOME crash]',e);}},30);
+      break;
     case'HEAT':   b.innerHTML=rHEAT(extra||'sector');setTimeout(()=>drawHEAT(extra||'sector'),30);break;
     case'WATCH':  b.innerHTML=rWATCH();setTimeout(()=>initWATCH(),60);break;
     case'SCRN':   b.innerHTML=rSCRN();setTimeout(()=>initSCRN(),30);break;
@@ -4081,77 +4099,81 @@ async function scrnFetchLive(){
 // HOME — Market Overview Dashboard
 // ═══════════════════════════════════════════
 function buildMarketSummary(){
-  const spx   = D.equities.indices[0];
-  const ndx   = D.equities.indices[1];
-  const vix   = D.equities.indices[4];
-  const t     = D.fixedIncome.treasuries;
-  const y10   = t.find(x=>x.tenor==='10Y')?.yield ?? 0;
-  const y2    = t.find(x=>x.tenor==='2Y')?.yield ?? 0;
-  const spread= (y10-y2)*100;
-  const gold  = D.commodities.metals[0];
-  const wti   = D.commodities.energy[0];
-  const dxy   = D.fx.find(f=>f.name==='DXY');
-  const sectors = D.equities.sectors||[];
-  const topSec  = sectors.length ? [...sectors].sort((a,b)=>b.d1-a.d1)[0] : null;
-  const botSec  = sectors.length ? [...sectors].sort((a,b)=>a.d1-b.d1)[0] : null;
-  const advSec  = sectors.filter(s=>s.d1>0).length;
-  const decSec  = sectors.filter(s=>s.d1<0).length;
+  try{
+    const spx   = D.equities.indices[0];
+    const ndx   = D.equities.indices[1];
+    const vix   = D.equities.indices[4];
+    const t     = D.fixedIncome.treasuries;
+    const y10   = t.find(x=>x.tenor==='10Y')?.yield ?? 0;
+    const y2    = t.find(x=>x.tenor==='2Y')?.yield  ?? 0;
+    const spread= (y10-y2)*100;
+    const gold  = D.commodities.metals[0];
+    const wti   = D.commodities.energy[0];
+    const dxy   = D.fx.find(f=>f.name==='DXY');
+    const sectors = D.equities.sectors||[];
+    const topSec  = sectors.length ? [...sectors].sort((a,b)=>b.d1-a.d1)[0] : null;
+    const botSec  = sectors.length ? [...sectors].sort((a,b)=>a.d1-b.d1)[0] : null;
+    const advSec  = sectors.filter(s=>s.d1>0).length;
+    const decSec  = sectors.filter(s=>s.d1<0).length;
 
-  // Build a readable, auto-generated daily summary
-  const lines = [];
+    // If core data not yet loaded, show loading state
+    if(spx.val==null && vix.val==null){
+      return `<div style="padding:6px 10px;font-size:10px;color:#2a2a2a;letter-spacing:1px;border-bottom:1px solid var(--border);background:var(--bg1)">
+        LOADING MARKET DATA…
+      </div>`;
+    }
 
-  // Equity tone
-  const spxDir  = spx.pct > 0.5 ? 'rallying' : spx.pct < -0.5 ? 'selling off' : spx.pct > 0 ? 'edging higher' : 'drifting lower';
-  const spxMag  = Math.abs(spx.pct) > 1.5 ? 'sharply ' : Math.abs(spx.pct) > 0.7 ? '' : 'modestly ';
-  lines.push(`Equities are ${spxMag}${spxDir} — S&P 500 ${spx.pct>=0?'+':''}${spx.pct.toFixed(2)}% · NASDAQ ${ndx.pct>=0?'+':''}${ndx.pct.toFixed(2)}%.`);
+    const lines = [];
+    const spxPct  = spx.pct ?? 0;
+    const ndxPct  = ndx.pct ?? 0;
+    const spxDir  = spxPct > 0.5 ? 'rallying' : spxPct < -0.5 ? 'selling off' : spxPct > 0 ? 'edging higher' : 'drifting lower';
+    const spxMag  = Math.abs(spxPct) > 1.5 ? 'sharply ' : Math.abs(spxPct) > 0.7 ? '' : 'modestly ';
+    lines.push(`Equities ${spxMag}${spxDir} — S&P 500 ${spxPct>=0?'+':''}${spxPct.toFixed(2)}% · NASDAQ ${ndxPct>=0?'+':''}${ndxPct.toFixed(2)}%.`);
 
-  // Breadth
-  if(advSec > decSec) lines.push(`Broad participation with ${advSec} of ${sectors.length} sectors advancing.`);
-  else if(decSec > advSec) lines.push(`Risk-off tone with ${decSec} of ${sectors.length} sectors in the red.`);
-  if(topSec && botSec) lines.push(`${topSec.name} leads (+${topSec.d1.toFixed(2)}%), ${botSec.name} lags (${botSec.d1.toFixed(2)}%).`);
+    if(sectors.length){
+      if(advSec > decSec) lines.push(`Broad participation: ${advSec}/${sectors.length} sectors advancing.`);
+      else if(decSec > advSec) lines.push(`Risk-off: ${decSec}/${sectors.length} sectors declining.`);
+      if(topSec && botSec) lines.push(`${topSec.name} leads (+${topSec.d1.toFixed(2)}%), ${botSec.name} lags (${botSec.d1.toFixed(2)}%).`);
+    }
 
-  // Volatility
-  const vixTxt = vix.val < 15 ? `VIX is low at ${vix.val.toFixed(1)}, signalling complacency.`
-               : vix.val < 20 ? `VIX is moderate at ${vix.val.toFixed(1)}, near historical average.`
-               : vix.val < 30 ? `VIX elevated at ${vix.val.toFixed(1)}, reflecting market anxiety.`
-               : `VIX spiking at ${vix.val.toFixed(1)} — significant stress in the market.`;
-  lines.push(vixTxt);
+    if(vix.val!=null){
+      const vixTxt = vix.val < 15 ? `VIX low at ${vix.val.toFixed(1)} — complacency territory.`
+                   : vix.val < 20 ? `VIX moderate at ${vix.val.toFixed(1)}, near historical average.`
+                   : vix.val < 30 ? `VIX elevated at ${vix.val.toFixed(1)}, market anxiety elevated.`
+                   : `VIX spiking at ${vix.val.toFixed(1)} — significant stress.`;
+      lines.push(vixTxt);
+    }
 
-  // Rates
-  const curveShape = spread > 20 ? 'steepening (normal)' : spread > 0 ? 'nearly flat' : 'inverted';
-  const rateDir = (t.find(x=>x.tenor==='10Y')?.d1??0) > 0 ? 'rising' : 'falling';
-  lines.push(`10Y yield ${rateDir} at ${y10.toFixed(3)}% · 2s10s spread ${spread>=0?'+':''}${spread.toFixed(0)}bp (${curveShape}).`);
+    if(y10 > 0){
+      const curveShape = spread > 20 ? 'steepening' : spread > 0 ? 'flat' : 'inverted';
+      const d1_10 = t.find(x=>x.tenor==='10Y')?.d1 ?? 0;
+      const rateDir = d1_10 > 0 ? 'rising' : d1_10 < 0 ? 'falling' : 'unchanged';
+      lines.push(`Rates: 10Y ${rateDir} at ${y10.toFixed(3)}% · 2s10s ${spread>=0?'+':''}${spread.toFixed(0)}bp (${curveShape}).`);
+    }
 
-  // Commodities & FX
-  const goldDir = gold.d1 > 0 ? `Gold up ${gold.d1.toFixed(2)}% at $${gold.spot.toFixed(0)}` : `Gold down ${Math.abs(gold.d1).toFixed(2)}% at $${gold.spot.toFixed(0)}`;
-  const oilDir  = wti.d1 > 0  ? `WTI +${wti.d1.toFixed(2)}%` : `WTI ${wti.d1.toFixed(2)}%`;
-  const dxyDir  = dxy ? (dxy.d1>0?`DXY firmer at ${dxy.val.toFixed(2)}`:`DXY softer at ${dxy.val.toFixed(2)}`) : '';
-  lines.push(`${goldDir} · ${oilDir} · ${dxyDir}.`);
+    if(gold.spot!=null && wti.spot!=null){
+      lines.push(`Commodities: Gold $${gold.spot.toFixed(0)}/oz · WTI $${wti.spot.toFixed(2)}/bbl.`);
+    }
+    if(dxy?.val!=null){
+      lines.push(`DXY ${dxy.d1>=0?'+':''}${(dxy.d1??0).toFixed(2)} at ${dxy.val.toFixed(2)}.`);
+    }
 
-  // Risk signal
-  const riskOn  = spx.pct > 0 && gold.d1 < 0 && vix.val < 20;
-  const riskOff = spx.pct < 0 && gold.d1 > 0 && vix.val > 20;
-  const regime  = riskOn  ? {txt:'RISK-ON',  col:'var(--green)', note:'Equities bid, gold soft, vol contained.'}
-                : riskOff ? {txt:'RISK-OFF', col:'var(--red)',   note:'Equities pressured, gold bid, vol elevated.'}
-                :           {txt:'MIXED',    col:'var(--amber)', note:'Conflicting signals across asset classes.'};
-
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric',timeZone:'America/Denver'});
-
-  return `
-    <div style="padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:#040404">
-      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap">
-        <span style="font-size:9px;color:#555;letter-spacing:1px">${dateStr.toUpperCase()}</span>
-        <span style="font-size:9px;letter-spacing:1px;padding:1px 6px;border:1px solid ${regime.col};color:${regime.col};font-weight:600">${regime.txt}</span>
-        <span style="font-size:9px;color:#666">${regime.note}</span>
-      </div>
-      <div style="font-size:11px;color:#c0c0c0;line-height:1.7">
-        ${lines.map(l=>`<span style="margin-right:14px;display:inline">${l}</span>`).join('')}
-      </div>
+    const summaryText = lines.join('  ');
+    return `<div style="padding:5px 10px;font-size:10px;color:#555;letter-spacing:.3px;border-bottom:1px solid var(--border);background:var(--bg1);line-height:1.6;font-style:italic">
+      ${summaryText}
     </div>`;
+  }catch(e){
+    return `<div style="padding:5px 10px;font-size:9px;color:#2a2a2a;border-bottom:1px solid var(--border)">
+      MARKET SUMMARY LOADING…
+    </div>`;
+  }
 }
 
 function rHOME(){
+  console.log('[rHOME] D.equities.indices:', D.equities.indices?.map(x=>({sym:x.sym,val:x.val,pct:x.pct})));
+  console.log('[rHOME] D.fx:', D.fx?.map(x=>({name:x.name,val:x.val})));
+  console.log('[rHOME] D.commodities.energy:', D.commodities?.energy?.map(x=>({name:x.name,spot:x.spot})));
+  console.log('[rHOME] D.commodities.metals:', D.commodities?.metals?.map(x=>({name:x.name,spot:x.spot})));
   const t = D.fixedIncome.treasuries;
   const y2  = t.find(x=>x.tenor==='2Y')?.yield ?? 0;
   const y10 = t.find(x=>x.tenor==='10Y')?.yield ?? 0;
@@ -4238,7 +4260,7 @@ function rHOME(){
     ? `<div style="width:${adPct}%;background:var(--green);opacity:.7"></div><div style="flex:1;background:var(--red);opacity:.7"></div>`
     : `<div style="width:50%;background:#333"></div><div style="flex:1;background:#1a1a1a"></div>`;
 
-  return `<div id="home-wrap" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+  return `<div id="home-wrap" style="display:flex;flex-direction:column;position:absolute;inset:0;overflow:hidden">
     <!-- HEADER -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)">
       <span style="color:var(--amber);font-size:11px;font-weight:600;letter-spacing:2px">◈ TERMINAL</span>

@@ -56,8 +56,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #topright{display:flex;align-items:center;gap:10px}
 #mktstrip-live{display:flex;align-items:center;font-size:10px;letter-spacing:.5px;white-space:nowrap;font-family:var(--font)}
 #live-fetching-text{color:#cc8800;margin-left:10px}
-#clock{color:#a0a0a0;font-size:11px;white-space:nowrap}
-#livebadge{color:var(--green);font-size:10px;border:1px solid #1a3a1a;padding:1px 5px;background:#0a1a0a}
 
 /* ── SHORTCUT BAR ── */
 #shortcuts{
@@ -449,7 +447,7 @@ canvas{display:block}
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div id="logo">◈ TERMINAL</div>
+  <div id="logo">◈ TERMINAL &nbsp;<span id="clock" style="font-size:10px;font-weight:400;letter-spacing:1px;color:#666">--:--:--</span></div>
   <div id="cmdwrap">
     <span id="cmdprompt">&gt;&gt;</span>
     <input id="cmdbar" type="text" placeholder=">> SEARCH" autocomplete="off" spellcheck="false">
@@ -461,8 +459,6 @@ canvas{display:block}
       <span id="live-refresh-text" style="color:#555;margin-left:10px">REFRESHED: --:--:--</span>
       <span id="live-fetching-text"></span>
     </div>
-    <div id="livebadge" style="display:none">● LIVE</div>
-    <div id="clock">--:--:--</div>
     <div id="fomc-countdown" style="font-size:9px;color:#cc8800;letter-spacing:1px;padding:0 6px;border-left:1px solid #1a1a1a"></div>
   </div>
 </div>
@@ -495,8 +491,6 @@ canvas{display:block}
 </div>
 
 
-<!-- STATUS BAR -->
-<div id="status-bar" style="height:16px;background:#050505;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.5px;overflow:hidden;white-space:nowrap;color:#555"></div>
 
 <!-- TICKER TAPE -->
 <div id="ticker-tape"><div id="ticker-inner"><span class="ti"><span class="ti-sym">SPX</span><span class="ti-px">—</span><span class="ti-up">loading...</span></span></div></div>
@@ -2556,14 +2550,6 @@ function updateStatusBar(){
   if(statusEl) statusEl.innerHTML = FETCH_STATE.lastRefresh
     ? '<span style="color:#4aaa4a">● LIVE</span>'
     : '<span style="color:#555">● INIT</span>';
-
-  // Also keep the small status-bar strip in sync (secondary display)
-  const el = document.getElementById('status-bar');
-  if(!el) return;
-  let html = `<span style="color:#4aaa4a">LIVE &nbsp;|&nbsp; REFRESHED: ${ts}</span>`;
-  if(pending.length) html += ` &nbsp;<span style="color:#cc8800">⟳ FETCHING: ${pending.join(' ')}</span>`;
-  if(stale.length)   html += ` &nbsp;<span style="color:var(--red)">⚠ STALE: ${stale.join(' ')}</span>`;
-  el.innerHTML = html;
 }
 
 // Generic rate-limited fetch with timeout + CORS proxy for blocked APIs

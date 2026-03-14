@@ -554,22 +554,22 @@ const D = {
   },
 
   fx:[
-    {name:'DXY',     val:null,d1:null,w1:null,m1:null,vol:null,type:'idx'},
-    {name:'EURUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'USDJPY',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'GBPUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'USDCHF',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'AUDUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'USDCAD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'NZDUSD',  val:null,d1:null,w1:null,m1:null,vol:null,type:'g10'},
-    {name:'USDSEK',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDNOK',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDBRL',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDMXN',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDINR',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDCNY',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDZAR',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
-    {name:'USDTRY',  val:null,d1:null,w1:null,m1:null,vol:null,type:'em'},
+    {name:'DXY',    val:null,d1:null,pct:null,type:'idx'},
+    {name:'EURUSD', val:null,d1:null,pct:null,type:'g10'},
+    {name:'USDJPY', val:null,d1:null,pct:null,type:'g10'},
+    {name:'GBPUSD', val:null,d1:null,pct:null,type:'g10'},
+    {name:'USDCHF', val:null,d1:null,pct:null,type:'g10'},
+    {name:'AUDUSD', val:null,d1:null,pct:null,type:'g10'},
+    {name:'USDCAD', val:null,d1:null,pct:null,type:'g10'},
+    {name:'NZDUSD', val:null,d1:null,pct:null,type:'g10'},
+    {name:'USDSEK', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDNOK', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDBRL', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDMXN', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDINR', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDCNY', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDZAR', val:null,d1:null,pct:null,type:'em'},
+    {name:'USDTRY', val:null,d1:null,pct:null,type:'em'},
   ],
 
   commodities:{
@@ -1223,14 +1223,11 @@ function drawEQ(){}
 // ═══════════════════════════════════════════
 function rFX(){
   function fxTable(title,data){
-    const rows=data.filter(r=>r.val!=null).map(r=>{
+    const rows=data.filter(r=>r.val!=null&&r.type!=='idx').map(r=>{
       const dec=r.val>100?2:4;
-      const vol=r.vol==='HIGH'?`<span class="dn">HIGH</span>`:r.vol==='MOD'?`<span style="color:var(--amber)">MOD</span>`:`<span class="neu">${r.vol||'—'}</span>`;
-      return`<tr><td>${r.name}</td><td class="hl">${r.val.toFixed(dec)}</td>
-        <td>${fmtC(r.d1,dec)}</td>
-        <td>${vol}</td></tr>`;
+      return`<tr><td>${r.name}</td><td class="hl">${r.val.toFixed(dec)}</td><td>${fmtC(r.d1,dec)}</td></tr>`;
     }).join('');
-    const body=rows||`<tr><td colspan="4" style="color:#555;padding:8px;text-align:center">FETCHING…</td></tr>`;
+    const body=rows||`<tr><td colspan="3" style="color:#555;padding:8px;text-align:center">FETCHING…</td></tr>`;
     return`<div class="sl">${title}</div>
       <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th></tr></thead><tbody>${body}</tbody></table>`;
   }
@@ -1238,7 +1235,6 @@ function rFX(){
   const em=D.fx.filter(f=>f.type==='em');
 
 
-  const fxLookup={};D.fx.forEach(f=>{fxLookup[f.name]=f;});
 
   // Build currency options from live D.fx data
   // Build currency list from live FX data

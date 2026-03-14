@@ -417,12 +417,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #home-header{flex-shrink:0;padding:6px 8px 4px;border-bottom:1px solid var(--border)}
 #home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);flex-shrink:0}
 .home-tile{
-  background:var(--bg1);padding:10px 12px;cursor:pointer;position:relative;overflow:hidden;
+  background:var(--bg1);padding:7px 10px;cursor:pointer;position:relative;overflow:hidden;
   display:flex;flex-direction:column;gap:1px;
 }
 .home-tile:hover{background:var(--bg2)}
 .home-tile-label{font-size:9px;color:#aaa;letter-spacing:1px;font-weight:600}
-.home-tile-val{font-size:22px;font-weight:600;color:var(--text-bright);letter-spacing:-0.5px;line-height:1.1}
+.home-tile-val{font-size:18px;font-weight:600;color:var(--text-bright);letter-spacing:-0.5px;line-height:1.1}
 .home-tile-sub{font-size:9px;display:flex;gap:6px;align-items:center;margin-top:1px}
 .home-tile-chg{font-size:11px;font-weight:600}
 .home-tile-meta{color:#888;font-size:9px}
@@ -2185,30 +2185,29 @@ async function fetchFXRates(){
     'USDCNY=X':'USDCNY','USDZAR=X':'USDZAR','USDTRY=X':'USDTRY',
     '^DXY':'DXY'
   };
-  try{
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols.join(',')}&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketChange`;
-    const text = await proxyFetch(url, 12000).then(r=>r.text());
-    const data = JSON.parse(text);
-    const results = data?.quoteResponse?.result || [];
-    if(!results.length) throw new Error('empty quote response');
-    let anyOk = false;
-    for(const q of results){
-      const name = yfName[q.symbol];
-      if(!name) continue;
-      const row = D.fx.find(f=>f.name===name);
-      if(!row) continue;
-      const price = q.regularMarketPrice;
-      const prev  = q.regularMarketPreviousClose || price;
-      const chg   = q.regularMarketChange ?? (price - prev);
-      if(!price || isNaN(price)) continue;
-      const hiPrec = name==='EURUSD'||name==='GBPUSD'||name==='AUDUSD'||name==='NZDUSD';
-      row.val = +price.toFixed(hiPrec?4:2);
-      row.d1  = +chg.toFixed(hiPrec?4:2);
-      row.pct = +((chg/prev)*100).toFixed(3);
+  // Fetch all FX pairs in batches of 4 using yfFetch (v8/chart — proven reliable)
+  let anyOk = false;
+  const pairs = symbols.map(yf=>({yf, name:yfName[yf]})).filter(p=>p.name);
+  // Fetch in parallel batches of 4
+  for(let i=0; i<pairs.length; i+=4){
+    const batch = pairs.slice(i,i+4);
+    const results = await Promise.allSettled(batch.map(p=>yfFetch(p.yf)));
+    results.forEach((r,j)=>{
+      if(r.status!=='fulfilled'||!r.value) return;
+      const q = r.value;
+      const p = batch[j];
+      const row = D.fx.find(f=>f.name===p.name);
+      if(!row) return;
+      const hiPrec = p.name==='EURUSD'||p.name==='GBPUSD'||p.name==='AUDUSD'||p.name==='NZDUSD';
+      const dec = p.name==='DXY' ? 2 : hiPrec ? 4 : 2;
+      row.val = +q.price.toFixed(dec);
+      row.d1  = +q.chg.toFixed(dec);
+      row.pct = +q.pct.toFixed(3);
       anyOk = true;
-    }
-    if(anyOk) markFresh('FX'); else throw new Error('no valid quotes');
-  }catch(e){ markStale('FX', e.message||'fetchFXRates failed'); }
+    });
+    if(i+4 < pairs.length) await new Promise(r=>setTimeout(r,150));
+  }
+  if(anyOk) markFresh('FX'); else markStale('FX','all FX fetches failed');
 }
 
 
@@ -3073,8 +3072,10 @@ function buildMarketSummary(){
       lines.push(`DXY ${dxy.d1>=0?'+':''}${(dxy.d1??0).toFixed(2)} at ${dxy.val.toFixed(2)}.`);
     }
 
-    return `<div style="padding:7px 10px;border-bottom:1px solid var(--border);background:#020202;display:flex;flex-wrap:wrap;gap:6px 16px">
-      ${lines.map((line,i)=>`<span style="font-size:11px;color:${i===0?'var(--text)':'#aaa'};letter-spacing:.2px;line-height:1.5">${line}</span>`).join('')}
+    return `<div style="padding:10px 12px;border-bottom:1px solid var(--border);background:#020202">
+      <div style="display:flex;flex-wrap:wrap;gap:4px 20px">
+        ${lines.map((line,i)=>`<span style="font-size:${i===0?'13':'12'}px;color:${i===0?'var(--text-bright)':'#bbb'};letter-spacing:.2px;line-height:1.6">${line}</span>`).join('')}
+      </div>
     </div>`;
   }catch(e){
     return `<div style="padding:7px 10px;font-size:10px;color:#555;border-bottom:1px solid var(--border)">
@@ -3159,17 +3160,12 @@ function rHOME(){
     </div>
     <!-- DAILY SUMMARY -->
     ${buildMarketSummary()}
-    <!-- MARKET TILES -->
-    <div id="home-grid" style="flex-shrink:0">
+    <!-- MARKET TILES — compact single row -->
+    <div id="home-grid" style="flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border)">
       ${tile('spx','S&P 500', _n(spx.val,1), spx.pct??0, _nc(spx.pct,2)+'%', 'SPX', 'EQ')}
-      ${tile('ndx','NASDAQ', _n(ndx.val,1), ndx.pct??0, _nc(ndx.pct,2)+'%', 'NDX', 'EQ')}
-      ${tile('dow','DOW', _n(dow.val,0), dow.pct??0, _nc(dow.pct,2)+'%', 'DJIA', 'EQ')}
-      ${tile('vix','VIX', `<span style="color:${vixLevel.col}">${(vix.val!=null?vix.val.toFixed(2):'—')}</span>`, vix.chg??0, _nc(vix.chg??0,2), vixLevel.txt, 'VOL')}
+      ${tile('vix','VIX', `<span style="color:${vixLevel.col}">${(vix.val!=null?vix.val.toFixed(2):'—')}</span>`, vix.chg??0, _nc(vix.chg??0,2), vixLevel.txt, 'HOME')}
       ${tile('ust10','UST 10Y', y10.toFixed(3)+'%', t.find(x=>x.tenor==='10Y')?.d1??0, ((t.find(x=>x.tenor==='10Y')?.d1??0)).toFixed(3), '10Y YIELD', 'FI')}
-      ${tile('s2_10','2s10s', (s2_10>=0?'+':'')+s2_10.toFixed(0)+'bp', s2_10, s2_10.toFixed(0), s2_10<0?'INVERTED':'NORMAL CURVE', 'FI')}
       ${tile('dxy','DXY', _n(dxy.val,2), dxy.d1??0, _nc(dxy.d1??0,3), 'DOLLAR INDEX', 'FX')}
-      ${tile('eur','EUR/USD', _n(eur.val,4), eur.d1??0, _nc(eur.d1??0,4), 'G10 FX', 'FX')}
-      ${tile('wti','WTI', _n(wti.spot,2,'$'), wti.d1??0, _nc(wti.d1??0,2)+'%', '$/BBL', 'CMDTY')}
       ${tile('gold','GOLD', _n(gold.spot,0,'$'), gold.d1??0, _nc(gold.d1??0,2)+'%', '$/OZ', 'CMDTY')}
     </div>
     <!-- BREADTH BAR -->

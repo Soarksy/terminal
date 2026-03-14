@@ -48,21 +48,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   display:flex;align-items:center;padding:0 8px;gap:10px;z-index:2000;position:relative;
 }
 #logo{color:var(--amber);font-weight:600;font-size:12px;letter-spacing:3px;white-space:nowrap}
-#cmdwrap{flex:1;max-width:480px;min-width:200px;display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);padding:0 6px}
+#cmdwrap{width:420px;flex-shrink:0;display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);padding:0 6px}
 #cmdbar{
   flex:1;background:transparent;border:none;color:var(--text-bright);
   font-family:var(--font);font-size:12px;outline:none;caret-color:var(--amber);
 }
 #cmdbar::placeholder{color:var(--text-dim)}
 #topright{display:flex;align-items:center;gap:10px}
-#topbar-mkt{display:flex;align-items:center;gap:0;flex:1;overflow:hidden}
-.tbm-item{display:inline-flex;align-items:center;gap:4px;padding:0 8px;cursor:pointer;white-space:nowrap}
-.tbm-item:hover .tbm-val{color:var(--text-bright)}
-.tbm-lbl{font-size:9px;color:#444;letter-spacing:.8px}
-.tbm-val{font-size:10px;color:#888;font-weight:500;min-width:40px}
-.tbm-sep{color:#222;font-size:9px}
-.tbm-up{color:#5aaa7a!important}
-.tbm-dn{color:#cc5555!important}
 #mktstrip-live{display:flex;align-items:center;font-size:10px;letter-spacing:.5px;white-space:nowrap;font-family:var(--font)}
 #live-fetching-text{color:#cc8800;margin-left:10px}
 
@@ -457,19 +449,6 @@ canvas{display:block}
 <!-- TOPBAR -->
 <div id="topbar">
   <div id="logo">◈ TERMINAL &nbsp;<span id="clock" style="font-size:10px;font-weight:400;letter-spacing:1px;color:#666">--:--:--</span></div>
-  <div id="topbar-mkt">
-    <span class="tbm-item" onclick="OW('EQ')" title="S&amp;P 500"><span class="tbm-lbl">SPX</span><span id="tbm-spx" class="tbm-val">—</span></span>
-    <span class="tbm-sep">·</span>
-    <span class="tbm-item" onclick="OW('EQ')" title="Nasdaq 100"><span class="tbm-lbl">NDX</span><span id="tbm-ndx" class="tbm-val">—</span></span>
-    <span class="tbm-sep">·</span>
-    <span class="tbm-item" onclick="OW('VOL')" title="VIX"><span class="tbm-lbl">VIX</span><span id="tbm-vix" class="tbm-val">—</span></span>
-    <span class="tbm-sep">·</span>
-    <span class="tbm-item" onclick="OW('FX')" title="US Dollar Index"><span class="tbm-lbl">DXY</span><span id="tbm-dxy" class="tbm-val">—</span></span>
-    <span class="tbm-sep">·</span>
-    <span class="tbm-item" onclick="OW('FI')" title="10Y Treasury"><span class="tbm-lbl">10Y</span><span id="tbm-10y" class="tbm-val">—</span></span>
-    <span class="tbm-sep">·</span>
-    <span class="tbm-item" onclick="OW('CMDTY')" title="Gold"><span class="tbm-lbl">GOLD</span><span id="tbm-gold" class="tbm-val">—</span></span>
-  </div>
   <div id="cmdwrap">
     <input id="cmdbar" type="text" placeholder="SEARCH" autocomplete="off" spellcheck="false">
     <div id="search-type-badge"></div>
@@ -606,12 +585,7 @@ const D = {
       {name:'Copper',   spot:null, d1:null, curve:null, unit:'$/lb'},
       {name:'Platinum', spot:null, d1:null, curve:null, unit:'$/oz'},
     ],
-    agriculture:[
-      {name:'Corn',     spot:null, d1:null, curve:null, unit:'¢/bu'},
-      {name:'Wheat',    spot:null, d1:null, curve:null, unit:'¢/bu'},
-      {name:'Soybeans', spot:null, d1:null, curve:null, unit:'¢/bu'},
-      {name:'Sugar',    spot:null, d1:null, curve:null, unit:'¢/lb'},
-    ]
+    agriculture:[]
   },
 
   macro:{
@@ -1266,16 +1240,21 @@ function rFX(){
   const fxLookup={};D.fx.forEach(f=>{fxLookup[f.name]=f;});
 
   // Build currency options from live D.fx data
+  // Build currency list from live FX data
+  // Pairs like EURUSD → EUR at rate=val (1 EUR = val USD)
+  // Pairs like USDJPY → JPY at rate=1/val (1 JPY = 1/val USD)
+  const _fxCcyMap = {
+    'EURUSD':'EUR','GBPUSD':'GBP','AUDUSD':'AUD','NZDUSD':'NZD',
+    'USDJPY':'JPY','USDCHF':'CHF','USDCAD':'CAD','USDSEK':'SEK',
+    'USDNOK':'NOK','USDBRL':'BRL','USDCNY':'CNY','USDINR':'INR'
+  };
   const fxOpts = [
     {name:'USD', val:1},
-    ...D.fx.filter(f=>f.val!=null).map(f=>{
-      // Convert pair to base currency rate vs USD
-      const name = f.name.replace('USD=X','').replace('=X','');
-      // EURUSD=1.08 means 1 EUR = 1.08 USD → rate for EUR = 1.08
-      // USDJPY=150 means 1 USD = 150 JPY → rate for JPY = 1/150
+    ...D.fx.filter(f=>f.val!=null&&_fxCcyMap[f.name]).map(f=>{
+      const name = _fxCcyMap[f.name];
       const isUSDbase = f.name.startsWith('USD');
-      const rate = isUSDbase ? 1/f.val : f.val;
-      return {name, val:rate, raw:f.name};
+      const rate = isUSDbase ? 1/f.val : f.val; // rate = 1 CCY in USD
+      return {name, val:rate};
     })
   ];
   const fxOptHTML = fxOpts.map((o,i)=>
@@ -1330,7 +1309,6 @@ function rCMDTY(){
   }
   return cs('ENERGY',D.commodities.energy,'#e65100')
         +cs('METALS',D.commodities.metals,'#b5921a')
-        +cs('AGRICULTURE',D.commodities.agriculture,'#2e7d32');
 }
 
 // ═══════════════════════════════════════════
@@ -1490,10 +1468,7 @@ function rVOL(){
       </tbody></table>
     </div>`;
 
-  return buildTabs('vol-tabs',[
-    {id:'vol-main',    label:'VIX & INDICES', content:volTab},
-    {id:'vol-options', label:'OPTIONS FLOW',  content:`<div style="padding:8px 10px"><div class="sl" style="margin-bottom:8px">OPTIONS FLOW — EXTERNAL SOURCES</div><div style="font-size:9px;color:#555;margin-bottom:12px">Real-time options flow requires premium data subscriptions. Access via:</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${[['Unusual Whales','https://unusualwhales.com'],['Market Chameleon','https://marketchameleon.com'],['Barchart Options','https://www.barchart.com/options'],['CBOE LiveVol','https://datashop.cboe.com'],['SpotGamma','https://spotgamma.com'],['Quant Data','https://quantdata.us']].map(([n,u])=>'<a href="'+u+'" target="_blank" style="display:block;padding:6px 8px;border:1px solid #1a1a1a;color:var(--amber);font-size:10px;text-decoration:none;letter-spacing:0.5px">↗ '+n+'</a>').join('')}</div></div>`},
-  ]);
+  return buildTabs('vol-tabs',[{id:'vol-main', label:'VIX & INDICES', content:volTab}]);
 }
 
 
@@ -1750,76 +1725,6 @@ function rLADDER(){
 // RENDER: MACRO
 // ═══════════════════════════════════════════
 function rMACRO(){
-  // ── CALENDAR TAB ──
-  // Impact dot: ● = HIGH (red), ◉ = MED (amber), · = LOW (dim)
-  const impDot = imp => imp==='HIGH'
-    ? `<span title="High market impact" style="color:var(--red);font-size:11px;line-height:1">●</span>`
-    : imp==='MED'
-    ? `<span title="Medium market impact" style="color:var(--amber);font-size:11px;line-height:1">●</span>`
-    : `<span title="Low market impact" style="color:#333;font-size:11px;line-height:1">●</span>`;
-
-  const _mth={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const _parseDate=s=>{const p=(s||'').match(/(\w+)\s+(\d+)/);return p?new Date(new Date().getFullYear(),_mth[p[1]]??0,+p[2]):null;};
-  const _calNow=new Date();
-  const calFiltered=D.macro.calendar.filter(e=>{
-    const d=_parseDate(e.date);
-    if(!d) return true;
-    const ageMs=_calNow-d;
-    if(ageMs<0) return true;           // future: always show
-    if(e.act!==null) return ageMs < 7*86400000; // past with actual: keep 7 days
-    return true;                       // pending: always show
-  });
-  const calRows=calFiltered.map(e=>{
-    const pending = e.act === null;
-    // For released events: show actual with beat/miss color
-    // For pending: show forecast only (no actual column)
-    const actCol = e.beat===true ? 'var(--green)' : e.beat===false ? 'var(--red)' : 'var(--amber)';
-    const rowStyle = e.impact==='HIGH' ? 'border-left:2px solid rgba(255,68,68,0.4)' : '';
-
-    if(pending){
-      // Upcoming: DATE | TIME | ● | CTY | EVENT | PREV | FCST
-      return `<div class="cal-item" style="${rowStyle}">
-        <div style="color:#707070;font-size:9px;white-space:nowrap">${e.date||''}</div>
-        <div style="color:#606060;font-size:9px;white-space:nowrap">${e.time||'—'}</div>
-        <div style="width:14px;text-align:center">${impDot(e.impact)}</div>
-        <div style="color:#505050;font-size:9px;width:22px;font-weight:600">${e.cty}</div>
-        <div style="flex:1;font-size:10px;color:#a0a0a0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.event}</div>
-        <div style="width:52px;text-align:right;color:#606060;font-size:9px">${e.prev||'—'}</div>
-        <div style="width:52px;text-align:right;color:#888;font-size:9px;font-weight:600">${e.fore||'—'}</div>
-      </div>`;
-    } else {
-      // Released: DATE | TIME | ● | CTY | EVENT | PREV | ACTUAL (beat/miss)
-      return `<div class="cal-item" style="${rowStyle}">
-        <div style="color:#707070;font-size:9px;white-space:nowrap">${e.date||''}</div>
-        <div style="color:#606060;font-size:9px;white-space:nowrap">${e.time||'—'}</div>
-        <div style="width:14px;text-align:center">${impDot(e.impact)}</div>
-        <div style="color:#505050;font-size:9px;width:22px;font-weight:600">${e.cty}</div>
-        <div style="flex:1;font-size:10px;color:#707070;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.event}</div>
-        <div style="width:52px;text-align:right;color:#555;font-size:9px">${e.prev||'—'}</div>
-        <div style="width:52px;text-align:right;color:${actCol};font-size:10px;font-weight:700">${e.act||'—'}</div>
-      </div>`;
-    }
-  }).join('');
-
-  // Group header labels differ for past vs upcoming
-  const _emptyCalMsg = !calFiltered.length ? `
-    <div style="padding:20px 10px;text-align:center;color:#555;font-size:10px">
-      No scheduled events · <span style="color:var(--amber);cursor:pointer" onclick="switchTab('macro-tabs','macro-cal-links')">Browse external calendars →</span>
-    </div>` : '';
-
-  const calTab = `<div style="padding:4px 6px">
-    <div style="display:grid;grid-template-columns:50px 42px 14px 22px 1fr 52px 52px;font-size:9px;color:#555;padding:3px 0 3px 6px;border-bottom:1px solid #1a1a1a;margin-bottom:2px;letter-spacing:.5px">
-      <span>DATE</span><span>TIME</span><span style="text-align:center">IMP</span><span>CTY</span><span>EVENT</span><span style="text-align:right">PREV</span><span style="text-align:right">FCST / ACT</span>
-    </div>
-    <div style="font-size:9px;color:#444;padding:2px 6px 4px;display:flex;gap:14px;border-bottom:1px solid #111;margin-bottom:3px">
-      <span>${impDot('HIGH')} HIGH IMPACT</span>
-      <span>${impDot('MED')} MED IMPACT</span>
-      <span>${impDot('LOW')} LOW IMPACT</span>
-      <span style="margin-left:auto;color:#3aaa3a">GREEN = BEAT &nbsp;</span><span style="color:#cc5555">RED = MISS</span>
-    </div>
-    ${_emptyCalMsg||calRows}
-  </div>`;
-
   // ── CENTRAL BANKS TAB — links to live sources ──
   const CB_SOURCES = [
     {name:'FED',   full:'Federal Reserve',      url:'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm', desc:'FOMC calendar, statements, minutes, dot plot'},
@@ -1904,7 +1809,6 @@ function rMACRO(){
   </div>`;
 
   return buildTabs('macro-tabs',[
-    {id:'macro-cal',  label:'CALENDAR',      content:calTab},
     {id:'macro-cb', label:'CENTRAL BANKS', content:cbTabContent},
     {id:'macro-econ', label:'ECON / FRED',   content:econTab},
     {id:'macro-cal-links', label:'EXT CALENDARS', content:`
@@ -2608,10 +2512,12 @@ async function fetchFXRates(){
     if(d.result !== 'success') throw new Error('bad response');
     const rates = d.rates;
     const fxMap = {
-      'EURUSD': 1/rates.EUR, 'USDJPY': rates.JPY,
-      'GBPUSD': 1/rates.GBP, 'USDCHF': rates.CHF,
-      'AUDUSD': 1/rates.AUD, 'USDCAD': rates.CAD,
-      'USDCNY': rates.CNY,   'USDINR': rates.INR,
+      'EURUSD': 1/rates.EUR,  'USDJPY': rates.JPY,
+      'GBPUSD': 1/rates.GBP,  'USDCHF': rates.CHF,
+      'AUDUSD': 1/rates.AUD,  'USDCAD': rates.CAD,
+      'NZDUSD': 1/rates.NZD,  'USDSEK': rates.SEK,
+      'USDNOK': rates.NOK,    'USDBRL': rates.BRL,
+      'USDCNY': rates.CNY,    'USDINR': rates.INR,
     };
     D.fx.forEach(row => {
       const val = fxMap[row.name];
@@ -2939,26 +2845,6 @@ async function pollAll(){
 }
 
 function refreshOpenWindows(){
-  // ── Update topbar market strip ──
-  try{
-    const _spx = D.equities.indices[0];
-    const _ndx = D.equities.indices[1];
-    const _vix = D.equities.indices[4];
-    const _dxy = D.fx.find(f=>f.name==='DXY');
-    const _t10 = D.fixedIncome.treasuries.find(t=>t.tenor==='10Y');
-    const _gld = D.commodities.metals.find(m=>m.name==='Gold');
-    const _tbm = (id,val,pct,fmt)=>{
-      const el=document.getElementById(id); if(!el||val==null) return;
-      el.textContent = fmt ? fmt(val) : val.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-      el.className='tbm-val'+(pct>0?' tbm-up':pct<0?' tbm-dn':'');
-    };
-    if(_spx) _tbm('tbm-spx',_spx.val,_spx.pct,v=>v.toLocaleString('en-US',{maximumFractionDigits:0}));
-    if(_ndx) _tbm('tbm-ndx',_ndx.val,_ndx.pct,v=>v.toLocaleString('en-US',{maximumFractionDigits:0}));
-    if(_vix) _tbm('tbm-vix',_vix.val,_vix.pct,v=>v.toFixed(2));
-    if(_dxy) _tbm('tbm-dxy',_dxy.val,_dxy.d1,v=>v.toFixed(2));
-    if(_t10) _tbm('tbm-10y',_t10.yield,_t10.d1,v=>v.toFixed(3)+'%');
-    if(_gld) _tbm('tbm-gold',_gld.spot,_gld.d1,v=>v.toLocaleString('en-US',{maximumFractionDigits:0}));
-  }catch(e){}
   // Re-render open panels that depend on live data
   const livePanels = ['FI','TREAS','EQ','FX','CMDTY','INFL','VOL','AUCTION'];
   livePanels.forEach(cmd=>{
@@ -4225,14 +4111,14 @@ function rHELP(){
     {cmd:'HOME',  desc:'Market Overview',         detail:'UST 2Y · UST 10Y · 2s10s spread · SPX · Nasdaq · VIX · DXY · WTI · Gold · CB rates · News feed'},
     {cmd:'HEAT',  desc:'Visual Heatmap',          detail:'SECTOR: 11 GICS sectors by 1D % · CURVE: UST bars by tenor colored by 1D change'},
     {cmd:'FI',    desc:'Fixed Income Monitor',    detail:'Full UST curve 1M→30Y · Yield / duration / price · 1D/1W/1M Δ · 2s10s · 3m10y · 5s30s spreads · NORMAL/FLAT/INVERTED regime'},
-    {cmd:'MACRO', desc:'Macro Calendar & CBs',    detail:'Economic events · Actual vs forecast · HIGH/MED/LOW impact · FRED live data · Central bank links · External calendar links'},
+    {cmd:'MACRO', desc:'Macro Calendar & CBs',    detail:'Central bank sources · FRED live data: CPI NFP GDP PCE · External economic calendar links'},
     {cmd:'SCRN',  desc:'Equity Screener',         detail:'16 Finviz preset screens: Momentum / Fundamental / Sector / Special Situations · Opens Finviz with filters pre-applied · Live data'},
   ];
 
   const panels = [
     {cmd:'EQ',      desc:'Equity Monitor',    detail:'Index table: SPX Nasdaq Dow Russell VIX · Sector heatmap grid · 1D / 1W returns'},
     {cmd:'FX',      desc:'FX & Rates',        detail:'G10 + DXY + EM pairs · Spot price · 1D change · Vol level: LOW / MOD / HIGH · FX Calculator'},
-    {cmd:'CMDTY',   desc:'Commodities',       detail:'Energy · Metals · Agriculture · Spot price · 1D% change · Live Yahoo Finance'},
+    {cmd:'CMDTY',   desc:'Commodities',       detail:'Energy · Metals · Spot price · 1D% change · Live Yahoo Finance'},
     {cmd:'NEWS',    desc:'News Terminal',     detail:'12 headlines · Filter: macro eq energy credit geo · Click headline for full story'},
     {cmd:'INFL',    desc:'Inflation Monitor', detail:'TIPS breakevens 5Y/10Y/30Y/5Y5Y · CPI PCE Core PCE · Breakeven curve chart'},
     {cmd:'AUCTION', desc:'Treasury Auctions', detail:'Bid-to-cover · Tail bp · Indirect / Direct / Dealer split · Weak flag (red)'},

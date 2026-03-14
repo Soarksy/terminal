@@ -1213,7 +1213,7 @@ function rEQ(){
     {id:'eq-indices',  label:'S&P 500',   content:spxHeatmap},
     {id:'eq-sectors',  label:'SECTORS',   content:`<div style="padding:4px 6px"><div class="sl">SECTOR HEATMAP — 1D PERFORMANCE</div><div class="hm-grid">${hm}</div></div>`},
     {id:'eq-rotation', label:'ROTATION',  content:`<div style="padding:4px 6px"><div style="font-size:10px;color:#707070;margin-bottom:4px">● 1D + 1W LIVE FROM ETF DATA</div><table class="t"><thead><tr><th>RANK</th><th>SECTOR</th><th>1D ●</th><th>1W ●</th><th>MOM</th></tr></thead><tbody>${rotRows}</tbody></table></div>`},
-    {id:'eq-earnings', label:'EARNINGS',  content:`<div style="padding:4px 6px"><table class="t"><thead><tr><th>DATE</th><th>TICKER</th><th>COMPANY</th><th>TIME</th><th>EPS EST</th></tr></thead><tbody>${earnRows}</tbody></table></div>`},
+    {id:'eq-earnings', label:'EARNINGS',  content:earnTabContent},
   ]);
 }
 function drawEQ(){}
@@ -1225,13 +1225,14 @@ function rFX(){
   function fxTable(title,data){
     const rows=data.filter(r=>r.val!=null).map(r=>{
       const dec=r.val>100?2:4;
-      const vol=r.vol==='HIGH'?`<span class="dn">HIGH</span>`:r.vol==='MOD'?`<span style="color:var(--amber)">MOD</span>`:`<span class="neu">${r.vol}</span>`;
+      const vol=r.vol==='HIGH'?`<span class="dn">HIGH</span>`:r.vol==='MOD'?`<span style="color:var(--amber)">MOD</span>`:`<span class="neu">${r.vol||'—'}</span>`;
       return`<tr><td>${r.name}</td><td class="hl">${r.val.toFixed(dec)}</td>
         <td>${fmtC(r.d1,dec)}</td>
         <td>${vol}</td></tr>`;
     }).join('');
+    const body=rows||`<tr><td colspan="4" style="color:#555;padding:8px;text-align:center">FETCHING…</td></tr>`;
     return`<div class="sl">${title}</div>
-      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th></tr></thead><tbody>${rows}</tbody></table>`;
+      <table class="t"><thead><tr><th>PAIR</th><th>LAST ●</th><th>1D ●</th></tr></thead><tbody>${body}</tbody></table>`;
   }
   const g10=D.fx.filter(f=>f.type==='g10'||f.type==='idx');
   const em=D.fx.filter(f=>f.type==='em');
@@ -1265,7 +1266,9 @@ function rFX(){
     `<option value="${o.val}" data-name="${o.name}" ${o.name==='USD'?'selected':''}>${o.name}</option>`
   ).join('');
 
-  const calcContent = `
+  const calcContent = fxOpts.length<=1
+    ? `<div style="padding:20px;color:#555;font-size:10px;text-align:center">LOADING RATES…</div>`
+    : `
     <div style="padding:10px 12px">
       <div class="sl" style="margin-bottom:10px">FX CALCULATOR — LIVE RATES</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
@@ -1289,7 +1292,16 @@ function rFX(){
     </div>`;
 
   return buildTabs('fx-tabs',[
-    {id:'fx-g10',   label:'G10 & DXY', content:`<div style="padding:4px 6px">${fxTable('G10 & DXY',g10)}</div>`},
+    {id:'fx-g10',   label:'G10 & DXY', content:(()=>{
+      const dxy=D.fx.find(f=>f.name==='DXY');
+      const dxyBlock=dxy&&dxy.val!=null
+        ?`<div class="sf" style="margin-bottom:6px">
+            <div class="si"><span class="sil">DXY</span><span class="siv" style="font-size:13px;font-weight:700">${dxy.val.toFixed(2)}</span></div>
+            <div class="si"><span class="sil">1D</span><span class="siv ${dxy.d1>=0?'dn':'up'}">${dxy.d1>=0?'+':''}${(dxy.d1||0).toFixed(2)}</span></div>
+          </div>`
+        :`<div style="color:#555;font-size:9px;padding:2px 0 6px">DXY loading…</div>`;
+      return`<div style="padding:4px 6px">${dxyBlock}${fxTable('G10 PAIRS',g10)}</div>`;
+    })()},
     {id:'fx-em',    label:'EMERGING',  content:`<div style="padding:4px 6px">${fxTable('EMERGING MARKETS',em)}</div>`},
     {id:'fx-calc',  label:'CALCULATOR', content:calcContent},
   ]);
@@ -2534,7 +2546,7 @@ async function fetchFXRates(){
     });
     // Fetch DXY from Yahoo Finance (not in er-api)
     try{
-      const dxyQ = await yfFetch('DXY');
+      const dxyQ = await yfFetch('^DXY');
       if(dxyQ){ const r=D.fx.find(f=>f.name==='DXY'); if(r){r.val=+(dxyQ.price.toFixed(2));r.d1=+(dxyQ.chg.toFixed(2));r.pct=+(dxyQ.pct||0);} }
     }catch(_){}
     markFresh('FX');

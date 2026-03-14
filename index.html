@@ -98,6 +98,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #sc-right{display:flex;align-items:center;gap:0;margin-left:6px;flex-shrink:0;}
 
 /* ── WORKSPACE ── */
+#loading-screen{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:#020202;z-index:99998;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;transition:opacity 0.6s ease;
+}
+#loading-screen.fade-out{opacity:0;}
+#loading-screen.gone{display:none;}
+.ld-logo{font-size:22px;color:#ffab00;letter-spacing:4px;font-weight:700;margin-bottom:20px}
+.ld-bar-wrap{width:280px;height:2px;background:#111;margin-bottom:16px;overflow:hidden}
+.ld-bar{height:2px;background:#ffab00;width:0%;transition:width 0.3s ease}
+.ld-status{font-size:9px;color:#444;letter-spacing:1.5px;height:14px}
 #workspace{
   position:relative;width:100%;height:calc(100vh - 70px);
   background-color:#050608;
@@ -177,7 +189,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* ── COMMON TABLE ── */
 .t{width:100%;border-collapse:collapse;font-size:11px}
-.t th{color:#a0a0a0;font-size:10px;font-weight:600;text-align:right;padding:2px 6px;
+.t th{color:#c0c0c0;font-size:10px;font-weight:600;text-align:right;padding:2px 6px;
       border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:0.5px}
 .t th:first-child{text-align:left}
 .t td{font-size:11px;padding:3px 6px;border-bottom:1px solid #0d0d0d;text-align:right;white-space:nowrap;color:#c8c8c8}
@@ -185,7 +197,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .t tr:hover td{background:var(--bg2)}
 .t .up{color:var(--green)}
 .t .dn{color:var(--red)}
-.t .neu{color:var(--text-dim)}
+.t .neu{color:#aaa}
 .t .hl{color:var(--amber)}
 .t .w{color:var(--text-mid)}
 
@@ -325,13 +337,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ac-badge.cmdty   {color:#e65100;border-color:#3a1400}
 .ac-badge.command {color:#888;border-color:#555}
 .ac-badge.filing  {color:#e53935;border-color:#3a0000}
-.ac-sep{padding:2px 8px;font-size:8px;color:#222;letter-spacing:1px;background:#050505;border-bottom:1px solid #0d0d0d}
+.ac-sep{padding:2px 8px;font-size:9px;color:#666;letter-spacing:1px;background:#050505;border-bottom:1px solid #0d0d0d}
 
 /* ── SEARCH RESULTS WINDOW ── */
 .sr-row{display:grid;grid-template-columns:100px 1fr 80px;gap:0;border-bottom:1px solid #0d0d0d;cursor:pointer}
 .sr-row>div{padding:3px 6px;font-size:10px}
 .sr-row:hover>div{background:var(--bg2)}
-.sr-hdr>div{font-size:8px;color:#333;padding:2px 6px;border-bottom:1px solid var(--border)}
+.sr-hdr>div{font-size:9px;color:#888;padding:2px 6px;border-bottom:1px solid var(--border)}
 .no-match{padding:14px;text-align:center;color:#555;font-size:10px;letter-spacing:1px}
 
 
@@ -405,23 +417,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #home-header{flex-shrink:0;padding:6px 8px 4px;border-bottom:1px solid var(--border)}
 #home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);flex-shrink:0}
 .home-tile{
-  background:var(--bg1);padding:8px 10px;cursor:pointer;position:relative;overflow:hidden;
+  background:var(--bg1);padding:10px 12px;cursor:pointer;position:relative;overflow:hidden;
   display:flex;flex-direction:column;gap:1px;
 }
 .home-tile:hover{background:var(--bg2)}
-.home-tile-label{font-size:8px;color:var(--text-dim);letter-spacing:1px;font-weight:600}
-.home-tile-val{font-size:18px;font-weight:600;color:var(--text-bright);letter-spacing:-0.5px;line-height:1.1}
+.home-tile-label{font-size:9px;color:#aaa;letter-spacing:1px;font-weight:600}
+.home-tile-val{font-size:22px;font-weight:600;color:var(--text-bright);letter-spacing:-0.5px;line-height:1.1}
 .home-tile-sub{font-size:9px;display:flex;gap:6px;align-items:center;margin-top:1px}
-.home-tile-chg{font-size:10px;font-weight:600}
-.home-tile-meta{color:var(--text-dim);font-size:8px}
+.home-tile-chg{font-size:11px;font-weight:600}
+.home-tile-meta{color:#888;font-size:9px}
 .home-sparkwrap{position:absolute;bottom:0;right:0;left:0;height:28px;opacity:0.6}
 #home-news{flex:1;overflow-y:auto;padding:4px 0;min-height:0}
 .home-news-row{display:flex;gap:8px;align-items:baseline;padding:3px 8px;border-bottom:1px solid #0a0a0a;cursor:pointer}
 .home-news-row:hover{background:var(--bg2)}
-.home-news-ts{color:#666;font-size:9px;flex-shrink:0;width:34px}
-.home-news-src{color:var(--text-dim);font-size:8px;flex-shrink:0;width:28px}
+.home-news-ts{color:#888;font-size:9px;flex-shrink:0;width:34px}
+.home-news-src{color:#aaa;font-size:9px;flex-shrink:0;width:28px}
 .home-news-tag{font-size:9px;font-weight:600;padding:0 3px;border:1px solid;flex-shrink:0}
-.home-news-hl{font-size:9px;color:var(--text);line-height:1.4;flex:1}
+.home-news-hl{font-size:10px;color:var(--text);line-height:1.4;flex:1}
 #home-bottom{flex-shrink:0;display:flex;gap:0;border-top:1px solid var(--border)}
 .home-stat{flex:1;padding:4px 8px;border-right:1px solid var(--border);font-size:9px}
 .home-stat-l{color:var(--text-dim);font-size:8px}
@@ -445,6 +457,15 @@ canvas{display:block}
 </style>
 </head>
 <body>
+
+<div id="loading-screen">
+  <div class="ld-logo">◈ TERMINAL</div>
+  <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
+  <div class="ld-status" id="ld-status">INITIALIZING…</div>
+  <div style="position:absolute;bottom:18px;right:22px">
+    <button onclick="const ls=document.getElementById('loading-screen');if(ls){ls.classList.add('fade-out');setTimeout(()=>ls.classList.add('gone'),700);}runNetworkTest();" style="background:none;border:none;color:#333;font-family:var(--font);font-size:9px;letter-spacing:1px;cursor:pointer;padding:4px 8px" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#333'">▸ DIAG</button>
+  </div>
+</div>
 
 <!-- TOPBAR -->
 <div id="topbar">
@@ -590,14 +611,7 @@ const D = {
 
   macro:{
     calendar:[],
-    centralBanks:[
-      {name:'FED',  rate:'4.25-4.50%',next:'Mar 19'},
-      {name:'ECB',  rate:'2.40%',next:'Apr 14'},
-      {name:'BOJ',  rate:'0.50%'},
-      {name:'BOE',  rate:'4.50%',next:'May 07'},
-      {name:'PBOC', rate:'3.10%',next:'Apr 15'},
-      {name:'RBA',  rate:'4.10%',next:'Apr 01'},
-    ]
+    centralBanks:[]
   },
 
   news:[],  // populated by fetchRSSNews() on load
@@ -876,7 +890,7 @@ function rFI(){
 
   // ── TAB 3: AUCTION ──
   const fmtAucDate=s=>{if(!s||s==='—')return'—';const p=s.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0].slice(2)}`:s;};
-  const arows=D.fixedIncome.auctions.map(a=>`
+  const arows=[...D.fixedIncome.auctions].sort((a,b)=>new Date(a.auction||0)-new Date(b.auction||0)).map(a=>`
     <tr>
       <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:9px;color:#3aaa3a;margin-left:3px">●</span>':''}</td>
       <td class="w">${fmtAucDate(a.mat)}</td><td class="w" style="${a.weak?'color:var(--red)':''}">${fmtAucDate(a.auction)}</td>
@@ -888,7 +902,7 @@ function rFI(){
     </tr>`).join('');
   const auctionTab = `
     <div style="padding:4px 6px">
-      <div style="font-size:10px;color:#707070;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC)</div>
+      <div style="font-size:10px;color:#bbb;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC)</div>
       <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${arows}</tbody></table>
     </div>`;
 
@@ -1427,7 +1441,7 @@ function rAUCTION(){
   const fmtD=s=>{if(!s||s==='—')return'—';const p=s.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0].slice(2)}`:s;};
   const isLive = D.fixedIncome.auctions.some(a=>a.live);
   const liveBadge = isLive ? '<span style="font-size:9px;color:#3aaa3a;margin-left:6px">● LIVE · fiscaldata.treasury.gov</span>' : '<span style="font-size:9px;color:#505050;margin-left:6px">STATIC FALLBACK</span>';
-  const rows=D.fixedIncome.auctions.map(a=>`
+  const rows=[...D.fixedIncome.auctions].sort((a,b)=>new Date(a.auction||0)-new Date(b.auction||0)).map(a=>`
     <tr>
       <td style="${a.weak?'color:var(--red)':'color:var(--amber)'}">${a.sec}${a.live?'<span style="font-size:9px;color:#3aaa3a;margin-left:3px">●</span>':''}</td>
       <td class="w">${fmtD(a.mat)}</td><td class="w" style="${a.weak?'color:var(--red)':''}">${fmtD(a.auction)}</td>
@@ -1439,7 +1453,7 @@ function rAUCTION(){
     </tr>`).join('');
   // Compute live avg BTC per tenor from fresh data
   const getBTC=sec=>{const a=D.fixedIncome.auctions.find(x=>x.sec===sec);return a&&a.btc?a.btc.toFixed(2):'—';};
-  return`<div style="font-size:10px;color:#707070;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC) ${liveBadge}</div>
+  return`<div style="font-size:10px;color:#bbb;margin-bottom:4px">RED = WEAK AUCTION (HIGH TAIL / LOW BTC) ${liveBadge}</div>
     <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL (bp)</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="sf" style="margin-top:6px">
       <div class="si"><span class="sil">LAST BTC (2Y)</span><span class="siv">${getBTC('2Y Note')}</span></div>
@@ -1570,7 +1584,7 @@ function rECON(){
   return`
     <div class="sf" style="margin-bottom:6px">
       <div class="si"><span class="sil">DATA SOURCE</span><span class="siv" style="color:${hasData?'var(--green)':'var(--red)'}">${hasData?'FRED LIVE':'FRED PENDING'}</span></div>
-      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">${D.macro.centralBanks.find(b=>b.name==='FED')?.next||'—'}</span></div>
+      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">${'see MACRO'}</span></div>
       <div class="si"><span class="sil">CB DATA</span><span class="siv" style="color:#555;font-size:9px">Manual · updated each meeting</span></div>
       <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
     </div>
@@ -1811,7 +1825,7 @@ function rMACRO(){
   const econTab=`<div style="padding:4px 6px">
     <div class="sf" style="margin-bottom:6px">
       <div class="si"><span class="sil">FRED DATA</span><span class="siv" style="color:${Object.keys(fred).length>0?'var(--green)':'var(--red)'}">${Object.keys(fred).length>0?'LIVE':'LOADING'}</span></div>
-      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">${D.macro.centralBanks.find(b=>b.name==='FED')?.next||'—'}</span></div>
+      <div class="si"><span class="sil">NEXT FOMC</span><span class="siv" style="color:var(--amber)">${'see MACRO'}</span></div>
       <div class="si"><span class="sil">FED RATE</span><span class="siv">${fred['FEDFUNDS']?fred['FEDFUNDS'].val.toFixed(2)+'%':'—'}</span></div>
     </div>
     <table class="t"><thead><tr><th>CAT</th><th>INDICATOR</th><th>LATEST ●</th><th>PREV</th><th>CHG</th><th>RELEASE DATE</th></tr></thead><tbody>${econRows}</tbody></table>
@@ -2515,39 +2529,45 @@ async function fetchTreasuryAuctions(){
 // ═══════════════════════════════════════════
 async function fetchFXRates(){
   markPending('FX');
+  const symbols = [
+    'EURUSD=X','USDJPY=X','GBPUSD=X','USDCHF=X','AUDUSD=X','USDCAD=X',
+    'NZDUSD=X','USDSEK=X','USDNOK=X','USDBRL=X','USDMXN=X','USDINR=X',
+    'USDCNY=X','USDZAR=X','USDTRY=X','^DXY'
+  ];
+  const yfName = {
+    'EURUSD=X':'EURUSD','USDJPY=X':'USDJPY','GBPUSD=X':'GBPUSD',
+    'USDCHF=X':'USDCHF','AUDUSD=X':'AUDUSD','USDCAD=X':'USDCAD',
+    'NZDUSD=X':'NZDUSD','USDSEK=X':'USDSEK','USDNOK=X':'USDNOK',
+    'USDBRL=X':'USDBRL','USDMXN=X':'USDMXN','USDINR=X':'USDINR',
+    'USDCNY=X':'USDCNY','USDZAR=X':'USDZAR','USDTRY=X':'USDTRY',
+    '^DXY':'DXY'
+  };
   try{
-    const r = await fetch('https://open.er-api.com/v6/latest/USD', {signal: AbortSignal.timeout(8000)});
-    if(!r.ok) throw new Error(`HTTP ${r.status}`);
-    const d = await r.json();
-    if(d.result !== 'success') throw new Error('bad response');
-    const rates = d.rates;
-    const fxMap = {
-      'EURUSD': 1/rates.EUR,  'USDJPY': rates.JPY,
-      'GBPUSD': 1/rates.GBP,  'USDCHF': rates.CHF,
-      'AUDUSD': 1/rates.AUD,  'USDCAD': rates.CAD,
-      'NZDUSD': 1/rates.NZD,  'USDSEK': rates.SEK,
-      'USDNOK': rates.NOK,    'USDBRL': rates.BRL,
-      'USDMXN': rates.MXN,    'USDINR': rates.INR,
-      'USDCNY': rates.CNY,    'USDZAR': rates.ZAR,
-      'USDTRY': rates.TRY,
-    };
-    D.fx.forEach(row => {
-      const val = fxMap[row.name];
-      if(val != null && !isNaN(val)){
-        const prev = row.val || val;
-        row.d1  = +(val - prev).toFixed(4);
-        row.pct = +((val - prev)/prev*100).toFixed(3);
-        row.val = +val.toFixed(4);
-      }
-    });
-    // Fetch DXY from Yahoo Finance (not in er-api)
-    try{
-      const dxyQ = await yfFetch('^DXY');
-      if(dxyQ){ const r=D.fx.find(f=>f.name==='DXY'); if(r){r.val=+(dxyQ.price.toFixed(2));r.d1=+(dxyQ.chg.toFixed(2));r.pct=+(dxyQ.pct||0);} }
-    }catch(_){}
-    markFresh('FX');
-  }catch(e){ markStale('FX', e.message); }
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols.join(',')}&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketChange`;
+    const text = await proxyFetch(url, 12000).then(r=>r.text());
+    const data = JSON.parse(text);
+    const results = data?.quoteResponse?.result || [];
+    if(!results.length) throw new Error('empty quote response');
+    let anyOk = false;
+    for(const q of results){
+      const name = yfName[q.symbol];
+      if(!name) continue;
+      const row = D.fx.find(f=>f.name===name);
+      if(!row) continue;
+      const price = q.regularMarketPrice;
+      const prev  = q.regularMarketPreviousClose || price;
+      const chg   = q.regularMarketChange ?? (price - prev);
+      if(!price || isNaN(price)) continue;
+      const hiPrec = name==='EURUSD'||name==='GBPUSD'||name==='AUDUSD'||name==='NZDUSD';
+      row.val = +price.toFixed(hiPrec?4:2);
+      row.d1  = +chg.toFixed(hiPrec?4:2);
+      row.pct = +((chg/prev)*100).toFixed(3);
+      anyOk = true;
+    }
+    if(anyOk) markFresh('FX'); else throw new Error('no valid quotes');
+  }catch(e){ markStale('FX', e.message||'fetchFXRates failed'); }
 }
+
 
 // ═══════════════════════════════════════════
 // EQUITY INDICES — Yahoo Finance via allorigins
@@ -2660,8 +2680,7 @@ async function fetchSectorETFs(){
   }
   if(updated.length > 0){
     D.equities.sectors = updated;
-    console.log(`[SECTORS] Updated ${updated.length} sector ETFs`);
-  }
+    }
 }
 
 
@@ -2830,7 +2849,6 @@ async function fetchRSSNews(){
     if(r.status==='fulfilled') all.push(...r.value);
     else console.warn('[NEWS] feed failed:', NEWS_RSS[i].src, r.reason?.message);
   });
-  console.log('[NEWS] total items fetched:', all.length);
   if(!all.length){ markStale('NEWS','all RSS feeds failed'); return; }
   const seen = new Set();
   D.news = all
@@ -2867,6 +2885,7 @@ function refreshOpenWindows(){
   livePanels.forEach(cmd=>{
     if(WR[cmd]){
       renderW(cmd, cmd, null);
+      if(cmd==='FX') setTimeout(()=>{ if(document.getElementById('fxc-from')) fxCalc(); }, 50);
       WR[cmd].classList.add('flash');
       setTimeout(()=>WR[cmd].classList.remove('flash'), 500);
       if(cmd==='FI') setTimeout(drawYieldCurve, 60);
@@ -3500,36 +3519,17 @@ function buildMarketSummary(){
       lines.push(`DXY ${dxy.d1>=0?'+':''}${(dxy.d1??0).toFixed(2)} at ${dxy.val.toFixed(2)}.`);
     }
 
-    const summaryText = lines.join('  ');
-    return `<div style="padding:5px 10px;font-size:10px;color:#555;letter-spacing:.3px;border-bottom:1px solid var(--border);background:var(--bg1);line-height:1.6;font-style:italic">
-      ${summaryText}
+    return `<div style="padding:7px 10px;border-bottom:1px solid var(--border);background:#020202;display:flex;flex-wrap:wrap;gap:6px 16px">
+      ${lines.map((line,i)=>`<span style="font-size:11px;color:${i===0?'var(--text)':'#aaa'};letter-spacing:.2px;line-height:1.5">${line}</span>`).join('')}
     </div>`;
   }catch(e){
-    return `<div style="padding:5px 10px;font-size:9px;color:#555;border-bottom:1px solid var(--border)">
+    return `<div style="padding:7px 10px;font-size:10px;color:#555;border-bottom:1px solid var(--border)">
       MARKET SUMMARY LOADING…
     </div>`;
   }
 }
 
-function _cbNextBadge(next){
-  if(!next) return '<span style="color:#333">—</span>';
-  const parts=next.match(/(\w+)\s+(\d+)/);
-  if(!parts) return `<span style="color:#666">${next}</span>`;
-  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const now=new Date();
-  const yr=now.getFullYear();
-  const d=new Date(yr,months[parts[1]]??0,parseInt(parts[2]));
-  const isPast=d<now && (now-d)>86400000;
-  return isPast
-    ? `<span style="color:#333;text-decoration:line-through">${next}</span> <span style="color:var(--red);font-size:9px">PAST</span>`
-    : `<span style="color:${(now-d)>-604800000?'var(--amber)':'#666'}">${next}</span>`;
-}
-
 function rHOME(){
-  console.log('[rHOME] D.equities.indices:', D.equities.indices?.map(x=>({sym:x.sym,val:x.val,pct:x.pct})));
-  console.log('[rHOME] D.fx:', D.fx?.map(x=>({name:x.name,val:x.val})));
-  console.log('[rHOME] D.commodities.energy:', D.commodities?.energy?.map(x=>({name:x.name,spot:x.spot})));
-  console.log('[rHOME] D.commodities.metals:', D.commodities?.metals?.map(x=>({name:x.name,spot:x.spot})));
   const t = D.fixedIncome.treasuries;
   const y2  = t.find(x=>x.tenor==='2Y')?.yield ?? 0;
   const y10 = t.find(x=>x.tenor==='10Y')?.yield ?? 0;
@@ -3576,14 +3576,11 @@ function rHOME(){
     .filter(e=>e.impact==='HIGH' && e.act==null)
     .slice(0,5)
     .map(e=>`<div style="display:flex;gap:6px;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
-      <span style="color:#444;width:48px;flex-shrink:0">${e.date}</span>
+      <span style="color:#999;width:48px;flex-shrink:0">${e.date}</span>
       <span style="color:#ffab00;width:32px;flex-shrink:0">${e.cty}</span>
       <span style="color:var(--text-dim);flex:1">${e.event}</span>
-      <span style="color:#888;font-size:9px">${e.fore||'—'}</span>
+      <span style="color:#bbb;font-size:9px">${e.fore||'—'}</span>
     </div>`).join('');
-
-  // Earnings calendar — use EQ > EARNINGS tab for upcoming releases
-  const earningsRows = `<tr><td colspan="4" style="color:#444;font-size:9px;text-align:center;padding:8px">Open EQ → EARNINGS for upcoming releases</td></tr>`;
 
   // SPX key levels
   const spxVal = spx.val ?? 0;
@@ -3643,9 +3640,9 @@ function rHOME(){
       <span style="color:#707070;font-size:9px;letter-spacing:1px;flex-shrink:0">BREADTH</span>
       <div style="display:flex;width:120px;height:8px;border-radius:1px;overflow:hidden;flex-shrink:0">${adBar}</div>
       <span style="color:#555;font-size:9px;flex-shrink:0">ADV <span style="color:${adCol};font-weight:600">${advSectors}</span> &nbsp;/&nbsp; DEC <span style="color:${adCol==='var(--green)'?'var(--red)':'var(--green)'};font-weight:600">${decSectors}</span></span>
-      <span style="color:#222;flex-shrink:0">|</span>
+      <span style="color:#333;flex-shrink:0">|</span>
       <span style="color:#707070;font-size:9px;flex-shrink:0">SPX LEVELS</span>
-      ${spxLevels.map(l=>`<span style="font-size:9px;flex-shrink:0"><span style="color:#888">${l.label}</span>&nbsp;<span style="color:${l.col};font-weight:600">${l.val}</span></span>`).join('<span style="color:#1a1a1a;flex-shrink:0">&nbsp;·&nbsp;</span>')}
+      ${spxLevels.map(l=>`<span style="font-size:9px;flex-shrink:0"><span style="color:#aaa">${l.label}</span>&nbsp;<span style="color:${l.col};font-weight:600">${l.val}</span></span>`).join('<span style="color:#333;flex-shrink:0">&nbsp;·&nbsp;</span>')}
     </div>
     <!-- MAIN BODY — 3 column grid -->
     <div style="display:grid;grid-template-columns:1fr 1fr 220px;flex:1;min-height:0;overflow:hidden">
@@ -3660,28 +3657,50 @@ function rHOME(){
       <div style="display:flex;flex-direction:column;border-right:1px solid var(--border);min-height:0;overflow-y:auto">
         <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);flex-shrink:0">UPCOMING HIGH-IMPACT EVENTS</div>
         ${upcomingEvents || '<div style="color:#555;font-size:9px;padding:6px 8px">NO UPCOMING EVENTS</div>'}
-        <div style="padding:4px 10px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;margin-top:4px">EARNINGS CALENDAR</div>
-        ${earningsRows}
-
       </div>
-      <!-- COL 3: CB + QUICK OPEN -->
+      <!-- COL 3: SECTORS + FRED -->
       <div style="display:flex;flex-direction:column;overflow-y:auto">
-        <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border)">CENTRAL BANKS</div>
-        ${D.macro.centralBanks.map(cb=>`
-          <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid #0a0a0a;font-size:10px">
-            <span style="color:var(--text-dim)">${cb.name}</span>
-            <span style="color:var(--amber);font-weight:600">${cb.rate}</span>
-            <span style="font-size:9px;color:#333">${_cbNextBadge(cb.next)}</span>
-          </div>`).join('')}
+        <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border)">SECTORS — 1D</div>
+        ${(D.equities.sectors||[]).map(s=>{
+          const col=s.d1>0?'var(--green)':s.d1<0?'var(--red)':'#555';
+          const bar=Math.min(Math.abs(s.d1||0)/2,1);
+          const barW=Math.round(bar*40);
+          return`<div style="display:flex;align-items:center;gap:6px;padding:3px 8px;border-bottom:1px solid #080808;font-size:10px">
+            <span style="color:#999;width:44px;flex-shrink:0;font-size:9px">${s.name?.replace('Consumer Disc','Cons Disc').replace('Communication','Comms').replace('Real Estate','RE').slice(0,8)||s.etf}</span>
+            <div style="width:44px;height:4px;background:#0a0a0a;flex-shrink:0">
+              <div style="width:${barW}px;height:4px;background:${col};opacity:.8"></div>
+            </div>
+            <span style="color:${col};font-weight:600;font-size:10px;min-width:40px">${s.d1!=null?(s.d1>0?'+':'')+s.d1.toFixed(2)+'%':'—'}</span>
+          </div>`;
+        }).join('')||'<div style="color:#555;font-size:9px;padding:8px">LOADING…</div>'}
+        <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px;border-top:1px solid var(--border)">MACRO — FRED LIVE</div>
+        ${(()=>{
+          const fred=D.macro.fred||{};
+          const items=[
+            {label:'FED FUNDS', id:'FEDFUNDS', fmt:v=>v.toFixed(2)+'%'},
+            {label:'CPI MoM',   id:'CPIAUCSL', fmt:v=>(v>0?'+':'')+v.toFixed(2)+'%'},
+            {label:'CORE PCE',  id:'PCEPILFE', fmt:v=>(v>0?'+':'')+v.toFixed(2)+'%'},
+            {label:'UNEMP',     id:'UNRATE',   fmt:v=>v.toFixed(1)+'%'},
+            {label:'10Y BRKEVN',id:'T10YIE',   fmt:v=>v.toFixed(2)+'%'},
+            {label:'30Y MORT',  id:'MORTGAGE30US',fmt:v=>v.toFixed(2)+'%'},
+          ];
+          return items.map(it=>{
+            const d=fred[it.id];
+            const val=d?it.fmt(d.val):'—';
+            const chg=d?d.chg:null;
+            const chgCol=chg==null?'#333':chg>0?'var(--green)':'var(--red)';
+            const date=d?.date?.slice(0,7)||'';
+            return`<div style="display:flex;align-items:center;gap:4px;padding:3px 8px;border-bottom:1px solid #080808;font-size:10px">
+              <span style="color:#999;flex:1;font-size:9px">${it.label}</span>
+              <span style="color:var(--amber);font-weight:600">${val}</span>
+              ${chg!=null?`<span style="color:${chgCol};font-size:9px">${chg>0?'+':''}${chg.toFixed(2)}</span>`:''}
+            </div>`;
+          }).join('');
+        })()}
         <div onclick="window.open('https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html','_blank')"
-             style="padding:3px 8px;font-size:9px;color:#3aaa3a;cursor:pointer;border-top:1px solid #111;margin-top:2px"
+             style="padding:5px 8px;font-size:9px;color:#3aaa3a;cursor:pointer;border-top:1px solid #111;margin-top:2px"
              onmouseover="this.style.color='#66cc66'" onmouseout="this.style.color='#3aaa3a'">
-          ↗ CME FedWatch — live implied probabilities
-        </div>
-        <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border);margin-top:4px">QUICK OPEN</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px">
-          ${['EQ','FX','CMDTY','MACRO','ECON','VOL','SCRN'].map(p=>`
-          <div onclick="OW('${p}')" style="padding:5px 6px;border:1px solid #333;color:#888;font-size:9px;cursor:pointer;text-align:center;letter-spacing:1px" onmouseover="this.style.color='var(--amber)';this.style.borderColor='#666'" onmouseout="this.style.color='#888';this.style.borderColor='#333'">${p}</div>`).join('')}
+          ↗ CME FedWatch — live implied rate probabilities
         </div>
       </div>
     </div>
@@ -4133,7 +4152,7 @@ function rHELP(){
 
   const panels = [
     {cmd:'EQ',      desc:'Equity Monitor',    detail:'Index table: SPX Nasdaq Dow Russell VIX · Sector heatmap grid · 1D / 1W returns'},
-    {cmd:'FX',      desc:'FX & Rates',        detail:'G10 + DXY + EM pairs · Spot price · 1D change · Vol level: LOW / MOD / HIGH · FX Calculator'},
+    {cmd:'FX',      desc:'FX & Rates',        detail:'G10 + DXY + EM pairs · Spot price · 1D change · FX Calculator · Live Yahoo Finance'},
     {cmd:'CMDTY',   desc:'Commodities',       detail:'Energy · Metals · Spot price · 1D% change · Live Yahoo Finance'},
     {cmd:'NEWS',    desc:'News Terminal',     detail:'12 headlines · Filter: macro eq energy credit geo · Click headline for full story'},
     {cmd:'INFL',    desc:'Inflation Monitor', detail:'TIPS breakevens 5Y/10Y/30Y/5Y5Y · CPI PCE Core PCE · Breakeven curve chart'},
@@ -5067,18 +5086,26 @@ function drawVolumeChart(volumes, timestamps, labels, up){
 async function pollAllUpgraded(){
   FETCH_STATE.lastAttempt=new Date().toISOString();
   updateStatusBar();
+  // Loading screen progress
+  const _ld = document.getElementById('ld-bar');
+  const _ls = document.getElementById('ld-status');
+  const _lscreen = document.getElementById('loading-screen');
+  const _ldSet = (pct, msg) => { if(_ld) _ld.style.width=pct+'%'; if(_ls) _ls.textContent=msg; };
+  _ldSet(5,'CONNECTING…');
   // Fire non-proxy fetches immediately (they have CORS support)
   const directFetches = Promise.allSettled([
-    fetchFXRates(),        // open.er-api.com — direct CORS
-    fetchTreasuryAuctions(), // fiscaldata.treasury.gov — direct CORS
+    fetchFXRates(),        // Yahoo Finance batch quote — via proxy
+    fetchTreasuryAuctions(), // fiscaldata.treasury.gov — via proxy
     fetchFREDData(),       // api.stlouisfed.org — direct CORS
     fetchRSSNews(),        // RSS via allorigins
   ]);
 
   // Stagger Yahoo proxy fetches to avoid rate limiting
   await new Promise(r=>setTimeout(r,200));
+  _ldSet(20,'LOADING TREASURIES…');
   await fetchTreasuryYields();
 
+  _ldSet(40,'LOADING EQUITIES…');
   await new Promise(r=>setTimeout(r,400));
   await fetchEquityIndices();
   // Fetch VVIX live (Yahoo Finance ^VVIX)
@@ -5092,9 +5119,11 @@ async function pollAllUpgraded(){
     if(el2){ el2.textContent = q.price>130?'EXTREME':q.price>110?'HIGH':q.price>90?'ELEVATED':'NORMAL'; el2.style.color=q.price>130?'var(--red)':q.price>110?'#ff6f00':q.price>90?'var(--amber)':'var(--green)'; }
   }).catch(()=>{});
 
+  _ldSet(55,'LOADING SECTORS…');
   await new Promise(r=>setTimeout(r,400));
   await fetchSectorETFs();
 
+  _ldSet(70,'LOADING COMMODITIES…');
   await new Promise(r=>setTimeout(r,400));
   await fetchCommodities();
 
@@ -5103,16 +5132,22 @@ async function pollAllUpgraded(){
 
   await directFetches;
   refreshOpenWindows();
+  // Dismiss loading screen on first successful poll
+  if(_lscreen && !_lscreen.classList.contains('was-shown')){
+    _lscreen.classList.add('was-shown');
+    _ldSet(100,'READY');
+    setTimeout(()=>{
+      _lscreen.classList.add('fade-out');
+      setTimeout(()=>_lscreen.classList.add('gone'),700);
+    },400);
+  }
 }
 
 // ═══════════════════════════════════════════
 // BOOT — open default panels
 // ═══════════════════════════════════════════
-window.addEventListener('load',()=>{
-  D.metadata.version='3.5-live';
-  updateStatusBar();
 
-  async function runNetworkTest(){
+async function runNetworkTest(){
     const tests = [
       {name:'proxy → Yahoo SPY', fn:()=>proxyFetch('https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&range=5d').then(r=>r.json()).then(d=>{const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice; if(!p) throw new Error('bad payload'); return 'SPY $'+p;})},
       {name:'open.er-api.com FX',     fn:()=>fetch('https://open.er-api.com/v6/latest/USD',{signal:AbortSignal.timeout(8000)}).then(r=>r.json()).then(d=>{if(d.result!=='success')throw new Error('bad'); return 'EUR='+d.rates.EUR.toFixed(4);})},
@@ -5141,6 +5176,12 @@ window.addEventListener('load',()=>{
     }
     body.innerHTML=rows+'<div style="margin-top:8px;color:#555;font-size:9px;letter-spacing:1px">✓ = LIVE DATA AVAILABLE &nbsp;|&nbsp; ✗ = SOURCE UNAVAILABLE FROM YOUR NETWORK</div>';
   }
+
+window.addEventListener('load',()=>{
+  D.metadata.version='3.5-live';
+  updateStatusBar();
+
+
 
 // ═══════════════════════════════════════════
 // ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
@@ -5331,10 +5372,10 @@ document.addEventListener('keydown', e=>{ if(e.ctrlKey && e.key==='k'){ e.preven
   s.onload=()=>{
     // Run DIAG first, then poll after it finishes (avoid proxy contention)
     setTimeout(async ()=>{
-      await runNetworkTest();
+      if(location.search.includes('diag')) await runNetworkTest();
       await pollAllUpgraded();
       buildTickerTape();
-    }, 600);
+    }, 300);
     // Regular polling every 60s
     setInterval(pollAllUpgraded,60000);
     setInterval(buildTickerTape,120000);

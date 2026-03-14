@@ -239,11 +239,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .hm-sub{font-size:10px;color:var(--text-mid);margin-top:1px}
 
 /* News items */
-.news-item{padding:5px 0;border-bottom:1px solid #0d0d0d;cursor:pointer}
-.news-item:hover .news-hl{color:var(--text-bright)}
-.news-meta{display:flex;gap:6px;margin-bottom:1px}
-.news-ts{color:#666;font-size:9px}
-.news-src{color:#888;font-size:9px}
+
+.news-item:hover 
+
+
+
 .news-tag{font-size:9px;padding:0 4px;border:1px solid;font-weight:600;letter-spacing:0.5px}
 .news-tag.macro{color:#00acc1;border-color:#00232a}
 .news-tag.eq{color:#00c853;border-color:#003318}
@@ -251,7 +251,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .news-tag.credit{color:#aa00ff;border-color:#1e0033}
 .news-tag.geo{color:#e53935;border-color:#3a0000}
 .news-hl{font-size:11px;color:#d0d0d0;line-height:1.35}
-.news-filters{display:flex;gap:3px;margin-bottom:4px;flex-wrap:wrap}
+
 
 /* Map */
 .map-sidebar{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
@@ -278,7 +278,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .des-val{color:var(--text-bright)}
 
 /* Vol indicator */
-.vol-pip{display:inline-block;width:4px;height:4px;border-radius:50%;margin-right:2px}
+
 
 /* Flash animation */
 .flash{animation:fla 0.5s ease}
@@ -784,7 +784,6 @@ function toggleFS(key){
 function repaintWin(key){
   const cmd = key.split('_')[0];
   if(cmd==='HEAT'){ const t=document.querySelector('.heat-tab.active'); drawHEAT(t?t.dataset.mode:'sector'); }
-  else if(cmd==='INFL')   drawInfl();
   else if(cmd==='HOME')   initHOME();
   else if(cmd==='EQ')     drawEQ();
 }
@@ -2464,7 +2463,6 @@ async function fetchRSSNews(){
     .sort((a,b) => b.pubDate - a.pubDate)
     .slice(0, 40);
   markFresh('NEWS');
-  if(WR['NEWS']){ const b=document.getElementById('wb-NEWS'); if(b) b.innerHTML=rNEWS(); }
   if(WR['HOME']){
     const el=document.getElementById('home-news');
     if(el) el.innerHTML=D.news.slice(0,8).map((n,i)=>`
@@ -2549,7 +2547,6 @@ function buildSearchCorpus(){
     {key:'CB',          label:'Central Bank Monitor',         meta:'→ MACRO panel'},
     {key:'HEAT SECTOR', label:'Sector Performance Heatmap',   meta:'11 GICS sectors'},
     {key:'HEAT CURVE',  label:'Treasury Curve Heatmap',       meta:'Yield curve visual'},
-    {key:'CHRIS',       label:'CHRIS — Bond & Yield Dashboard',meta:'Opens TREAS · INFL · VOL · MACRO in bond layout'},
     {key:'ACCESS',      label:'Accessibility Settings',        meta:'Font size, contrast, color mode, motion'},
     {key:'WATCH',       label:'Watchlist — track favorite stocks', meta:'Live prices, sparklines, quick EQS access'},
   ].forEach(p=>C.push({key:p.key, label:p.label, meta:p.meta, type:'command',
@@ -2711,80 +2708,17 @@ function handleSpecialCommand(cmd){
     case 'HEAT CURVE':   OW('HEAT','curve');  break;
     case 'SCRN':         OW('SCRN'); break;
     case 'CB':           OW('MACRO'); break;
-    case 'CHRIS':        launchCHRIS(); break;
     case 'ACCESS':       showAccessPanel(); break;
     case 'WATCH':        OW('WATCH'); break;
     default:             OW(cmd);
   }
 }
 
-function launchCHRIS(){
-  // Close all existing windows first for a clean slate
-  Object.keys(WR).forEach(k=>CW(k));
-  const W=window.innerWidth, H=window.innerHeight-70;
-  const gap=4;
-
-  // Layout: left column (60%) = TREAS tall | right column (40%) = INFL top + VOL mid + MACRO bottom
-  const leftW  = Math.floor(W*0.60)-gap;
-  const rightW = W - leftW - gap*2;
-  const rightH1= Math.floor(H*0.38)-gap;  // INFL
-  const rightH2= Math.floor(H*0.30)-gap;  // VOL
-  const rightH3= H - rightH1 - rightH2 - gap*3; // MACRO
-
-  // Open panels — OW creates them at default pos, then we reposition
-  OW('FI');
-  OW('INFL');
-  OW('VOL');
-  OW('MACRO');
-
-  // Small delay to let DOM settle then reposition
-  setTimeout(()=>{
-    // TREAS — full left column
-    if(WR['FI']){
-      WR['FI'].style.left='0px';
-      WR['FI'].style.top='0px';
-      WR['FI'].style.width=leftW+'px';
-      WR['FI'].style.height=(H-gap)+'px';
-      WR['FI'].style.zIndex=++zTop;
-      renderW('FI','FI');
-      setTimeout(drawYieldCurve,60);
-    }
-    // INFL — right top
-    if(WR['INFL']){
-      WR['INFL'].style.left=(leftW+gap*2)+'px';
-      WR['INFL'].style.top='0px';
-      WR['INFL'].style.width=rightW+'px';
-      WR['INFL'].style.height=rightH1+'px';
-      WR['INFL'].style.zIndex=++zTop;
-      renderW('INFL');
-      setTimeout(()=>drawInfl(),60);
-    }
-    // VOL — right middle
-    if(WR['VOL']){
-      WR['VOL'].style.left=(leftW+gap*2)+'px';
-      WR['VOL'].style.top=(rightH1+gap)+'px';
-      WR['VOL'].style.width=rightW+'px';
-      WR['VOL'].style.height=rightH2+'px';
-      WR['VOL'].style.zIndex=++zTop;
-      renderW('VOL');
-    }
-    // MACRO — right bottom, auto-switch to CB tab for bond context
-    if(WR['MACRO']){
-      WR['MACRO'].style.left=(leftW+gap*2)+'px';
-      WR['MACRO'].style.top=(rightH1+rightH2+gap*2)+'px';
-      WR['MACRO'].style.width=rightW+'px';
-      WR['MACRO'].style.height=rightH3+'px';
-      WR['MACRO'].style.zIndex=++zTop;
-      renderW('MACRO','MACRO');
-    }
-  }, 60);
-}
-
 function macroSeriesAction(key){
   const inflKeys = ['CPI','CORECPI','PCE','COREPCE','BREAKEVEN','5Y5Y'];
   const volKeys  = ['VIX','MOVE','SKEW'];
-  if(inflKeys.includes(key)) OW('INFL');
-  else if(volKeys.includes(key)) OW('VOL');
+  if(inflKeys.includes(key)) OW('FI');       // INFLATION tab now in FI
+  else if(volKeys.includes(key)) OW('HOME'); // VOL now in HOME right column
   else OW('MACRO');
 }
 
@@ -2885,7 +2819,6 @@ function fxSetPair(pairName){
 
 // ── Static US stock univers
 // ── Finviz deep-link screener presets ──
-// Replaces static SCRN_UNIVERSE — no data needed, Finviz has live fundamentals + technicals
 
 const EARN_SOURCES = [
   {name:'Earnings Whispers', url:'https://www.earningswhispers.com/calendar',      desc:'Most accurate EPS estimates · whisper numbers · beat/miss streaks'},
@@ -3784,11 +3717,11 @@ function rHELP(){
     {cmd:'CMDTY',   desc:'Commodities · energy and metals, spot + 1D'},
     {cmd:'MACRO',   desc:'Macro · FRED data, central bank links, external calendars'},
     {cmd:'HEAT',    desc:'Heatmap · sector performance or yield curve visual'},
-    {cmd:'INFL',    desc:'Inflation → now inside FI panel → INFLATION tab'},
-    {cmd:'VOL',     desc:'Volatility → now shown in HOME right column'},
-    {cmd:'NEWS',    desc:'News → now inside HOME panel with filter bar'},
-    {cmd:'ECON',    desc:'Economic Releases → now inside MACRO → ECON/FRED tab'},
-    {cmd:'EARN',    desc:'Earnings Calendars → now inside SCRN bottom section'},
+    {cmd:'INFL',  desc:'Inflation → now inside FI → INFLATION tab'},
+    {cmd:'VOL',   desc:'Volatility → now in HOME right column'},
+    {cmd:'NEWS',  desc:'News → now in HOME with filter bar'},
+    {cmd:'ECON',  desc:'Economic Releases → now in MACRO → ECON/FRED tab'},
+    {cmd:'EARN',  desc:'Earnings Calendars → now in SCRN bottom section'},
     {cmd:'SCRN',    desc:'Screener · Finviz presets + earnings calendar links'},
     {cmd:'EQS',     desc:'Equity Search · live Yahoo Finance quote + chart'},
     {cmd:'CHART',   desc:'Chart · interactive price chart for any ticker'},

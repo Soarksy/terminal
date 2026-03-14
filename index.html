@@ -2175,7 +2175,7 @@ async function fetchFXRates(){
   const symbols = [
     'EURUSD=X','USDJPY=X','GBPUSD=X','USDCHF=X','AUDUSD=X','USDCAD=X',
     'NZDUSD=X','USDSEK=X','USDNOK=X','USDBRL=X','USDMXN=X','USDINR=X',
-    'USDCNY=X','USDZAR=X','USDTRY=X','^DXY'
+    'USDCNY=X','USDZAR=X','USDTRY=X','DX-Y.NYB'
   ];
   const yfName = {
     'EURUSD=X':'EURUSD','USDJPY=X':'USDJPY','GBPUSD=X':'GBPUSD',
@@ -2183,7 +2183,7 @@ async function fetchFXRates(){
     'NZDUSD=X':'NZDUSD','USDSEK=X':'USDSEK','USDNOK=X':'USDNOK',
     'USDBRL=X':'USDBRL','USDMXN=X':'USDMXN','USDINR=X':'USDINR',
     'USDCNY=X':'USDCNY','USDZAR=X':'USDZAR','USDTRY=X':'USDTRY',
-    '^DXY':'DXY'
+    'DX-Y.NYB':'DXY'
   };
   // Fetch all FX pairs in batches of 4 using yfFetch (v8/chart — proven reliable)
   let anyOk = false;
@@ -3592,8 +3592,8 @@ function rWATCH(){
           <tr style="position:sticky;top:0;background:#080808;z-index:1">
             <th style="text-align:left;font-size:9px;color:#888;padding:5px 10px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">TICKER</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">LAST</th>
-            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">CHG</th>
-            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">CHG%</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1D CHG</th>
+            <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1D%</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1W%</th>
             <th style="text-align:center;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">3M SPARK</th>
             <th style="padding:5px 6px;border-bottom:1px solid #1a1a1a"></th>
@@ -4045,9 +4045,7 @@ function showArrangePopup(){
     {label:'3 COLUMN',     icon:'▭▭▭', desc:'Three equal columns',    fn:()=>arrangeGrid(3,1)},
     {label:'2×2 GRID',     icon:'⊟', desc:'4 equal windows',           fn:()=>arrangeGrid(2,2)},
     {label:'2×3 GRID',     icon:'⊠', desc:'6 windows',                 fn:()=>arrangeGrid(3,2)},
-    {label:'MAIN + RIGHT', icon:'▰▱', desc:'Wide left, narrow right',  fn:()=>arrangeSplit(0.65)},
-    {label:'MAIN + STACK', icon:'▱▰', desc:'Wide left, 2 stacked right',fn:()=>arrangeMainStack()},
-    {label:'FOCUS',        icon:'◻', desc:'Top window fills workspace', fn:()=>arrangeFocus()},
+    {label:'MAIN + STACK', icon:'▰▱', desc:'Wide left + stacked right', fn:()=>arrangeMainStack()},
     {label:'CASCADE',      icon:'⧉', desc:'Overlapping cascade',        fn:()=>arrangeCascade()},
   ];
 
@@ -4097,27 +4095,14 @@ function arrangeAuto(){
 function arrangeGrid(cols, rows){
   const keys=Object.keys(WR); if(!keys.length)return;
   const W=window.innerWidth, H=window.innerHeight-46;
-  const cellW=Math.floor(W/cols)-6, cellH=Math.floor(H/rows)-6;
+  const cellW=Math.floor(W/cols)-2, cellH=Math.floor(H/rows)-2;
   keys.forEach((k,i)=>{
-    const c=i%cols, r=Math.floor(i/rows);
+    const col=i%cols, row=Math.floor(i/cols);
     const w=WR[k];
-    w.style.left=(c*Math.floor(W/cols))+'px';
-    w.style.top=(r*Math.floor(H/rows))+'px';
+    w.style.left=(col*Math.floor(W/cols))+'px';
+    w.style.top=(row*Math.floor(H/rows))+'px';
     w.style.width=cellW+'px';
     w.style.height=cellH+'px';
-  });
-}
-
-function arrangeSplit(leftRatio){
-  const keys=Object.keys(WR); if(!keys.length)return;
-  const W=window.innerWidth, H=window.innerHeight-46;
-  const leftW=Math.floor(W*leftRatio)-6;
-  const rightW=W-leftW-12;
-  const rightH=Math.floor(H/Math.max(1,keys.length-1))-6;
-  keys.forEach((k,i)=>{
-    const w=WR[k];
-    if(i===0){ w.style.left='0px'; w.style.top='0px'; w.style.width=leftW+'px'; w.style.height=(H-4)+'px'; }
-    else{ w.style.left=(leftW+8)+'px'; w.style.top=((i-1)*(rightH+6))+'px'; w.style.width=rightW+'px'; w.style.height=rightH+'px'; }
   });
 }
 
@@ -4132,20 +4117,6 @@ function arrangeMainStack(){
     const w=WR[k];
     if(i===0){ w.style.left='0px'; w.style.top='0px'; w.style.width=leftW+'px'; w.style.height=(H-4)+'px'; }
     else{ w.style.left=(leftW+6)+'px'; w.style.top=((i-1)*(stackH+6))+'px'; w.style.width=rightW+'px'; w.style.height=stackH+'px'; }
-  });
-}
-
-function arrangeFocus(){
-  const keys=Object.keys(WR); if(!keys.length)return;
-  // Find topmost window
-  let topKey=keys[0], topZ=-1;
-  keys.forEach(k=>{ const z=parseInt(WR[k].style.zIndex)||0; if(z>topZ){topZ=z;topKey=k;} });
-  const W=window.innerWidth, H=window.innerHeight-46;
-  // Topmost fills workspace, others tucked behind
-  keys.forEach((k,i)=>{
-    const w=WR[k];
-    if(k===topKey){ w.style.left='0px'; w.style.top='0px'; w.style.width=(W-4)+'px'; w.style.height=(H-4)+'px'; w.style.zIndex=++zTop; }
-    else{ w.style.left=(20+i*16)+'px'; w.style.top=(20+i*16)+'px'; w.style.width='400px'; w.style.height='280px'; }
   });
 }
 

@@ -730,7 +730,7 @@ function refreshWin(winKey, cmd, extra){
     case'NEWS':  b.innerHTML=rNEWS();  break;
     case'INFL':  b.innerHTML=rINFL();  setTimeout(()=>drawInfl(),40); break;
     case'AUCTION':b.innerHTML=rAUCTION();break;
-    case'VOL':   b.innerHTML=rVOL();   setTimeout(drawVOL,40); break;
+    case'VOL':   b.innerHTML=rVOL();   break;
     case'EARN':  b.innerHTML=rEARN();  break;
     case'ECON':  b.innerHTML=rECON();  break;
     case'HOME':
@@ -781,7 +781,6 @@ function toggleFS(key){
 function repaintWin(key){
   const cmd = key.split('_')[0];
   if(cmd==='HEAT'){ const t=document.querySelector('.heat-tab.active'); drawHEAT(t?t.dataset.mode:'sector'); }
-  else if(cmd==='VOL')    drawVOL();
   else if(cmd==='INFL')   drawInfl();
   else if(cmd==='HOME')   initHOME();
   else if(cmd==='EQ')     drawEQ();
@@ -799,7 +798,7 @@ function renderW(cmd,key,extra){
     case'NEWS':   b.innerHTML=rNEWS();break;
     case'INFL':   b.innerHTML=rINFL();setTimeout(()=>drawInfl(),30);break;
     case'AUCTION':b.innerHTML=rAUCTION();break;
-    case'VOL':    b.innerHTML=rVOL();setTimeout(()=>drawVOL(),30);break;
+    case'VOL':    b.innerHTML=rVOL();break;
     case'EQS':    b.innerHTML=rEQS(extra);setTimeout(()=>{if(extra)fetchEQS(extra.toUpperCase())},30);break;
     case'CHART':  b.innerHTML=rCHART(extra);setTimeout(()=>loadChartData(),60);break;
     case'EARN':   b.innerHTML=rEARN();break;
@@ -1064,8 +1063,9 @@ function drawYieldCurveStatic(ctx,pts,W,pad,pw,ph,mn,mx,xp,yp,lineCol,grad){
 // RENDER: EQUITIES
 // ═══════════════════════════════════════════
 function rEQ(){
-  // SPX only for index row
+  // Guard: return loading state if data not yet arrived
   const spx = D.equities.indices[0];
+  if(!spx || spx.val == null) return `<div style="padding:20px;color:#555;font-size:10px">LOADING EQUITY DATA…</div>`;
   const spxUp = spx.pct >= 0;
   const spxRow = `<tr>
     <td style="color:var(--amber);font-weight:600">${spx.name}</td>
@@ -1246,7 +1246,8 @@ function rFX(){
   const _fxCcyMap = {
     'EURUSD':'EUR','GBPUSD':'GBP','AUDUSD':'AUD','NZDUSD':'NZD',
     'USDJPY':'JPY','USDCHF':'CHF','USDCAD':'CAD','USDSEK':'SEK',
-    'USDNOK':'NOK','USDBRL':'BRL','USDCNY':'CNY','USDINR':'INR'
+    'USDNOK':'NOK','USDBRL':'BRL','USDCNY':'CNY','USDINR':'INR',
+    'USDMXN':'MXN','USDZAR':'ZAR','USDTRY':'TRY'
   };
   const fxOpts = [
     {name:'USD', val:1},
@@ -2314,10 +2315,11 @@ async function proxyFetch(url, timeoutMs=10000){
   // Proxy list ordered by reliability for github.io origin (March 2026)
   // allorigins /get returns JSON wrapper: {contents:'...', status:{...}}
   const proxies = [
-    { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, unwrap: true },
     { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, unwrap: false },
-    { url: `https://corsproxy.io/?url=${encodeURIComponent(url)}`, unwrap: false },
     { url: `https://cors.eu.org/${url}`, unwrap: false },
+    { url: `https://corsproxy.io/?url=${encodeURIComponent(url)}`, unwrap: false },
+    { url: `https://proxy.cors.sh/${url}`, unwrap: false },
+    { url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, unwrap: true },
   ];
   let lastErr;
   for(const proxy of proxies){
@@ -2517,7 +2519,9 @@ async function fetchFXRates(){
       'AUDUSD': 1/rates.AUD,  'USDCAD': rates.CAD,
       'NZDUSD': 1/rates.NZD,  'USDSEK': rates.SEK,
       'USDNOK': rates.NOK,    'USDBRL': rates.BRL,
-      'USDCNY': rates.CNY,    'USDINR': rates.INR,
+      'USDMXN': rates.MXN,    'USDINR': rates.INR,
+      'USDCNY': rates.CNY,    'USDZAR': rates.ZAR,
+      'USDTRY': rates.TRY,
     };
     D.fx.forEach(row => {
       const val = fxMap[row.name];
@@ -2528,6 +2532,11 @@ async function fetchFXRates(){
         row.val = +val.toFixed(4);
       }
     });
+    // Fetch DXY from Yahoo Finance (not in er-api)
+    try{
+      const dxyQ = await yfFetch('DXY');
+      if(dxyQ){ const r=D.fx.find(f=>f.name==='DXY'); if(r){r.val=+(dxyQ.price.toFixed(2));r.d1=+(dxyQ.chg.toFixed(2));r.pct=+(dxyQ.pct||0);} }
+    }catch(_){}
     markFresh('FX');
   }catch(e){ markStale('FX', e.message); }
 }
@@ -3131,7 +3140,6 @@ function launchCHRIS(){
       WR['VOL'].style.height=rightH2+'px';
       WR['VOL'].style.zIndex=++zTop;
       renderW('VOL','VOL');
-      setTimeout(()=>drawVOL(),60);
     }
     // MACRO — right bottom, auto-switch to CB tab for bond context
     if(WR['MACRO']){

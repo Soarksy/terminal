@@ -48,13 +48,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   display:flex;align-items:center;padding:0 8px;gap:10px;z-index:2000;position:relative;
 }
 #logo{color:var(--amber);font-weight:600;font-size:12px;letter-spacing:3px;white-space:nowrap}
-#cmdwrap{width:260px;flex-shrink:0;display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);padding:0 6px}
+#cmdwrap{flex:1;max-width:480px;min-width:200px;display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);padding:0 6px}
 #cmdbar{
   flex:1;background:transparent;border:none;color:var(--text-bright);
   font-family:var(--font);font-size:12px;outline:none;caret-color:var(--amber);
 }
 #cmdbar::placeholder{color:var(--text-dim)}
 #topright{display:flex;align-items:center;gap:10px}
+#topbar-mkt{display:flex;align-items:center;gap:0;flex:1;overflow:hidden}
+.tbm-item{display:inline-flex;align-items:center;gap:4px;padding:0 8px;cursor:pointer;white-space:nowrap}
+.tbm-item:hover .tbm-val{color:var(--text-bright)}
+.tbm-lbl{font-size:9px;color:#444;letter-spacing:.8px}
+.tbm-val{font-size:10px;color:#888;font-weight:500;min-width:40px}
+.tbm-sep{color:#222;font-size:9px}
+.tbm-up{color:#5aaa7a!important}
+.tbm-dn{color:#cc5555!important}
 #mktstrip-live{display:flex;align-items:center;font-size:10px;letter-spacing:.5px;white-space:nowrap;font-family:var(--font)}
 #live-fetching-text{color:#cc8800;margin-left:10px}
 
@@ -449,6 +457,19 @@ canvas{display:block}
 <!-- TOPBAR -->
 <div id="topbar">
   <div id="logo">◈ TERMINAL &nbsp;<span id="clock" style="font-size:10px;font-weight:400;letter-spacing:1px;color:#666">--:--:--</span></div>
+  <div id="topbar-mkt">
+    <span class="tbm-item" onclick="OW('EQ')" title="S&amp;P 500"><span class="tbm-lbl">SPX</span><span id="tbm-spx" class="tbm-val">—</span></span>
+    <span class="tbm-sep">·</span>
+    <span class="tbm-item" onclick="OW('EQ')" title="Nasdaq 100"><span class="tbm-lbl">NDX</span><span id="tbm-ndx" class="tbm-val">—</span></span>
+    <span class="tbm-sep">·</span>
+    <span class="tbm-item" onclick="OW('VOL')" title="VIX"><span class="tbm-lbl">VIX</span><span id="tbm-vix" class="tbm-val">—</span></span>
+    <span class="tbm-sep">·</span>
+    <span class="tbm-item" onclick="OW('FX')" title="US Dollar Index"><span class="tbm-lbl">DXY</span><span id="tbm-dxy" class="tbm-val">—</span></span>
+    <span class="tbm-sep">·</span>
+    <span class="tbm-item" onclick="OW('FI')" title="10Y Treasury"><span class="tbm-lbl">10Y</span><span id="tbm-10y" class="tbm-val">—</span></span>
+    <span class="tbm-sep">·</span>
+    <span class="tbm-item" onclick="OW('CMDTY')" title="Gold"><span class="tbm-lbl">GOLD</span><span id="tbm-gold" class="tbm-val">—</span></span>
+  </div>
   <div id="cmdwrap">
     <input id="cmdbar" type="text" placeholder="SEARCH" autocomplete="off" spellcheck="false">
     <div id="search-type-badge"></div>
@@ -594,61 +615,7 @@ const D = {
   },
 
   macro:{
-    calendar:[
-      // ── MARCH 2026 ──
-      {date:'Mar 07',time:'08:30',cty:'US',event:'Nonfarm Payrolls Feb',      prev:'143K',  fore:'160K',          act:'151K',  impact:'HIGH',beat:true},
-      {date:'Mar 07',time:'08:30',cty:'US',event:'Unemployment Rate Feb',     prev:'4.0%',  fore:'4.0%',          act:'4.1%',  impact:'HIGH',beat:false},
-      {date:'Mar 12',time:'08:30',cty:'US',event:'CPI MoM Feb',               prev:'0.5%',  fore:'0.3%',          act:'0.2%',  impact:'HIGH',beat:true},
-      {date:'Mar 12',time:'08:30',cty:'US',event:'Core CPI MoM Feb',          prev:'0.4%',  fore:'0.3%',          act:'0.2%',  impact:'HIGH',beat:true},
-      {date:'Mar 13',time:'08:30',cty:'US',event:'PPI Final Demand MoM Feb',  prev:'0.4%',  fore:'0.3%',          act:null,    impact:'MED', beat:null},
-      {date:'Mar 13',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'242K',  fore:'235K',          act:null,    impact:'MED', beat:null},
-      {date:'Mar 14',time:'09:15',cty:'US',event:'Industrial Production MoM', prev:'-0.1%', fore:'0.2%',          act:null,    impact:'MED', beat:null},
-      {date:'Mar 17',time:'08:30',cty:'US',event:'Retail Sales MoM Feb',      prev:'-0.9%', fore:'0.7%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 17',time:'10:00',cty:'US',event:'NAHB Housing Market Index', prev:'42',    fore:'43',            act:null,    impact:'LOW', beat:null},
-      {date:'Mar 18',time:'08:30',cty:'US',event:'Housing Starts Feb',        prev:'1.366M',fore:'1.38M',         act:null,    impact:'MED', beat:null},
-      {date:'Mar 18',time:'',     cty:'JP', event:'BOJ Rate Decision',        prev:'0.50%', fore:'0.50%',         act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 19',time:'14:00',cty:'US',event:'FOMC Rate Decision',        prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,   impact:'HIGH',beat:null},
-      {date:'Mar 19',time:'14:30',cty:'US',event:'Fed Press Conference',      prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 19',time:'',     cty:'UK', event:'BOE Rate Decision',        prev:'4.50%', fore:'4.50%',         act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 20',time:'10:00',cty:'US',event:'Existing Home Sales Feb',   prev:'4.08M', fore:'4.12M',         act:null,    impact:'MED', beat:null},
-      {date:'Mar 24',time:'09:45',cty:'US',event:'S&P Global PMI Composite',  prev:'52.7',  fore:'52.5',          act:null,    impact:'MED', beat:null},
-      {date:'Mar 26',time:'08:30',cty:'US',event:'GDP QoQ Q4 Final',          prev:'2.3%',  fore:'2.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 26',time:'08:30',cty:'US',event:'Durable Goods Orders MoM',  prev:'3.2%',  fore:'-1.0%',         act:null,    impact:'MED', beat:null},
-      {date:'Mar 27',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'',      fore:'235K',          act:null,    impact:'MED', beat:null},
-      {date:'Mar 28',time:'08:30',cty:'US',event:'Core PCE MoM Feb',          prev:'0.3%',  fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Mar 28',time:'08:30',cty:'US',event:'Personal Income MoM Feb',   prev:'0.9%',  fore:'0.4%',          act:null,    impact:'MED', beat:null},
-      {date:'Mar 28',time:'10:00',cty:'US',event:'U Michigan Sentiment Final', prev:'64.7',  fore:'64.0',          act:null,    impact:'MED', beat:null},
-      // ── APRIL 2026 ──
-      {date:'Apr 01',time:'10:00',cty:'US',event:'ISM Manufacturing PMI Mar', prev:'50.3',  fore:'50.1',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 02',time:'08:30',cty:'US',event:'ADP Employment Mar',        prev:'77K',   fore:'125K',          act:null,    impact:'MED', beat:null},
-      {date:'Apr 03',time:'10:00',cty:'US',event:'ISM Services PMI Mar',      prev:'53.5',  fore:'53.0',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 03',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'',      fore:'232K',          act:null,    impact:'MED', beat:null},
-      {date:'Apr 04',time:'08:30',cty:'US',event:'Nonfarm Payrolls Mar',      prev:'151K',  fore:'158K',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 04',time:'08:30',cty:'US',event:'Unemployment Rate Mar',     prev:'4.1%',  fore:'4.1%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 10',time:'08:30',cty:'US',event:'CPI MoM Mar',               prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 10',time:'08:30',cty:'US',event:'Core CPI MoM Mar',          prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 11',time:'08:30',cty:'US',event:'PPI Final Demand MoM Mar',  prev:'',      fore:'0.2%',          act:null,    impact:'MED', beat:null},
-      {date:'Apr 14',time:'',     cty:'EU', event:'ECB Rate Decision',        prev:'2.40%', fore:'2.15%',         act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 15',time:'08:30',cty:'US',event:'Retail Sales MoM Mar',      prev:'',      fore:'0.5%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 16',time:'09:15',cty:'US',event:'Industrial Production MoM', prev:'',      fore:'0.2%',          act:null,    impact:'MED', beat:null},
-      {date:'Apr 17',time:'08:30',cty:'US',event:'Housing Starts Mar',        prev:'',      fore:'1.39M',         act:null,    impact:'MED', beat:null},
-      {date:'Apr 24',time:'08:30',cty:'US',event:'Durable Goods Orders MoM',  prev:'',      fore:'0.5%',          act:null,    impact:'MED', beat:null},
-      {date:'Apr 25',time:'08:30',cty:'US',event:'Initial Jobless Claims',    prev:'',      fore:'230K',          act:null,    impact:'MED', beat:null},
-      {date:'Apr 25',time:'08:30',cty:'US',event:'GDP Advance Q1 2026',       prev:'2.3%',  fore:'1.8%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 30',time:'08:30',cty:'US',event:'Core PCE MoM Mar',          prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'Apr 30',time:'14:00',cty:'US',event:'FOMC Rate Decision',        prev:'4.25-4.50%',fore:'4.25-4.50%',act:null,   impact:'HIGH',beat:null},
-      // ── MAY 2026 ──
-      {date:'May 01',time:'14:30',cty:'US',event:'Fed Press Conference',      prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
-      {date:'May 02',time:'08:30',cty:'US',event:'Nonfarm Payrolls Apr',      prev:'',      fore:'155K',          act:null,    impact:'HIGH',beat:null},
-      {date:'May 07',time:'',     cty:'UK', event:'BOE Rate Decision',        prev:'4.50%', fore:'4.25%',         act:null,    impact:'HIGH',beat:null},
-      {date:'May 13',time:'08:30',cty:'US',event:'CPI MoM Apr',               prev:'',      fore:'0.3%',          act:null,    impact:'HIGH',beat:null},
-      {date:'May 28',time:'08:30',cty:'US',event:'Core PCE MoM Apr',          prev:'',      fore:'0.2%',          act:null,    impact:'HIGH',beat:null},
-      // ── JUNE 2026 ──
-      {date:'Jun 06',time:'08:30',cty:'US',event:'Nonfarm Payrolls May',      prev:'',      fore:'150K',          act:null,    impact:'HIGH',beat:null},
-      {date:'Jun 11',time:'14:00',cty:'US',event:'FOMC Rate Decision',        prev:'4.25-4.50%',fore:'4.00-4.25%',act:null,   impact:'HIGH',beat:null},
-      {date:'Jun 11',time:'14:30',cty:'US',event:'Fed Press Conference',      prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
-      {date:'Jun 12',time:'08:30',cty:'US',event:'CPI MoM May',               prev:'',      fore:'',              act:null,    impact:'HIGH',beat:null},
-    ],
+    calendar:[],
     centralBanks:[
       {name:'FED',  rate:'4.25-4.50%',next:'Mar 19'},
       {name:'ECB',  rate:'2.40%',next:'Apr 14'},
@@ -667,12 +634,7 @@ const D = {
   companies:{},  // populated by fetchEQS live data
 
   // ── Extended sub-objects (populated by API polling) ──
-  screener:  {},   // equity screener results (future)
-  filings:   {},   // reserved
-  alerts:    {     // configurable thresholds
-    rules: [],     // [{id,type,symbol,field,op,threshold,triggered}]
-    fired: [],     // [{ts,msg,severity}] — recent triggered alerts
-  },
+
   metadata: {      // system metadata
     lastRefresh:  null,
     lastAttempt:  null,
@@ -1303,6 +1265,49 @@ function rFX(){
 
   const fxLookup={};D.fx.forEach(f=>{fxLookup[f.name]=f;});
 
+  // Build currency options from live D.fx data
+  const fxOpts = [
+    {name:'USD', val:1},
+    ...D.fx.filter(f=>f.val!=null).map(f=>{
+      // Convert pair to base currency rate vs USD
+      const name = f.name.replace('USD=X','').replace('=X','');
+      // EURUSD=1.08 means 1 EUR = 1.08 USD → rate for EUR = 1.08
+      // USDJPY=150 means 1 USD = 150 JPY → rate for JPY = 1/150
+      const isUSDbase = f.name.startsWith('USD');
+      const rate = isUSDbase ? 1/f.val : f.val;
+      return {name, val:rate, raw:f.name};
+    })
+  ];
+  const fxOptHTML = fxOpts.map((o,i)=>
+    `<option value="${o.val}" data-name="${o.name}" ${i===1?'selected':''}>${o.name}</option>`
+  ).join('');
+  const fxToOptHTML = fxOpts.map((o,i)=>
+    `<option value="${o.val}" data-name="${o.name}" ${o.name==='USD'?'selected':''}>${o.name}</option>`
+  ).join('');
+
+  const calcContent = `
+    <div style="padding:10px 12px">
+      <div class="sl" style="margin-bottom:10px">FX CALCULATOR — LIVE RATES</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <input id="fxc-amount" type="number" value="1000" step="any"
+               style="width:100px;background:#0a0a0a;border:1px solid #333;color:var(--text);font-family:var(--font);font-size:11px;padding:4px 6px"
+               oninput="fxCalc()">
+        <select id="fxc-from" onchange="fxCalc()"
+                style="background:#0a0a0a;border:1px solid #333;color:var(--amber);font-family:var(--font);font-size:11px;padding:4px 6px;cursor:pointer">
+          ${fxOptHTML}
+        </select>
+        <button onclick="fxSwapCalc()"
+                style="background:#111;border:1px solid #333;color:#888;font-family:var(--font);font-size:11px;padding:4px 8px;cursor:pointer">⇄</button>
+        <select id="fxc-to" onchange="fxCalc()"
+                style="background:#0a0a0a;border:1px solid #333;color:var(--amber);font-family:var(--font);font-size:11px;padding:4px 6px;cursor:pointer">
+          ${fxToOptHTML}
+        </select>
+      </div>
+      <div style="font-size:22px;font-weight:600;color:var(--text);margin-bottom:8px" id="fxc-result">—</div>
+      <div id="fxc-rate-box" style="font-size:10px;color:#555;padding:6px 0;border-top:1px solid #111"></div>
+      <div style="font-size:9px;color:#333;margin-top:8px">Rates: open.er-api.com · updated each poll cycle</div>
+    </div>`;
+
   return buildTabs('fx-tabs',[
     {id:'fx-g10',   label:'G10 & DXY', content:`<div style="padding:4px 6px">${fxTable('G10 & DXY',g10)}</div>`},
     {id:'fx-em',    label:'EMERGING',  content:`<div style="padding:4px 6px">${fxTable('EMERGING MARKETS',em)}</div>`},
@@ -1797,6 +1802,11 @@ function rMACRO(){
   }).join('');
 
   // Group header labels differ for past vs upcoming
+  const _emptyCalMsg = !calFiltered.length ? `
+    <div style="padding:20px 10px;text-align:center;color:#555;font-size:10px">
+      No scheduled events · <span style="color:var(--amber);cursor:pointer" onclick="switchTab('macro-tabs','macro-cal-links')">Browse external calendars →</span>
+    </div>` : '';
+
   const calTab = `<div style="padding:4px 6px">
     <div style="display:grid;grid-template-columns:50px 42px 14px 22px 1fr 52px 52px;font-size:9px;color:#555;padding:3px 0 3px 6px;border-bottom:1px solid #1a1a1a;margin-bottom:2px;letter-spacing:.5px">
       <span>DATE</span><span>TIME</span><span style="text-align:center">IMP</span><span>CTY</span><span>EVENT</span><span style="text-align:right">PREV</span><span style="text-align:right">FCST / ACT</span>
@@ -1807,7 +1817,7 @@ function rMACRO(){
       <span>${impDot('LOW')} LOW IMPACT</span>
       <span style="margin-left:auto;color:#3aaa3a">GREEN = BEAT &nbsp;</span><span style="color:#cc5555">RED = MISS</span>
     </div>
-    ${calRows}
+    ${_emptyCalMsg||calRows}
   </div>`;
 
   // ── CENTRAL BANKS TAB — links to live sources ──
@@ -2929,6 +2939,26 @@ async function pollAll(){
 }
 
 function refreshOpenWindows(){
+  // ── Update topbar market strip ──
+  try{
+    const _spx = D.equities.indices[0];
+    const _ndx = D.equities.indices[1];
+    const _vix = D.equities.indices[4];
+    const _dxy = D.fx.find(f=>f.name==='DXY');
+    const _t10 = D.fixedIncome.treasuries.find(t=>t.tenor==='10Y');
+    const _gld = D.commodities.metals.find(m=>m.name==='Gold');
+    const _tbm = (id,val,pct,fmt)=>{
+      const el=document.getElementById(id); if(!el||val==null) return;
+      el.textContent = fmt ? fmt(val) : val.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+      el.className='tbm-val'+(pct>0?' tbm-up':pct<0?' tbm-dn':'');
+    };
+    if(_spx) _tbm('tbm-spx',_spx.val,_spx.pct,v=>v.toLocaleString('en-US',{maximumFractionDigits:0}));
+    if(_ndx) _tbm('tbm-ndx',_ndx.val,_ndx.pct,v=>v.toLocaleString('en-US',{maximumFractionDigits:0}));
+    if(_vix) _tbm('tbm-vix',_vix.val,_vix.pct,v=>v.toFixed(2));
+    if(_dxy) _tbm('tbm-dxy',_dxy.val,_dxy.d1,v=>v.toFixed(2));
+    if(_t10) _tbm('tbm-10y',_t10.yield,_t10.d1,v=>v.toFixed(3)+'%');
+    if(_gld) _tbm('tbm-gold',_gld.spot,_gld.d1,v=>v.toLocaleString('en-US',{maximumFractionDigits:0}));
+  }catch(e){}
   // Re-render open panels that depend on live data
   const livePanels = ['FI','TREAS','EQ','FX','CMDTY','INFL','VOL','AUCTION'];
   livePanels.forEach(cmd=>{
@@ -3010,7 +3040,7 @@ function buildSearchCorpus(){
     '5Y':'5-Year Note','7Y':'7-Year Note','10Y':'10-Year Note',
     '20Y':'20-Year Bond','30Y':'30-Year Bond'
   };
-  D.fixedIncome.treasuries.forEach(t=>{
+  D.fixedIncome.treasuries.filter(t=>t.yield!=null).forEach(t=>{
     const k = 'UST'+t.tenor.replace(/\s/g,'');
     C.push({key:k, label:TENOR_LABELS[t.tenor]||`UST ${t.tenor}`,
       meta:`${t.yield.toFixed(3)}% yield`, type:'bond',
@@ -3022,14 +3052,24 @@ function buildSearchCorpus(){
       action:()=>OW('FI')});
   });
 
-  // Equities — from WATCH list only (SCRN_UNIVERSE removed)
-  (D.watchlist||[]).forEach(w=>{
-    C.push({key:w.sym, label:w.sym+' — '+(w.name||w.sym),
-      meta:'WATCHLIST', type:'equity', action:()=>OW('EQS',w.sym)});
+  // Equities — from WATCH list (localStorage) + common tickers
+  try{
+    const wlRaw = localStorage.getItem('wl');
+    const wlItems = wlRaw ? JSON.parse(wlRaw) : [];
+    (Array.isArray(wlItems)?wlItems:[]).forEach(w=>{
+      if(w&&w.sym) C.push({key:w.sym, label:w.sym+(w.name?' — '+w.name:''),
+        meta:'WATCHLIST', type:'equity', action:()=>OW('EQS',w.sym)});
+    });
+  }catch(e){}
+  // Always include major tickers for search
+  ['AAPL','MSFT','NVDA','GOOGL','AMZN','META','TSLA','JPM','V','WMT',
+   'SPY','QQQ','GLD','TLT','BTC-USD','ETH-USD'].forEach(sym=>{
+    if(!C.find(x=>x.key===sym))
+      C.push({key:sym, label:sym, meta:'Equity — open EQS', type:'equity', action:()=>OW('EQS',sym)});
   });
 
   // FX pairs
-  D.fx.forEach(f=>{
+  D.fx.filter(f=>f.val!=null).forEach(f=>{
     C.push({key:f.name, label:f.name+' Exchange Rate',
       meta:`${f.val.toFixed(f.val>10?3:4)}`, type:'fx',
       action:()=>OW('FX')});
@@ -3050,7 +3090,7 @@ function buildSearchCorpus(){
     {key:'ISM',   label:'ISM Manufacturing / Services',meta:'MACRO panel'},
     {key:'PMI',   label:'Purchasing Managers Index',meta:'MACRO panel'},
     {key:'FEDRATE',label:'Federal Funds Rate',      meta:'MACRO · CB monitor'},
-    {key:'FEDFUNDS',label:'Fed Funds Rate (FRED)',  meta:'5.25–5.50%'},
+    {key:'FEDFUNDS',label:'Fed Funds Rate (FRED)',  meta:'RATES panel'},
     {key:'BREAKEVEN',label:'Inflation Breakevens',  meta:'INFL panel'},
     {key:'5Y5Y',  label:'5Y5Y Forward Inflation',   meta:'INFL panel'},
     {key:'MOVE',  label:'MOVE Index — Rates Vol',   meta:'VOL panel'},
@@ -3062,7 +3102,7 @@ function buildSearchCorpus(){
     action:()=>macroSeriesAction(m.key)}));
 
   // Commodities
-  [...D.commodities.energy,...D.commodities.metals,...D.commodities.agriculture].forEach(c=>{
+  [...D.commodities.energy,...D.commodities.metals,...D.commodities.agriculture].filter(c=>c.spot!=null).forEach(c=>{
     C.push({key:c.name.replace(/\s+/g,'').toUpperCase(),
       label:c.name, meta:`${c.spot.toFixed(c.spot>100?1:3)} ${c.unit}`,
       type:'cmdty', action:()=>OW('CMDTY')});

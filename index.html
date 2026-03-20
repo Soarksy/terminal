@@ -103,13 +103,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   background:#020202;z-index:99998;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   pointer-events:none;transition:opacity 0.6s ease;
+  overflow:hidden;
 }
 #loading-screen.fade-out{opacity:0;}
 #loading-screen.gone{display:none;}
-.ld-logo{font-size:22px;color:#ffab00;letter-spacing:4px;font-weight:700;margin-bottom:20px}
-.ld-bar-wrap{width:280px;height:2px;background:#111;margin-bottom:16px;overflow:hidden}
-.ld-bar{height:2px;background:#ffab00;width:0%;transition:width 0.3s ease}
-.ld-status{font-size:9px;color:#444;letter-spacing:1.5px;height:14px}
+/* Grid overlay */
+#loading-screen::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,171,0,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,171,0,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
+.ld-logo{margin-bottom:20px;position:relative;display:flex;align-items:center;justify-content:center}
+.ld-tagline{font-size:9px;color:#333;letter-spacing:3px;margin-bottom:28px;text-transform:uppercase}
+.ld-bar-wrap{width:320px;height:1px;background:#1a1a1a;margin-bottom:20px;overflow:hidden;position:relative}
+.ld-bar{height:1px;background:linear-gradient(90deg,#cc8800,#ffab00,#ffdd66);width:0%;transition:width 0.4s ease}
+.ld-bar-glow{position:absolute;top:-4px;right:0;width:20px;height:8px;background:radial-gradient(#ffab00,transparent);opacity:0;transition:opacity 0.3s}
+.ld-status{font-size:9px;color:#333;letter-spacing:2px;height:14px;margin-bottom:40px}
+.ld-stats{display:flex;gap:32px;margin-top:0}
+.ld-stat{text-align:center}
+.ld-stat-label{font-size:8px;color:#1e1e1e;letter-spacing:1.5px;margin-bottom:3px}
+.ld-stat-val{font-size:11px;color:#2a2a2a;font-weight:600;letter-spacing:1px}
 #workspace{
   position:relative;width:100%;height:calc(100vh - 70px);
   background-color:#050608;
@@ -426,7 +442,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .home-tile-sub{font-size:9px;display:flex;gap:6px;align-items:center;margin-top:1px}
 .home-tile-chg{font-size:11px;font-weight:600}
 .home-tile-meta{color:#888;font-size:9px}
-.home-sparkwrap{position:absolute;bottom:0;right:0;left:0;height:28px;opacity:0.6}
 #home-news{flex:1;overflow-y:auto;padding:4px 0;min-height:0}
 .home-news-row{display:flex;gap:8px;align-items:baseline;padding:3px 8px;border-bottom:1px solid #0a0a0a;cursor:pointer}
 .home-news-row:hover{background:var(--bg2)}
@@ -459,17 +474,58 @@ canvas{display:block}
 <body>
 
 <div id="loading-screen">
-  <div class="ld-logo">◈ TERMINAL</div>
-  <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
+  <div class="ld-logo"><svg viewBox="0 0 80 48" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;width:80px;height:48px">
+  <!-- Outer frame with corner ticks -->
+  <rect x="1" y="1" width="46" height="46" fill="none" stroke="#ffab00" stroke-width="1.2"/>
+  <!-- Corner accent ticks -->
+  <line x1="1" y1="1" x2="8" y2="1" stroke="#ffab00" stroke-width="2"/>
+  <line x1="1" y1="1" x2="1" y2="8" stroke="#ffab00" stroke-width="2"/>
+  <line x1="47" y1="1" x2="40" y2="1" stroke="#ffab00" stroke-width="2"/>
+  <line x1="47" y1="1" x2="47" y2="8" stroke="#ffab00" stroke-width="2"/>
+  <line x1="1" y1="47" x2="8" y2="47" stroke="#ffab00" stroke-width="2"/>
+  <line x1="1" y1="47" x2="1" y2="40" stroke="#ffab00" stroke-width="2"/>
+  <line x1="47" y1="47" x2="40" y2="47" stroke="#ffab00" stroke-width="2"/>
+  <line x1="47" y1="47" x2="47" y2="40" stroke="#ffab00" stroke-width="2"/>
+  <!-- Rising bars (4 bars) -->
+  <rect x="7" y="28" width="6" height="13" fill="#ffab00" opacity="0.35"/>
+  <rect x="15" y="20" width="6" height="21" fill="#ffab00" opacity="0.55"/>
+  <rect x="23" y="12" width="6" height="29" fill="#ffab00" opacity="0.75"/>
+  <rect x="31" y="5"  width="6" height="36" fill="#ffab00" opacity="1"/>
+  <!-- Trend line -->
+  <polyline points="10,32 18,24 26,16 34,9" fill="none" stroke="#ffdd88" stroke-width="1" stroke-dasharray="2,2" opacity="0.6"/>
+  <!-- Wordmark -->
+  <text x="52" y="22" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#ffab00" letter-spacing="2">TERM</text>
+  <text x="52" y="34" font-family="IBM Plex Mono,monospace" font-size="6" font-weight="400" fill="#554400" letter-spacing="1.5">INAL</text>
+</svg></div>
+  <div class="ld-bar-wrap">
+    <div class="ld-bar" id="ld-bar"></div>
+    <div class="ld-bar-glow" id="ld-glow"></div>
+  </div>
   <div class="ld-status" id="ld-status">INITIALIZING…</div>
+  <div class="ld-stats">
+    <div class="ld-stat"><div class="ld-stat-label">EQUITIES</div><div class="ld-stat-val" id="ldst-eq">—</div></div>
+    <div class="ld-stat"><div class="ld-stat-label">FIXED INCOME</div><div class="ld-stat-val" id="ldst-fi">—</div></div>
+    <div class="ld-stat"><div class="ld-stat-label">FX</div><div class="ld-stat-val" id="ldst-fx">—</div></div>
+    <div class="ld-stat"><div class="ld-stat-label">COMMODITIES</div><div class="ld-stat-val" id="ldst-cm">—</div></div>
+  </div>
   <div style="position:absolute;bottom:18px;right:22px">
-    <button onclick="const ls=document.getElementById('loading-screen');if(ls){ls.classList.add('fade-out');setTimeout(()=>ls.classList.add('gone'),700);}runNetworkTest();" style="background:none;border:none;color:#333;font-family:var(--font);font-size:9px;letter-spacing:1px;cursor:pointer;padding:4px 8px" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#333'">▸ DIAG</button>
+    <button onclick="const ls=document.getElementById('loading-screen');if(ls){ls.classList.add('fade-out');setTimeout(()=>ls.classList.add('gone'),700);}runNetworkTest();" style="background:none;border:none;color:#222;font-family:var(--font);font-size:9px;letter-spacing:1px;cursor:pointer;padding:4px 8px" onmouseover="this.style.color='#555'" onmouseout="this.style.color='#222'">▸ DIAG</button>
   </div>
 </div>
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div id="logo">◈ TERMINAL &nbsp;<span id="clock" style="font-size:10px;font-weight:400;letter-spacing:1px;color:#666">--:--:--</span></div>
+  <div id="logo"><svg viewBox="0 0 28 16" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;width:28px;height:16px">
+  <!-- Square frame -->
+  <rect x="0.5" y="0.5" width="15" height="15" fill="none" stroke="#ffab00" stroke-width="0.8"/>
+  <!-- Rising bars -->
+  <rect x="2.5" y="9" width="2" height="5" fill="#ffab00" opacity="0.5"/>
+  <rect x="5.5" y="6" width="2" height="8" fill="#ffab00" opacity="0.65"/>
+  <rect x="8.5" y="3.5" width="2" height="10.5" fill="#ffab00" opacity="0.8"/>
+  <rect x="11.5" y="1.5" width="2" height="12.5" fill="#ffab00"/>
+  <!-- Wordmark -->
+  <text x="18" y="11.5" font-family="IBM Plex Mono,monospace" font-size="7" font-weight="700" fill="#ffab00" letter-spacing="1">TERM</text>
+</svg> &nbsp;<span id="clock" style="font-size:10px;font-weight:400;letter-spacing:1px;color:#666">--:--:--</span></div>
   <div id="cmdwrap">
     <input id="cmdbar" type="text" placeholder="SEARCH" autocomplete="off" spellcheck="false">
     <div id="search-type-badge"></div>
@@ -524,19 +580,18 @@ canvas{display:block}
 const D = {
   fixedIncome: {
     treasuries: [
-      {tenor:'1M', yield:4.34,d1:-.01,w1:-.02,m1:-.04,dur:.08,price:99.64},
-      {tenor:'3M', yield:4.32,d1:-.01,w1:-.02,m1:-.06,dur:.25,price:98.92},
-      {tenor:'6M', yield:4.28,d1:-.01,w1:-.03,m1:-.08,dur:.49,price:97.88},
-      {tenor:'1Y', yield:4.18,d1:-.02,w1:-.04,m1:-.12,dur:.97,price:95.98},
-      {tenor:'2Y', yield:4.02,d1:-.03,w1:-.06,m1:-.14,dur:1.91,price:96.14},
-      {tenor:'3Y', yield:4.08,d1:-.02,w1:-.05,m1:-.12,dur:2.84,price:95.44},
-      {tenor:'5Y', yield:4.18,d1:-.01,w1:-.04,m1:-.10,dur:4.58,price:96.88},
-      {tenor:'7Y', yield:4.28,d1:+.01,w1:-.02,m1:-.06,dur:6.21,price:97.22},
-      {tenor:'10Y',yield:4.32,d1:+.02,w1:-.01,m1:-.04,dur:8.64,price:96.44},
-      {tenor:'20Y',yield:4.62,d1:+.02,w1:+.01,m1:+.02,dur:14.2,price:93.88},
-      {tenor:'30Y',yield:4.72,d1:+.03,w1:+.02,m1:+.04,dur:18.6,price:92.84},
+      {tenor:'1M', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'3M', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'6M', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'1Y', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'2Y', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'3Y', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'5Y', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'7Y', yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'10Y',yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'20Y',yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
+      {tenor:'30Y',yield:null,d1:null,w1:null,m1:null,dur:null,price:null},
     ],
-    spreads:{ig:[],hy:[],muni:[],em:[]}, // static spreads removed
     auctions:[
       {sec:'4W T-Bill', issue:'2026-03-06',mat:'2026-04-07',auction:'2026-03-04',yield:4.255,btc:2.98,tail:.1,ind:67.2,dir:18.8,deal:14.0,weak:false},
       {sec:'8W T-Bill', issue:'2026-03-06',mat:'2026-05-05',auction:'2026-03-04',yield:4.262,btc:2.91,tail:.1,ind:69.0,dir:17.6,deal:13.4,weak:false},
@@ -549,24 +604,16 @@ const D = {
       {sec:'20Y Bond',  issue:'2026-03-16',mat:'2046-03-15',auction:'2026-03-12',yield:4.682,btc:2.30,tail:2.6,ind:59.0,dir:13.8,deal:27.2,weak:true},
       {sec:'30Y Bond',  issue:'2026-03-16',mat:'2056-03-15',auction:'2026-03-13',yield:4.614,btc:2.33,tail:2.2,ind:57.4,dir:14.8,deal:27.8,weak:false},
     ],
-    inflation:{
-      breakevens:[
-        {tenor:'5Y',   be:null,nom:null,real:null,d1:null},
-        {tenor:'10Y',  be:null,nom:null,real:null,d1:null},
-        {tenor:'30Y',  be:null,nom:null,real:null,d1:null},
-        {tenor:'5Y5Y', be:null,nom:null,real:null,d1:null},
-      ],
-      metrics:[]  // removed — FRED gauges above are live
-    }
+    inflation:{breakevens:[], metrics:[]}
   },
 
   equities:{
     indices:[
-      {name:'S&P 500', val:null, chg:null, pct:null, vol:'—'},
-      {name:'Nasdaq',  val:null, chg:null, pct:null, vol:'—'},
-      {name:'Dow',     val:null, chg:null, pct:null, vol:'—'},
-      {name:'Russell', val:null, chg:null, pct:null, vol:'—'},
-      {name:'VIX',     val:null, chg:null, pct:null, vol:'—'},
+      {name:'S&P 500', val:null, chg:null, pct:null},
+      {name:'Nasdaq',  val:null, chg:null, pct:null},
+      {name:'Dow',     val:null, chg:null, pct:null},
+      {name:'Russell', val:null, chg:null, pct:null},
+      {name:'VIX',     val:null, chg:null, pct:null},
     ],
     sectors:[]  // populated live by fetchSectorETFs()
   },
@@ -592,39 +639,34 @@ const D = {
 
   commodities:{
     energy:[
-      {name:'WTI Crude',  spot:null, d1:null, curve:null, unit:'$/bbl'},
-      {name:'Brent Crude',spot:null, d1:null, curve:null, unit:'$/bbl'},
-      {name:'Nat Gas',    spot:null, d1:null, curve:null, unit:'$/MMBtu'},
-      {name:'Heating Oil',spot:null, d1:null, curve:null, unit:'$/gal'},
+      {name:'WTI Crude',  spot:null, d1:null, unit:'$/bbl'},
+      {name:'Brent Crude',spot:null, d1:null, unit:'$/bbl'},
+      {name:'Nat Gas',    spot:null, d1:null, unit:'$/MMBtu'},
+      {name:'Heating Oil',spot:null, d1:null, unit:'$/gal'},
     ],
     metals:[
-      {name:'Gold',     spot:null, d1:null, curve:null, unit:'$/oz'},
-      {name:'Silver',   spot:null, d1:null, curve:null, unit:'$/oz'},
-      {name:'Copper',   spot:null, d1:null, curve:null, unit:'$/lb'},
-      {name:'Platinum', spot:null, d1:null, curve:null, unit:'$/oz'},
+      {name:'Gold',     spot:null, d1:null, unit:'$/oz'},
+      {name:'Silver',   spot:null, d1:null, unit:'$/oz'},
+      {name:'Copper',   spot:null, d1:null, unit:'$/lb'},
+      {name:'Platinum', spot:null, d1:null, unit:'$/oz'},
     ],
     agriculture:[]
   },
 
   macro:{
-    calendar:[],
     centralBanks:[]
   },
 
   news:[],  // populated by fetchRSSNews() on load
 
 
-  earnings:[],  // populated by EQ panel earnings tab
+  // Runtime state (not part of data model, set by fetch functions)
+  _vix9d: null, _vix3m: null, _marketState: null,
 
-  companies:{},  // populated by fetchEQS live data
-
-  // ── Extended sub-objects (populated by API polling) ──
-
-  metadata: {      // system metadata
-    lastRefresh:  null,
-    lastAttempt:  null,
-    version:      '3.3',
-    sources:      {TREAS:'idle', FX:'idle', EQ:'idle', CMDTY:'idle', NEWS:'idle'},
+  metadata: {
+    lastRefresh: null,
+    lastAttempt: null,
+    sources: {TREAS:'idle', FX:'idle', EQ:'idle', CMDTY:'idle', NEWS:'idle'},
   }
 };
 
@@ -886,95 +928,95 @@ function rFI(){
       <table class="t"><thead><tr><th>SECURITY</th><th>MATURITY</th><th>AUCTION DT</th><th>HI YLD</th><th>BTC</th><th>TAIL</th><th>INDIR%</th><th>DIR%</th><th>DEAL%</th></tr></thead><tbody>${arows}</tbody></table>
     </div>`;
 
-  // ── TAB 4: LADDER ──
-  const maxDv01 = Math.max(...t.map(r=>{
-    const yrs=r.tenor==='1M'?1/12:r.tenor==='3M'?.25:r.tenor==='6M'?.5:parseFloat(r.tenor)||1;
-    return yrs;
-  }));
-  const lrows = t.map(r=>{
-    const yrs=r.tenor==='1M'?1/12:r.tenor==='3M'?.25:r.tenor==='6M'?.5:parseFloat(r.tenor)||1;
-    const y=r.yield/100;
-    const dur = yrs <= 1 ? yrs : yrs/(1+y);
-    const dv01 = (dur*100*10000)/1e6;
-    const s10 = -(dv01*10).toFixed(0);
-    const s100 = -(dv01*100).toFixed(0);
-    const barW = Math.round(dv01/maxDv01*60);
-    const d1col = r.d1>0?'var(--green)':r.d1<0?'var(--red)':'#444';
-    const durCol = dur>10?'var(--red)':dur>5?'var(--amber)':'var(--green)';
-    const dv01Bar = `<div style="display:inline-block;width:${barW}px;height:5px;background:var(--amber);vertical-align:middle;margin-right:4px;opacity:0.5"></div>`;
-    return `<tr>
-      <td style="color:var(--amber);font-weight:600">${r.tenor}</td>
-      <td style="color:var(--green);font-weight:600">${r.yield.toFixed(3)}%</td>
-      <td style="color:${d1col};font-size:9px">${r.d1>0?'+':''}${r.d1.toFixed(3)}</td>
-      <td style="color:${durCol}">${dur.toFixed(2)}y</td>
-      <td>${dv01Bar}$${dv01.toFixed(2)}</td>
-      <td style="color:var(--red);font-size:9px">-$${Math.abs(s10).toLocaleString()}</td>
-      <td style="color:var(--red);font-size:9px">-$${Math.abs(s100).toLocaleString()}</td>
-    </tr>`;
-  }).join('');
-  const ladderTab = `
-    <div style="padding:4px 6px">
-      <div style="font-size:10px;color:#707070;margin-bottom:4px">DV01 = $/bp PER $1M FACE · SHOCK = LOSS ON +10bp / +100bp PARALLEL SHIFT</div>
-      <table class="t"><thead><tr><th>TENOR</th><th>YIELD</th><th>1D Δ</th><th>MOD DUR</th><th>DV01 $/bp</th><th>+10bp P&L</th><th>+100bp P&L</th></tr></thead><tbody>${lrows}</tbody></table>
-      <div style="margin-top:6px;padding:5px;border:1px solid #1a1a1a;font-size:9px;color:#555">
-        Duration approximated for bullet bonds at par. Convexity not included — actual losses on large moves will be slightly less than linear.
-      </div>
-    </div>`;
-
-  // ── INFLATION TAB ──
+  // ── TAB 4: INFLATION ──
   const fred2 = D.macro.fred || {};
   const be10_fi = fred2['T10YIE'];
   const be5_fi  = fred2['T5YIE'];
   const cpi_fi  = fred2['CPIAUCSL'];
   const corecpi_fi = fred2['CPILFESL'];
   const pce_fi  = fred2['PCEPILFE'];
-  const beData_fi = D.fixedIncome.inflation.breakevens.map(b => {
-    if(b.tenor==='10Y' && be10_fi) return {...b, be:be10_fi.val, d1:be10_fi.chg};
-    if(b.tenor==='5Y'  && be5_fi)  return {...b, be:be5_fi.val,  d1:be5_fi.chg};
-    return b;
-  });
-  const be_fi = beData_fi.map(b=>`<tr>
-    <td>${b.tenor}</td>
-    <td style="color:var(--amber);font-weight:600">${b.be!=null?b.be.toFixed(2)+'%':'<span style=\\"color:#555\\">—</span>'}</td>
-    <td class="${b.d1!=null?(b.d1>0?'dn':b.d1<0?'up':'neu'):'neu'}">${b.d1!=null?(b.d1>0?'+':'')+b.d1.toFixed(3):'—'}</td>
-  </tr>`).join('');
-  const gauges_fi = [
-    {label:'CPI MoM',d:cpi_fi,note:'Headline CPI'},
-    {label:'Core CPI',d:corecpi_fi,note:'Ex food & energy'},
-    {label:'Core PCE',d:pce_fi,note:'Fed preferred'},
+
+  const be10v = be10_fi?.val ?? null;
+  const be5v  = be5_fi?.val  ?? null;
+  const fwd5y5y = (be10v != null && be5v != null) ? (be10v*2 - be5v).toFixed(2) : null;
+
+  const beStatRows = [
+    {label:'10Y BREAKEVEN', val:be10v, d1:be10_fi?.chg},
+    {label:'5Y BREAKEVEN',  val:be5v,  d1:be5_fi?.chg},
+    {label:'5Y5Y FORWARD',  val:fwd5y5y ? parseFloat(fwd5y5y) : null, d1:null},
+    {label:'FED TARGET',    val:2.00,  d1:null, fixed:true},
+  ].map(r => {
+    const col = r.fixed ? '#555' : r.val == null ? '#555' : r.val > 2.5 ? 'var(--red)' : r.val > 2.0 ? 'var(--amber)' : 'var(--green)';
+    const valStr = r.val == null ? '<span style="color:#444">—</span>' : r.val.toFixed(2) + '%';
+    const chgStr = r.d1 != null ? `<span style="color:${r.d1>0?'var(--red)':'var(--green)'}">${r.d1>0?'+':''}${r.d1.toFixed(3)}</span>` : '—';
+    return `<div class="si"><span class="sil">${r.label}</span><span class="siv" style="color:${col}">${valStr}</span><span style="font-size:9px;color:#555;margin-left:6px">${r.d1!=null?chgStr:''}</span></div>`;
+  }).join('');
+
+  const gaugeRows = [
+    {label:'CPI MoM',      d:cpi_fi,      note:'Headline CPI'},
+    {label:'Core CPI MoM', d:corecpi_fi,  note:'Ex food & energy'},
+    {label:'Core PCE MoM', d:pce_fi,      note:'Fed preferred'},
   ].map(g => {
-    if(!g.d) return `<tr><td style="color:var(--text-dim)">${g.label}</td><td colspan="4" style="color:#555">LOADING…</td></tr>`;
+    if(!g.d) return `<tr><td style="color:var(--text-dim)">${g.label}</td><td colspan="4" style="color:#444">LOADING…</td></tr>`;
     const col = g.d.val > 0.3 ? 'var(--red)' : g.d.val > 0.2 ? 'var(--amber)' : 'var(--green)';
     const chgCol = g.d.chg > 0 ? 'var(--red)' : 'var(--green)';
     return `<tr><td style="color:var(--text-dim)">${g.label}</td><td style="color:${col};font-weight:600">${g.d.val.toFixed(2)}%</td><td style="color:#555">${g.d.prev.toFixed(2)}%</td><td style="color:${chgCol}">${g.d.chg>=0?'+':''}${g.d.chg.toFixed(3)}</td><td style="color:#555;font-size:9px">${g.d.date}</td></tr>`;
   }).join('');
-  const be10v_fi = be10_fi?.val || 2.3;
-  const be5v_fi  = be5_fi?.val  || 2.4;
-  const fwd5y5y_fi = (be10v_fi*2 - be5v_fi).toFixed(2);
+
   const inflTab = `<div style="padding:4px 6px">
-    <div class="sf" style="margin-bottom:6px">
-      <div class="si"><span class="sil">10Y BREAKEVEN</span><span class="siv" style="color:${be10v_fi>2.3?'var(--red)':be10v_fi>2.0?'var(--amber)':'var(--green)'}">${be10v_fi.toFixed(2)}%</span></div>
-      <div class="si"><span class="sil">5Y BREAKEVEN</span><span class="siv">${be5v_fi.toFixed(2)}%</span></div>
-      <div class="si"><span class="sil">5Y5Y FWD</span><span class="siv">${fwd5y5y_fi}%</span></div>
-      <div class="si"><span class="sil">FED TARGET</span><span class="siv" style="color:#555">2.00%</span></div>
+    <div class="sl" style="margin-bottom:6px">BREAKEVEN INFLATION — FRED LIVE</div>
+    <div class="sf" style="margin-bottom:10px">${beStatRows}</div>
+    <div class="sl" style="margin-bottom:4px">INFLATION GAUGES — MoM%</div>
+    <table class="t"><thead><tr><th>SERIES</th><th>LATEST ●</th><th>PREV</th><th>Δ</th><th>DATE</th></tr></thead><tbody>${gaugeRows}</tbody></table>
+  </div>`;
+
+  // ── TAB 5: CREDIT SPREADS ──
+  const fred_cr = D.macro.fred || {};
+  const hy_oas  = fred_cr['BAMLH0A0HYM2'];
+  const bbb_oas = fred_cr['BAMLC0A4CBBBEY'];
+
+  const spreadGauge = (label, d, warn, danger, note) => {
+    if(!d) return `<tr><td style="color:var(--text-dim)">${label}</td><td colspan="4" style="color:#444">LOADING…</td></tr>`;
+    const col = d.val > danger ? 'var(--red)' : d.val > warn ? 'var(--amber)' : 'var(--green)';
+    const chgCol = d.chg > 0 ? 'var(--red)' : 'var(--green)';
+    return `<tr>
+      <td style="color:var(--text-dim)">${label}</td>
+      <td style="color:${col};font-weight:600">${Math.round(d.val)}bp</td>
+      <td style="color:#555">${Math.round(d.prev)}bp</td>
+      <td style="color:${chgCol}">${d.chg>0?'+':''}${d.chg.toFixed(0)}bp</td>
+      <td style="color:#555;font-size:9px">${d.date} · ${note}</td>
+    </tr>`;
+  };
+
+  // Regime labels based on historical HY OAS norms
+  const hyV = hy_oas?.val;
+  const hyRegime = !hyV ? '—' : hyV < 300 ? 'TIGHT — RISK-ON' : hyV < 500 ? 'NORMAL' : hyV < 800 ? 'WIDE — STRESS' : 'VERY WIDE — CRISIS';
+  const hyRegCol = !hyV ? '#555' : hyV < 300 ? 'var(--green)' : hyV < 500 ? 'var(--amber)' : 'var(--red)';
+
+  const spreadTab = `<div style="padding:4px 6px">
+    <div class="sf" style="margin-bottom:8px">
+      <div class="si"><span class="sil">HY OAS</span><span class="siv" style="color:${hyRegCol}">${hyV!=null?Math.round(hyV)+'bp':'—'}</span></div>
+      <div class="si"><span class="sil">REGIME</span><span class="siv" style="color:${hyRegCol};font-size:9px">${hyRegime}</span></div>
+      <div class="si"><span class="sil">BBB OAS</span><span class="siv">${bbb_oas?.val!=null?Math.round(bbb_oas.val)+'bp':'—'}</span></div>
+      <div class="si"><span class="sil">HY–BBB GAP</span><span class="siv">${(hyV!=null&&bbb_oas?.val!=null)?Math.round(hyV-bbb_oas.val)+'bp':'—'}</span></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div><div class="sl">BREAKEVEN / TIPS</div>
-        <table class="t"><thead><tr><th>TENOR</th><th>BRKEVN ●</th><th>1D Δ</th></tr></thead><tbody>${be_fi}</tbody></table>
-      </div>
-      <div><div class="sl">INFLATION GAUGES — FRED</div>
-        <table class="t"><thead><tr><th>SERIES</th><th>LATEST</th><th>PREV</th><th>Δ</th><th>DATE</th></tr></thead><tbody>${gauges_fi}</tbody></table>
-      </div>
+    <div class="sl" style="margin-bottom:4px">OAS SPREADS — BAML/ICE FRED ●</div>
+    <table class="t"><thead><tr><th>SERIES</th><th>OAS</th><th>PREV</th><th>Δ</th><th>DATE</th></tr></thead><tbody>
+      ${spreadGauge('HY (B–CCC rated)',  hy_oas,  500, 800, 'BAMLH0A0HYM2')}
+      ${spreadGauge('BBB (Inv. Grade)',  bbb_oas, 200, 350, 'BAMLC0A4CBBBEY')}
+    </tbody></table>
+    <div style="margin-top:8px;font-size:9px;color:#444;line-height:1.6">
+      OAS = Option-Adjusted Spread vs Treasuries · Higher = more credit risk priced in<br>
+      HY normal range: 300–500bp · Crisis levels: >800bp · Last crisis peak: ~2000bp (2020)
     </div>
-    <canvas id="infl-c" height="80" style="width:100%">
   </div>`;
 
   return buildTabs('fi-tabs',[
     {id:'fi-curve',   label:'YIELD CURVE', content:curveTab},
     {id:'fi-tenors',  label:'TENORS',      content:tenorTab},
     {id:'fi-auction', label:'AUCTIONS',    content:auctionTab},
-    {id:'fi-ladder',  label:'DURATION',    content:ladderTab},
     {id:'fi-infl',    label:'INFLATION',   content:inflTab},
+    {id:'fi-spreads', label:'SPREADS',     content:spreadTab},
   ]);
 }
 
@@ -1110,12 +1152,12 @@ function rEQ(){
   const spx = D.equities.indices[0];
   if(!spx || spx.val == null) return `<div style="padding:20px;color:#555;font-size:10px">LOADING EQUITY DATA…</div>`;
   const spxUp = spx.pct >= 0;
+  const spxChgCol = spxUp?'var(--green)':'var(--red)';
   const spxRow = `<tr>
     <td style="color:var(--amber);font-weight:600">${spx.name}</td>
     <td class="hl">${spx.val.toFixed(2)}</td>
-    <td>${fmtC(spx.chg,2)}</td>
-    <td>${spxUp?`<span class="up">+${spx.pct.toFixed(2)}%</span>`:`<span class="dn">${spx.pct.toFixed(2)}%</span>`}</td>
-    <td class="w">${spx.vol}</td>
+    <td style="color:${spxChgCol};font-weight:600">${spxUp?'+':''}${spx.pct.toFixed(2)}%</td>
+    <td style="color:${spxChgCol}">${spxUp?'+':''}${spx.chg!=null?spx.chg.toFixed(2):'—'} pts</td>
   </tr>`;
 
   // SPX constituent heatmap — grouped by GICS sector with header rows
@@ -1171,8 +1213,8 @@ function rEQ(){
     ]},
   ];
 
-  const sectorNameMap = {XLK:'Technology',XLF:'Financials',XLV:'Healthcare',XLY:'Consumer Disc',
-    XLI:'Industrials',XLC:'Comm Svcs',XLE:'Energy',XLB:'Materials',XLU:'Utilities',XLRE:'Real Estate',XLP:'Cons Staples'};
+  const sectorNameMap = {XLK:'Tech',XLF:'Financials',XLV:'Healthcare',XLY:'Cons Disc',
+    XLI:'Industrials',XLC:'Comm Svc',XLE:'Energy',XLB:'Materials',XLU:'Utilities',XLRE:'Real Estate',XLP:'Cons Staples'};
   const secD1 = {}; (D.equities.sectors||[]).forEach(s=>{ secD1[s.name]=s.d1; });
 
   // Short sector label map for compact header
@@ -1220,7 +1262,7 @@ function rEQ(){
         <div class="sl" style="margin:0">S&P 500 HEATMAP — ${D.equities.sectors.length?'LIVE ETF PROXY':'LOADING…'}</div>
         <span style="font-size:9px;color:#444">Click ticker → EQS detail</span>
       </div>
-      <table class="t" style="margin-bottom:5px;font-size:9px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>CHG%</th><th>VOL</th></tr></thead><tbody>${spxRow}</tbody></table>
+      <table class="t" style="margin-bottom:5px;font-size:9px"><thead><tr><th style="text-align:left">INDEX</th><th>LAST</th><th>1D%</th><th>1D PTS</th></tr></thead><tbody>${spxRow}</tbody></table>
       ${hmSectors}
     </div>`;
   const hm=(D.equities.sectors||[]).map(s=>{
@@ -1229,7 +1271,7 @@ function rEQ(){
     return`<div class="hm-cell" style="background:${bg}">
       <div class="hm-name">${s.name}</div>
       <div class="hm-val" style="color:${vc}">${s.d1>0?'+':''}${s.d1.toFixed(2)}%</div>
-      <div class="hm-sub">${s.mcap}T — 1W: ${fmtCS(s.w1,1)}%</div>
+      ${s.w1!=null?`<div class="hm-sub">1W: ${fmtCS(s.w1,1)}%</div>`:''}
     </div>`;
   }).join('');
 
@@ -1246,10 +1288,19 @@ function rEQ(){
   }).join('');
 
   // EARNINGS tab — redirect to dedicated EARN panel
-  const earnTabContent = `<div style="padding:12px">
-    <div class="sl" style="margin-bottom:8px">EARNINGS CALENDAR</div>
-    <div style="font-size:9px;color:#555;margin-bottom:12px">Live earnings data with estimates, whisper numbers and beat/miss tracking.</div>
-    <button onclick="OW('EARN')" style="background:#0a1a0a;border:1px solid #2a5a2a;color:#5aaa7a;font-family:var(--font);font-size:10px;padding:6px 14px;cursor:pointer;letter-spacing:.8px">↗ OPEN EARN PANEL</button>
+  const earnTabContent = `<div style="padding:8px 10px">
+    <div class="sl" style="margin-bottom:8px">EARNINGS CALENDARS — EXTERNAL</div>
+    <div style="font-size:9px;color:#555;margin-bottom:8px">Live EPS estimates, whisper numbers, and beat/miss tracking</div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      ${EARN_SOURCES.map(s=>`
+        <div onclick="window.open('${s.url}','_blank')"
+             style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505"
+             onmouseover="this.style.borderColor='#2a4a2a'" onmouseout="this.style.borderColor='#111'">
+          <div style="color:var(--amber);font-size:10px;font-weight:600;min-width:140px">${s.name}</div>
+          <div style="color:#555;font-size:9px;flex:1">${s.desc.split(' · ')[0]}</div>
+          <div style="color:#333">↗</div>
+        </div>`).join('')}
+    </div>
   </div>`;
 
   return buildTabs('eq-tabs',[
@@ -1305,14 +1356,34 @@ function rFX(){
     `<option value="${o.val}" data-name="${o.name}" ${o.name==='USD'?'selected':''}>${o.name}</option>`
   ).join('');
 
+  const CALC_PRESETS = [
+    {from:'USD',to:'EUR',amt:1000},{from:'USD',to:'GBP',amt:1000},{from:'USD',to:'JPY',amt:1000},
+    {from:'EUR',to:'USD',amt:1000},{from:'GBP',to:'USD',amt:1000},{from:'USD',to:'CAD',amt:1000},
+    {from:'USD',to:'CHF',amt:1000},{from:'USD',to:'CNY',amt:1000},{from:'JPY',to:'USD',amt:100000},
+    {from:'EUR',to:'GBP',amt:1000},{from:'USD',to:'MXN',amt:1000},{from:'USD',to:'BRL',amt:1000},
+  ];
+  const presetBtns = CALC_PRESETS.map(p=>{
+    const fOpt = fxOpts.find(o=>o.name===p.from);
+    const tOpt = fxOpts.find(o=>o.name===p.to);
+    if(!fOpt||!tOpt) return '';
+    const rate = p.from==='USD' ? 1/tOpt.val : p.to==='USD' ? fOpt.val : fOpt.val/tOpt.val;
+    const result = p.from==='USD' ? p.amt/tOpt.val : p.to==='USD' ? p.amt*fOpt.val : p.amt*fOpt.val/tOpt.val;
+    const disp = result>1000 ? result.toFixed(0) : result.toFixed(2);
+    return `<div onclick="fxSetPreset('${p.from}','${p.to}',${p.amt})"
+      style="padding:5px 6px;border:1px solid #1a1a1a;cursor:pointer;background:#050505;font-size:9px;line-height:1.3"
+      onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor='#1a1a1a'">
+      <div style="color:#666;margin-bottom:1px">${p.amt>999?p.amt.toLocaleString():p.amt} ${p.from}</div>
+      <div style="color:var(--amber);font-weight:600">${disp} ${p.to}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+
   const calcContent = fxOpts.length<=1
     ? `<div style="padding:20px;color:#555;font-size:10px;text-align:center">LOADING RATES…</div>`
     : `
-    <div style="padding:10px 12px">
-      <div class="sl" style="margin-bottom:10px">FX CALCULATOR — LIVE RATES</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <div style="padding:8px 12px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">
         <input id="fxc-amount" type="number" value="1000" step="any"
-               style="width:100px;background:#0a0a0a;border:1px solid #333;color:var(--text);font-family:var(--font);font-size:11px;padding:4px 6px"
+               style="width:88px;background:#0a0a0a;border:1px solid #333;color:var(--text);font-family:var(--font);font-size:11px;padding:4px 6px"
                oninput="fxCalc()">
         <select id="fxc-from" onchange="fxCalc()"
                 style="background:#0a0a0a;border:1px solid #333;color:var(--amber);font-family:var(--font);font-size:11px;padding:4px 6px;cursor:pointer">
@@ -1325,9 +1396,11 @@ function rFX(){
           ${fxToOptHTML}
         </select>
       </div>
-      <div style="font-size:22px;font-weight:600;color:var(--text);margin-bottom:8px" id="fxc-result">—</div>
-      <div id="fxc-rate-box" style="font-size:10px;color:#555;padding:6px 0;border-top:1px solid #111"></div>
-      <div style="font-size:9px;color:#333;margin-top:8px">Rates: open.er-api.com · updated each poll cycle</div>
+      <div style="font-size:24px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-0.5px" id="fxc-result">—</div>
+      <div id="fxc-rate-box" style="font-size:10px;color:#aaa;padding:5px 0 8px;border-bottom:1px solid #111"></div>
+      <div class="sl" style="margin-top:8px;margin-bottom:6px">QUICK PAIRS</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px">${presetBtns}</div>
+      <div style="font-size:9px;color:#444;margin-top:8px">Live rates via Yahoo Finance · updated each poll cycle</div>
     </div>`;
 
   return buildTabs('fx-tabs',[
@@ -1341,7 +1414,6 @@ function rFX(){
         :`<div style="color:#555;font-size:9px;padding:2px 0 6px">DXY loading…</div>`;
       return`<div style="padding:4px 6px">${dxyBlock}${fxTable('G10 PAIRS',g10)}</div>`;
     })()},
-    {id:'fx-em',    label:'EMERGING',  content:`<div style="padding:4px 6px">${fxTable('EMERGING MARKETS',em)}</div>`},
     {id:'fx-calc',  label:'CALCULATOR', content:calcContent},
   ]);
 }
@@ -1805,9 +1877,6 @@ function buildFilingsTab(ticker, edgarInfo, currency, companyName){
 // ═══════════════════════════════════════════
 // EQS ANALYST RATINGS — Yahoo Finance v10 quoteSummary
 // ═══════════════════════════════════════════
-// Legacy stub
-async function drawEQSSparkline(ticker, quote){}
-
 // ── Draw a line chart on a canvas element by ID ──
 function drawEQSCanvas(canvasId, pts, up){
   const canvas = document.getElementById(canvasId);
@@ -1894,41 +1963,6 @@ const FETCH_STATE = {
 
 // ── FRED SERIES MAP ──
 // Maps FRED series IDs to D paths for automated ingestion
-const FRED_SERIES = {
-  // Treasury yields (constant maturity)
-  'DGS1MO':  {path:'fixedIncome.treasuries', tenor:'1M',  field:'yield'},
-  'DGS3MO':  {path:'fixedIncome.treasuries', tenor:'3M',  field:'yield'},
-  'DGS6MO':  {path:'fixedIncome.treasuries', tenor:'6M',  field:'yield'},
-  'DGS1':    {path:'fixedIncome.treasuries', tenor:'1Y',  field:'yield'},
-  'DGS2':    {path:'fixedIncome.treasuries', tenor:'2Y',  field:'yield'},
-  'DGS3':    {path:'fixedIncome.treasuries', tenor:'3Y',  field:'yield'},
-  'DGS5':    {path:'fixedIncome.treasuries', tenor:'5Y',  field:'yield'},
-  'DGS7':    {path:'fixedIncome.treasuries', tenor:'7Y',  field:'yield'},
-  'DGS10':   {path:'fixedIncome.treasuries', tenor:'10Y', field:'yield'},
-  'DGS20':   {path:'fixedIncome.treasuries', tenor:'20Y', field:'yield'},
-  'DGS30':   {path:'fixedIncome.treasuries', tenor:'30Y', field:'yield'},
-  // Inflation breakevens (TIPS)
-  'T5YIE':   {path:'fixedIncome.inflation.breakevens', tenor:'5Y',   field:'be'},
-  'T10YIE':  {path:'fixedIncome.inflation.breakevens', tenor:'10Y',  field:'be'},
-  'T30YIEM': {path:'fixedIncome.inflation.breakevens', tenor:'30Y',  field:'be'},
-  'T5YIFR':  {path:'fixedIncome.inflation.breakevens', tenor:'5Y5Y', field:'be'},
-  // Spreads
-  'BAMLC0A0CM':  {path:'fixedIncome.spreads.ig',  name:'AAA Corp', field:'oas', scale:100},
-  'BAMLC0A1CAAA':{path:'fixedIncome.spreads.ig',  name:'AAA Corp', field:'oas', scale:1},
-  'BAMLH0A0HYM2':{path:'fixedIncome.spreads.hy',  name:'BB Corp',  field:'oas', scale:1},
-  'BAMLH0A3HYM2':{path:'fixedIncome.spreads.hy',  name:'CCC Corp', field:'oas', scale:1},
-};
-
-// ── EIA SERIES MAP ──
-const EIA_SERIES = {
-  'PET.RWTC.W': {path:'commodities.energy', name:'WTI Crude',  field:'spot'},
-  'PET.RBRTE.W':{path:'commodities.energy', name:'Brent Crude',field:'spot'},
-  'NG.RNGWHHD.D':{path:'commodities.energy',name:'Nat Gas',    field:'spot'},
-};
-
-// ── ALPHA VANTAGE / FMP SYMBOLS ──
-const EQUITY_SYMBOLS = ['SPY','QQQ','DIA','IWM','VIX'];
-const FX_SYMBOLS     = ['EURUSD','USDJPY','GBPUSD','USDCHF','AUDUSD','USDCAD'];
 
 // ═══════════════════════════════════════════
 // FETCH HELPERS
@@ -2038,48 +2072,46 @@ function fmtLargeNum(n){
 // ═══════════════════════════════════════════
 async function fetchTreasuryYields(){
   markPending('TREAS');
-  // ^IRX=13wk(~3M), ^FVX=5Y, ^TYX=30Y work via allorigins; ^TNX(10Y) times out
-  // Use CoinGecko-style approach: fetch one at a time with short timeout
-  const yieldSyms = [
-    {sym:'^IRX', tenor:'3M'},
-    {sym:'^FVX', tenor:'5Y'},
-    {sym:'^TYX', tenor:'30Y'},
-  ];
-  // Also try fetching 10Y via a different Yahoo endpoint format
-  const allSyms = [
-    ...yieldSyms,
-    {sym:'TNX', tenor:'10Y'},   // try without caret
-    {sym:'%5ETNX', tenor:'10Y'}, // pre-encoded
+  // Fetch full curve from FRED: DGS1MO, DGS3MO, DGS6MO, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30
+  const FRED_CURVE = [
+    {id:'DGS1MO', tenor:'1M'}, {id:'DGS3MO', tenor:'3M'}, {id:'DGS6MO', tenor:'6M'},
+    {id:'DGS1',   tenor:'1Y'}, {id:'DGS2',   tenor:'2Y'}, {id:'DGS3',   tenor:'3Y'},
+    {id:'DGS5',   tenor:'5Y'}, {id:'DGS7',   tenor:'7Y'}, {id:'DGS10',  tenor:'10Y'},
+    {id:'DGS20',  tenor:'20Y'},{id:'DGS30',  tenor:'30Y'},
   ];
   let anyOk = false;
-  const seen = new Set();
-  for(const {sym, tenor} of allSyms){
-    if(seen.has(tenor)) continue;
+  for(const {id, tenor} of FRED_CURVE){
     try{
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=5d`;
-      const r = await proxyFetch(url, 7000);
-      const d = await r.json();
-      const m = d?.chart?.result?.[0]?.meta;
-      if(!m) throw new Error('no meta for '+sym);
-      if(!seen.has(tenor)){
-        seen.add(tenor);
-        const price = m.regularMarketPrice;
-        const prev  = m.chartPreviousClose || price;
-        const d1    = +((price-prev)/prev*100).toFixed(3);
-        const t = D.fixedIncome.treasuries.find(x=>x.tenor===tenor);
-        if(t){ t.yield=+price.toFixed(3); t.d1=d1; anyOk=true; }
-      }
+      const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${id}&api_key=${API_KEYS.FRED}&sort_order=desc&limit=10&file_type=json`;
+      const r = await proxyFetch(url, 9000);
+      const data = await r.json();
+      const obs = (data?.observations || []).filter(o=>o.value!='.');
+      if(!obs.length) continue;
+      const latest = parseFloat(obs[0].value);
+      const prev   = obs[1] ? parseFloat(obs[1].value) : latest;
+      const wkAgo  = obs[5] ? parseFloat(obs[5].value) : prev;
+      const moAgo  = obs[9] ? parseFloat(obs[9].value) : prev;
+      const t = D.fixedIncome.treasuries.find(x=>x.tenor===tenor);
+      if(!t || isNaN(latest)) continue;
+      t.yield = +latest.toFixed(3);
+      t.d1    = +(latest - prev).toFixed(3);
+      t.w1    = +(latest - wkAgo).toFixed(3);
+      t.m1    = +(latest - moAgo).toFixed(3);
+      // Approximate duration and price for display
+      const yrs = {1:1/12,3:0.25,6:0.5,1:1,2:2,3:3,5:5,7:7,10:10,20:20,30:30}[parseInt(tenor)] ||
+        tenor.endsWith('M') ? parseInt(tenor)/12 : parseInt(tenor);
+      const y = latest/100;
+      t.dur   = +(yrs <= 1 ? yrs : yrs/(1+y)).toFixed(2);
+      t.price = +(100 / Math.pow(1+y, yrs)).toFixed(2);
+      anyOk = true;
     }catch(e){}
-    await new Promise(r=>setTimeout(r,280));
+    await new Promise(r=>setTimeout(r,150));
   }
   if(anyOk) markFresh('TREAS');
-  else markStale('TREAS', 'all yield tickers failed');
+  else markStale('TREAS','FRED curve fetch failed');
 }
 
-// ═══════════════════════════════════════════
-// TREASURY AUCTION RESULTS — fiscaldata.treasury.gov (CORS-open, no key)
-// Fetches the 15 most recent auctions and merges into D.fixedIncome.auctions
-// ═══════════════════════════════════════════
+
 async function fetchTreasuryAuctions(){
   // Key terms we care about — maps API security_term → display label
   const TERM_MAP = {
@@ -2227,7 +2259,7 @@ async function fetchEquityIndices(){
         const d = await r.json();
         const m = d?.chart?.result?.[0]?.meta;
         if(!m) throw new Error('no meta');
-        return {status:'fulfilled', value:{ sym, price: m.regularMarketPrice, prev: m.chartPreviousClose }};
+        return {status:'fulfilled', value:{ sym, price: m.regularMarketPrice, prev: m.chartPreviousClose, marketState: m.marketState||'REGULAR' }};
       })().catch(e=>({status:'rejected',reason:e})),
     ]);
     allResults.push(result);
@@ -2243,6 +2275,7 @@ async function fetchEquityIndices(){
     idx.val = price;
     idx.chg = +(price - prev).toFixed(2);
     idx.pct = +((price-prev)/prev*100).toFixed(2);
+    if(i===0) D._marketState = r.value.marketState; // store for HOME tile display
     anyOk = true;
   });
   if(anyOk) markFresh('EQ');
@@ -2282,17 +2315,17 @@ async function fetchCommodities(){
 // SECTOR ETFs — Yahoo Finance (live 1D % for EQ heatmap / rotation / HOME)
 // ═══════════════════════════════════════════
 const SECTOR_ETF_MAP = [
-  {etf:'XLK', name:'Tech',        mcap:12.4},
-  {etf:'XLF', name:'Financials',  mcap:4.8},
-  {etf:'XLV', name:'Healthcare',  mcap:4.2},
-  {etf:'XLE', name:'Energy',      mcap:3.1},
-  {etf:'XLI', name:'Industrials', mcap:2.9},
-  {etf:'XLY', name:'Cons Disc',   mcap:2.8},
-  {etf:'XLC', name:'Comm Svc',    mcap:2.6},
-  {etf:'XLB', name:'Materials',   mcap:1.4},
-  {etf:'XLU', name:'Utilities',   mcap:1.2},
-  {etf:'XLRE',name:'Real Estate', mcap:1.1},
-  {etf:'XLP', name:'Cons Staples',mcap:1.8},
+  {etf:'XLK', name:'Tech'},
+  {etf:'XLF', name:'Financials'},
+  {etf:'XLV', name:'Healthcare'},
+  {etf:'XLE', name:'Energy'},
+  {etf:'XLI', name:'Industrials'},
+  {etf:'XLY', name:'Cons Disc'},
+  {etf:'XLC', name:'Comm Svc'},
+  {etf:'XLB', name:'Materials'},
+  {etf:'XLU', name:'Utilities'},
+  {etf:'XLRE',name:'Real Estate'},
+  {etf:'XLP', name:'Cons Staples'},
 ];
 async function fetchSectorETFs(){
   // Batch into 3 groups with 300ms delay between to avoid overwhelming proxy
@@ -2381,13 +2414,19 @@ async function fetchFREDData(){
     {id:'T5YIE',      label:'5Y Breakeven',          fmt: v=>v.toFixed(2)+'%'},
     {id:'MORTGAGE30US',label:'30Y Mortgage Rate',    fmt: v=>v.toFixed(2)+'%'},
     {id:'ICSA',       label:'Initial Claims',        fmt: v=>Math.round(v)+'K'},
+    // Credit spreads (OAS in basis points)
+    {id:'BAMLH0A0HYM2',  label:'HY OAS Spread',      fmt: v=>Math.round(v)+'bp'},
+    {id:'BAMLC0A4CBBBEY', label:'BBB OAS Spread',     fmt: v=>Math.round(v)+'bp'},
   ];
   markPending('FRED');
   if(!D.macro.fred) D.macro.fred = {};
   let anyOk = false;
   for(const s of series){
     try{
-      const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${s.id}&api_key=${API_KEYS.FRED}&sort_order=desc&limit=2&file_type=json`;
+      // For index-level series, request pch (monthly % change) to get true MoM%
+      const needsPch = ['CPIAUCSL','CPILFESL','PCEPILFE','INDPRO','RETAILSMNSA'].includes(s.id);
+      const units = needsPch ? '&units=pch' : '';
+      const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${s.id}&api_key=${API_KEYS.FRED}&sort_order=desc&limit=2&file_type=json${units}`;
       const r = await proxyFetch(url, 10000);
       const data = await r.json();
       const obs = data?.observations?.filter(o=>o.value!='.');
@@ -2474,15 +2513,6 @@ async function fetchRSSNews(){
   }
 }
 
-async function fetchNews(){ return fetchRSSNews(); }
-
-// ═══════════════════════════════════════════
-// MAIN POLL ORCHESTRATOR (legacy stub — real one is pollAllUpgraded below)
-// ═══════════════════════════════════════════
-async function pollAll(){
-  // Redirect to upgraded version
-  return pollAllUpgraded();
-}
 
 function refreshOpenWindows(){
   // Re-render open panels that depend on live data
@@ -2794,6 +2824,23 @@ function fxSwapCalc(){
   }
   fxCalc();
 }
+function fxSetPreset(from, to, amt){
+  const amtEl  = document.getElementById('fxc-amount');
+  const fromEl = document.getElementById('fxc-from');
+  const toEl   = document.getElementById('fxc-to');
+  if(!amtEl||!fromEl||!toEl) return;
+  amtEl.value = amt;
+  // Find matching options by data-name attribute
+  for(let i=0;i<fromEl.options.length;i++){
+    if(fromEl.options[i].getAttribute('data-name')===from){ fromEl.selectedIndex=i; break; }
+  }
+  for(let i=0;i<toEl.options.length;i++){
+    if(toEl.options[i].getAttribute('data-name')===to){ toEl.selectedIndex=i; break; }
+  }
+  fxCalc();
+}
+
+
 
 function fxSetPair(pairName){
   // pairName like "EURUSD" — set FROM to the base ccy, TO to USD (or reverse if USD base)
@@ -2829,189 +2876,59 @@ const EARN_SOURCES = [
 ];
 
 const FINVIZ_PRESETS = [
-  // ── MOMENTUM / TECHNICAL ──
   {
-    group: 'MOMENTUM',
-    label: 'Large Cap Momentum',
-    desc: 'Cap >$10B · 1W price > 3% · SMA200 above',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_sma200_pa,ta_perf_1w_o3&o=-marketcap',
+    label: 'Value',
+    desc: 'P/E <15 · Profitable · Cap >$2B · Low P/B',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,fa_pe_low,fa_epsyoy_pos,fa_pb_u3&o=pe',
   },
   {
-    group: 'MOMENTUM',
-    label: 'RS Leaders (52W High)',
-    desc: 'Near 52-week high · Volume surge · Large cap',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_highlow52w_nh&o=-volume',
-  },
-  {
-    group: 'MOMENTUM',
-    label: 'High Volume Movers',
-    desc: '1D move >3% · Volume >2M · Any cap',
-    url: 'https://finviz.com/screener.ashx?v=111&f=ta_perf_1d_o3,sh_avgvol_o2000&o=-volume',
-  },
-  {
-    group: 'MOMENTUM',
-    label: 'Oversold Bounce Setup',
-    desc: 'RSI <30 · SMA50 above price · Large cap',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_rsi_os30,ta_sma50_pb&o=-marketcap',
-  },
-  // ── FUNDAMENTAL ──
-  {
-    group: 'FUNDAMENTAL',
-    label: 'Value — Low P/E',
-    desc: 'P/E <15 · Profitable · Cap >$2B',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,fa_pe_low,fa_epsyoy_pos&o=pe',
-  },
-  {
-    group: 'FUNDAMENTAL',
-    label: 'Growth — EPS Acceleration',
+    label: 'Growth',
     desc: 'EPS growth >25% · Revenue growth >15% · Any cap',
     url: 'https://finviz.com/screener.ashx?v=111&f=fa_epsyoy_pos25,fa_salesqoq_o15&o=-epsyoy',
   },
   {
-    group: 'FUNDAMENTAL',
-    label: 'High Dividend Yield',
-    desc: 'Div yield >3% · Profitable · Large cap',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,fa_div_o3,fa_epsyoy_pos&o=-dividendyield',
+    label: 'High Quality',
+    desc: 'ROE >20% · Low debt · Profitable · Cap >$5B',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_mid,fa_roe_o20,fa_debteq_u1,fa_epsyoy_pos&o=-roe',
   },
   {
-    group: 'FUNDAMENTAL',
-    label: 'Quality — High ROE',
-    desc: 'ROE >20% · Low debt · Cap >$5B',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_mid,fa_roe_o20,fa_debteq_u1&o=-roe',
+    label: 'Oversold',
+    desc: 'RSI <30 · Large cap · SMA50 above price',
+    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_rsi_os30,ta_sma50_pb&o=-marketcap',
   },
-  // ── SECTOR ──
-  {
-    group: 'SECTOR',
-    label: 'Technology Leaders',
-    desc: 'Sector: Technology · Cap >$10B · SMA200 above',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,sec_technology,ta_sma200_pa&o=-marketcap',
-  },
-  {
-    group: 'SECTOR',
-    label: 'Financials — Banks',
-    desc: 'Industry: Banks · Cap >$2B · P/B <2',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,ind_moneycenterbanks,fa_pb_u2&o=-marketcap',
-  },
-  {
-    group: 'SECTOR',
-    label: 'Healthcare Biotech',
-    desc: 'Sector: Healthcare · Biotech / Pharma',
-    url: 'https://finviz.com/screener.ashx?v=111&f=sec_healthcare,ind_biotechnology&o=-marketcap',
-  },
-  {
-    group: 'SECTOR',
-    label: 'Energy — O&G',
-    desc: 'Sector: Energy · Cap >$1B · Positive EPS',
-    url: 'https://finviz.com/screener.ashx?v=111&f=sec_energy,cap_smallover,fa_epsyoy_pos&o=-marketcap',
-  },
-  // ── SPECIAL SITUATIONS ──
-  {
-    group: 'SPECIAL',
-    label: 'Earnings This Week',
-    desc: 'Reporting within 7 days · Cap >$1B',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_smallover,earningsdate_thisweek&o=-marketcap',
-  },
-  {
-    group: 'SPECIAL',
-    label: 'Insider Buying',
-    desc: 'Recent insider purchase · Cap >$500M',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_micro,it_insiderbuy&o=-marketcap',
-  },
-  {
-    group: 'SPECIAL',
-    label: 'Short Squeeze Candidates',
-    desc: 'Short float >20% · Volume surge · Positive momentum',
-    url: 'https://finviz.com/screener.ashx?v=111&f=sh_short_o20,ta_perf_1w_o5&o=-shortfloat',
-  },
-  {
-    group: 'SPECIAL',
-    label: 'New 52W Lows — Contrarian',
-    desc: 'Near 52-week low · Large cap · Analyst upgrade',
-    url: 'https://finviz.com/screener.ashx?v=111&f=cap_large,ta_highlow52w_nl&o=marketcap',
-  },
-];
-
-const SCREENER_TOOLS = [
-  {name:'FINVIZ',       url:'https://finviz.com/screener.ashx',            desc:'60+ filters · fundamentals · technicals · free'},
-  {name:'TRADINGVIEW',  url:'https://www.tradingview.com/screener/',        desc:'Technical + fundamental · global markets · free tier'},
-  {name:'KOYFIN',       url:'https://app.koyfin.com/screener',             desc:'Macro + equity · clean UI · free tier'},
-  {name:'BARCHART',     url:'https://www.barchart.com/stocks/stocks-screener', desc:'Technical screener · options · free'},
-  {name:'STOCKANALYSIS',url:'https://stockanalysis.com/stocks/screener/',  desc:'Clean fundamental screener · free'},
-  {name:'SIMPLYWALL ST',url:'https://simplywall.st/discover/investing-ideas/screener', desc:'Visual fundamental analysis · quality scoring'},
 ];
 
 function rSCRN(){
-  const groups = ['MOMENTUM','FUNDAMENTAL','SECTOR','SPECIAL'];
-  const groupColors = {
-    MOMENTUM:   {bg:'#060c14', border:'#0d2040', label:'#5a8abf', accent:'var(--blue)'},
-    FUNDAMENTAL:{bg:'#060e08', border:'#0d2814', label:'#5aaa7a', accent:'var(--green)'},
-    SECTOR:     {bg:'#0e0a04', border:'#2a1a04', label:'#cc9944', accent:'var(--amber)'},
-    SPECIAL:    {bg:'#0d0608', border:'#281020', label:'#a06ab0', accent:'#a06ab0'},
-  };
+  const presetCards = FINVIZ_PRESETS.map(p =>
+    `<div onclick="window.open('${p.url}','_blank')"
+         style="padding:10px 12px;border:1px solid #1a1a1a;cursor:pointer;background:#050505"
+         onmouseover="this.style.borderColor='#2a4a2a';this.style.background='#070f07'"
+         onmouseout="this.style.borderColor='#1a1a1a';this.style.background='#050505'">
+      <div style="color:var(--amber);font-size:11px;font-weight:700;margin-bottom:4px">${p.label} ↗</div>
+      <div style="color:#666;font-size:9px;line-height:1.5">${p.desc}</div>
+    </div>`
+  ).join('');
 
-  const presetCards = groups.map(g => {
-    const gColor = groupColors[g];
-    const presets = FINVIZ_PRESETS.filter(p => p.group === g);
-    const cards = presets.map(p => `
-      <div onclick="window.open('${p.url}','_blank')"
-           style="background:${gColor.bg};border:1px solid ${gColor.border};padding:8px 10px;cursor:pointer;transition:border-color 0.15s"
-           onmouseover="this.style.borderColor='${gColor.label}'" onmouseout="this.style.borderColor='${gColor.border}'">
-        <div style="color:${gColor.label};font-size:10px;font-weight:600;letter-spacing:0.8px;margin-bottom:3px">↗ ${p.label}</div>
-        <div style="color:#555;font-size:9px;line-height:1.4">${p.desc}</div>
-      </div>`).join('');
-    return `
-      <div>
-        <div style="font-size:9px;color:${gColor.label};letter-spacing:1.5px;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid ${gColor.border}">${g}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${cards}</div>
-      </div>`;
-  }).join('');
+  const earnCards = EARN_SOURCES.map(s =>
+    `<div onclick="window.open('${s.url}','_blank')"
+         style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505"
+         onmouseover="this.style.borderColor='#2a4a2a'" onmouseout="this.style.borderColor='#111'">
+      <div style="color:var(--amber);font-size:10px;font-weight:600;min-width:140px">${s.name}</div>
+      <div style="color:#555;font-size:9px;flex:1">${s.desc}</div>
+      <div style="color:#333;font-size:10px">↗</div>
+    </div>`
+  ).join('');
 
-  const toolRows = SCREENER_TOOLS.map(t => `
-    <div onclick="window.open('${t.url}','_blank')"
-         style="display:flex;align-items:center;gap:12px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505"
-         onmouseover="this.style.borderColor='#333'" onmouseout="this.style.borderColor='#111'">
-      <div style="color:var(--amber);font-size:10px;font-weight:600;letter-spacing:0.8px;min-width:110px">${t.name}</div>
-      <div style="color:#555;font-size:9px">${t.desc}</div>
-      <div style="margin-left:auto;color:#333;font-size:9px">↗</div>
-    </div>`).join('');
-
-  return `
-    <div style="padding:6px 8px;overflow-y:auto;height:100%">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #111">
-        <div class="sl" style="margin:0">EQUITY SCREENER — FINVIZ PRESETS</div>
-        <div style="font-size:9px;color:#555">Click any preset to open in Finviz with filters pre-applied</div>
-        <div style="margin-left:auto;font-size:9px;color:#3aaa3a">● LIVE DATA VIA FINVIZ</div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        ${presetCards}
-      </div>
-
-      <div class="sl" style="margin-bottom:6px">SCREENER TOOLS — EXTERNAL</div>
-      <div style="display:flex;flex-direction:column;gap:3px">
-        ${toolRows}
-      </div>
-
-      <div style="margin-top:8px;padding:5px 8px;border:1px solid #1a1a1a;font-size:9px;color:#444;line-height:1.5">
-        All presets open Finviz with filters pre-applied · Free account not required for most screens
-      </div>
-      <div class="sl" style="margin-top:10px;margin-bottom:6px">EARNINGS CALENDARS</div>
-      <div style="font-size:9px;color:#555;margin-bottom:8px">Live EPS estimates, whisper numbers, and beat/miss tracking</div>
-      <div style="display:flex;flex-direction:column;gap:3px">
-        ${EARN_SOURCES.map(s=>`
-          <div onclick="window.open('${s.url}','_blank')"
-               style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid #111;cursor:pointer;background:#050505"
-               onmouseover="this.style.borderColor='#2a4a2a'" onmouseout="this.style.borderColor='#111'">
-            <div style="color:var(--amber);font-size:10px;font-weight:600;min-width:140px">${s.name}</div>
-            <div style="color:#555;font-size:9px;flex:1">${s.desc}</div>
-            <div style="color:#333;font-size:10px">↗</div>
-          </div>`).join('')}
-      </div>
-    </div>`;
+  return `<div style="padding:8px 10px;overflow-y:auto">
+    <div class="sl" style="margin-bottom:8px">STOCK SCREENER PRESETS — FINVIZ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">${presetCards}</div>
+    <div style="font-size:9px;color:#444;margin-bottom:14px">Opens Finviz with filters pre-applied · Free account not required</div>
+    <div class="sl" style="margin-bottom:6px">EARNINGS CALENDARS</div>
+    <div style="font-size:9px;color:#555;margin-bottom:8px">Live EPS estimates, whisper numbers, and beat/miss tracking</div>
+    <div style="display:flex;flex-direction:column;gap:3px">${earnCards}</div>
+  </div>`;
 }
-// ═══════════════════════════════════════════
-// HOME — Market Overview Dashboard
-// ═══════════════════════════════════════════
+
 function buildMarketSummary(){
   try{
     const spx   = D.equities.indices[0];
@@ -3066,7 +2983,9 @@ function buildMarketSummary(){
     }
 
     if(gold.spot!=null && wti.spot!=null){
-      lines.push(`Commodities: Gold $${gold.spot.toFixed(0)}/oz · WTI $${wti.spot.toFixed(2)}/bbl.`);
+      const goldChg = gold.d1!=null ? ` (${gold.d1>=0?'+':''}${gold.d1.toFixed(2)}%)` : '';
+      const wtiChg  = wti.d1!=null  ? ` (${wti.d1>=0?'+':''}${wti.d1.toFixed(2)}%)`  : '';
+      lines.push(`Commodities: Gold $${gold.spot.toFixed(0)}${goldChg} · WTI $${wti.spot.toFixed(2)}${wtiChg}.`);
     }
     if(dxy?.val!=null){
       lines.push(`DXY ${dxy.d1>=0?'+':''}${(dxy.d1??0).toFixed(2)} at ${dxy.val.toFixed(2)}.`);
@@ -3120,8 +3039,8 @@ function rHOME(){
       <div class="home-tile-sub">
         <span class="home-tile-chg" style="color:${chgCol}">${_chg!=0||chgFmt?chgSign+(chgFmt??""):'—'}</span>
         <span class="home-tile-meta">${meta}</span>
+        ${(id==='spx'&&D._marketState&&D._marketState!=='REGULAR')?`<span style="font-size:8px;color:#666;margin-left:4px">${D._marketState}</span>`:''}
       </div>
-      <div class="home-sparkwrap"><canvas id="hts-${id}" height="28"></canvas></div>
     </div>`;
   }
 
@@ -3154,7 +3073,17 @@ function rHOME(){
   return `<div id="home-wrap" style="display:flex;flex-direction:column;position:absolute;inset:0;overflow:hidden">
     <!-- HEADER -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)">
-      <span style="color:var(--amber);font-size:11px;font-weight:600;letter-spacing:2px">◈ TERMINAL</span>
+      <span style="display:flex;align-items:center"><svg viewBox="0 0 28 16" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;width:28px;height:16px">
+  <!-- Square frame -->
+  <rect x="0.5" y="0.5" width="15" height="15" fill="none" stroke="#ffab00" stroke-width="0.8"/>
+  <!-- Rising bars -->
+  <rect x="2.5" y="9" width="2" height="5" fill="#ffab00" opacity="0.5"/>
+  <rect x="5.5" y="6" width="2" height="8" fill="#ffab00" opacity="0.65"/>
+  <rect x="8.5" y="3.5" width="2" height="10.5" fill="#ffab00" opacity="0.8"/>
+  <rect x="11.5" y="1.5" width="2" height="12.5" fill="#ffab00"/>
+  <!-- Wordmark -->
+  <text x="18" y="11.5" font-family="IBM Plex Mono,monospace" font-size="7" font-weight="700" fill="#ffab00" letter-spacing="1">TERM</text>
+</svg></span>
       <span style="font-size:10px;color:${mktStatus.col};letter-spacing:1px">${mktStatus.txt}</span>
       <span id="home-clock" style="color:#555;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
     </div>
@@ -3203,24 +3132,38 @@ function rHOME(){
       <div style="display:flex;flex-direction:column;overflow-y:auto">
         ${(()=>{
           const _vix=D.equities.indices[4];
-          const _vvixEl=document.getElementById('vvix-val');
-          const _vvixVal=_vvixEl?parseFloat(_vvixEl.textContent)||null:null;
           if(!_vix||_vix.val==null) return '';
           const _v=_vix.val;
           const _reg=_v<15?{l:'LOW',c:'var(--green)'}:_v<20?{l:'MOD',c:'var(--amber)'}:_v<25?{l:'ELEV',c:'#ff6f00'}:_v<30?{l:'HIGH',c:'var(--red)'}:{l:'CRISIS',c:'#ff1744'};
-          const _desc=_v<15?'Complacency territory':_v<20?'Normal range':_v<25?'Elevated anxiety':_v<30?'Significant stress':'Market crisis';
-          return`<div style="padding:4px 8px;border-bottom:1px solid var(--border);background:#030303">
+          const _desc=_v<15?'Complacency':_v<20?'Normal range':_v<25?'Elevated anxiety':_v<30?'Significant stress':'Market crisis';
+          // VIX term structure data (fetched async)
+          const _vix9d = D._vix9d||null;
+          const _vix3m = D._vix3m||null;
+          const _vvixEl = document.getElementById('vvix-val');
+          const _vvixVal = _vvixEl?parseFloat(_vvixEl.textContent)||null:null;
+          // Contango/backwardation signal
+          let _tsLabel='', _tsCol='#555';
+          if(_vix9d&&_vix3m){
+            if(_v > _vix3m){ _tsLabel='BACKWARDATION — near > far (stress)'; _tsCol='var(--red)'; }
+            else { _tsLabel='CONTANGO — near < far (normal)'; _tsCol='#555'; }
+          }
+          return`<div style="padding:5px 8px;border-bottom:1px solid var(--border);background:#030303">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
               <span style="font-size:9px;color:var(--amber);letter-spacing:1.5px">VOLATILITY</span>
-              <span style="font-size:9px;color:${_reg.c};font-weight:600;letter-spacing:1px">${_reg.l}</span>
+              <span style="font-size:9px;color:${_reg.c};font-weight:600;letter-spacing:1px">${_reg.l} — ${_desc}</span>
             </div>
-            <div style="display:flex;align-items:baseline;gap:8px">
-              <span style="font-size:20px;font-weight:700;color:${_reg.c}">${_v.toFixed(2)}</span>
-              <span style="font-size:9px;color:${_vix.chg>=0?'var(--red)':'var(--green)'}">${_vix.chg>=0?'+':''}${(_vix.chg||0).toFixed(2)}</span>
-              <span style="font-size:9px;color:#666">VIX</span>
-              ${_vvixVal?`<span style="font-size:9px;color:#888;margin-left:4px">VVIX ${_vvixVal.toFixed(0)}</span>`:''}
+            <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+              <div style="display:flex;align-items:baseline;gap:4px">
+                <span style="font-size:9px;color:#555">VIX</span>
+                <span style="font-size:18px;font-weight:700;color:${_reg.c};letter-spacing:-0.5px">${_v.toFixed(2)}</span>
+                <span style="font-size:9px;color:${(_vix.chg||0)>=0?'var(--red)':'var(--green)'}">${(_vix.chg||0)>=0?'+':''}${(_vix.chg||0).toFixed(2)}</span>
+              </div>
+              ${_vix9d!=null?`<div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:#555">9D</span><span style="font-size:12px;color:#aaa;font-weight:600">${_vix9d.toFixed(2)}</span></div>`:''}
+              ${_vix3m!=null?`<div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:#555">3M</span><span style="font-size:12px;color:#aaa;font-weight:600">${_vix3m.toFixed(2)}</span></div>`:''}
+              ${_vvixVal?`<div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:9px;color:#555">VVIX</span><span style="font-size:12px;color:#888;font-weight:600">${_vvixVal.toFixed(0)}</span></div>`:''}
             </div>
-            <div style="font-size:9px;color:#666;margin-top:1px">${_desc}</div>
+            ${_tsLabel?`<div style="font-size:9px;color:${_tsCol};margin-top:2px">${_tsLabel}</div>`:''}
+            ${(_vvixVal&&_v)?`<div style="font-size:9px;color:#555;margin-top:2px">VVIX/VIX ${(_vvixVal/_v).toFixed(2)} <span style="color:#444">— ${_vvixVal/_v>6?'high vol demand':'normal vol demand'}</span></div>`:''}
           </div>`;
         })()}
         <div style="padding:4px 8px;font-size:9px;color:var(--amber);letter-spacing:1.5px;border-bottom:1px solid var(--border)">SECTORS — 1D</div>
@@ -3272,18 +3215,8 @@ function rHOME(){
 
 function initHOME(){
   const t = D.fixedIncome.treasuries;
-  const sparkDefs = [
-    {id:'spx',   base: D.equities.indices[0]?.val||5000,  vol:.006},
-    {id:'ndx',   base: D.equities.indices[1]?.val||17000, vol:.008},
-    {id:'dow',   base: D.equities.indices[2]?.val||40000, vol:.005},
-    {id:'vix',   base: D.equities.indices[4]?.val||18,    vol:.025},
-    {id:'ust10', base: t.find(x=>x.tenor==='10Y')?.yield??4.5, vol:.003},
-    {id:'dxy',   base: D.fx.find(f=>f.name==='DXY')?.val??103, vol:.003},
-    {id:'eur',   base: D.fx.find(f=>f.name==='EURUSD')?.val??1.08, vol:.003},
-    {id:'wti',   base: D.commodities.energy[0].spot,    vol:.012},
-    {id:'gold',  base: D.commodities.metals[0].spot,    vol:.006},
-  ];
-  sparkDefs.forEach(s=>{ drawSparkline('hts-'+s.id, makeSparkData(s.base,22,s.vol)); });
+
+
   // Live clock ticker
   if(window._homeClock) clearInterval(window._homeClock);
   window._homeClock = setInterval(()=>{
@@ -3299,17 +3232,18 @@ function refreshHOMETiles(){
   const t=D.fixedIncome.treasuries;
   const y2=t.find(x=>x.tenor==='2Y')?.yield??0;
   const y10=t.find(x=>x.tenor==='10Y')?.yield??0;
-  const s2_10=(y10-y2)*100;
+  const spx=D.equities.indices[0], ndx=D.equities.indices[1], vix=D.equities.indices[4];
+  const dxy=D.fx.find(f=>f.name==='DXY')||D.fx[0];
+  const wti=D.commodities.energy[0], gold=D.commodities.metals[0];
+  // Guard: skip if core data not yet loaded
+  if(spx.val==null && gold.spot==null) return;
+  const _f=(v,d)=>v!=null?v.toFixed(d):'—';
   const updates={
-    'spx':   {val:D.equities.indices[0].val.toFixed(1),  chg:D.equities.indices[0].pct, fmt:'pct'},
-    'ndx':   {val:D.equities.indices[1].val.toFixed(1),  chg:D.equities.indices[1].pct, fmt:'pct'},
-    'dow':   {val:D.equities.indices[2]?.val.toFixed(0)||'—', chg:D.equities.indices[2]?.pct||0, fmt:'pct'},
-    'vix':   {val:D.equities.indices[4].val.toFixed(2),  chg:D.equities.indices[4].chg, fmt:'d2'},
-    'ust10': {val:y10.toFixed(3)+'%', chg:t.find(x=>x.tenor==='10Y')?.d1??0, fmt:'d3'},
-    'dxy':   {val:(D.fx.find(f=>f.name==='DXY')||D.fx[0]).val.toFixed(2), chg:(D.fx.find(f=>f.name==='DXY')||D.fx[0]).d1, fmt:'d3'},
-    'eur':   {val:(D.fx.find(f=>f.name==='EURUSD')||D.fx[1]).val.toFixed(4), chg:(D.fx.find(f=>f.name==='EURUSD')||D.fx[1]).d1, fmt:'d4'},
-    'wti':   {val:'$'+D.commodities.energy[0].spot.toFixed(2), chg:D.commodities.energy[0].d1, fmt:'pct'},
-    'gold':  {val:'$'+D.commodities.metals[0].spot.toFixed(0), chg:D.commodities.metals[0].d1, fmt:'pct'},
+    'spx':   {val:_f(spx.val,1),          chg:spx.pct??0,   fmt:'pct'},
+    'vix':   {val:_f(vix.val,2),           chg:vix.chg??0,   fmt:'d2'},
+    'ust10': {val:_f(y10,3)+'%',           chg:t.find(x=>x.tenor==='10Y')?.d1??0, fmt:'d3'},
+    'dxy':   {val:_f(dxy.val,2),           chg:dxy.d1??0,    fmt:'d3'},
+    'gold':  {val:gold.spot!=null?'$'+_f(gold.spot,0):'—', chg:gold.d1??0, fmt:'pct'},
   };
   Object.entries(updates).forEach(([id,u])=>{
     const valEl=document.getElementById('htv-'+id);
@@ -3324,16 +3258,8 @@ function refreshHOMETiles(){
         chgEl.style.color=col; chgEl.textContent=disp;
       }
     }
-    const sparkDef={spx:{base:D.equities.indices[0].val,vol:.006},
-      ndx:{base:D.equities.indices[1].val,vol:.008},
-      dow:{base:D.equities.indices[2]?.val||35000,vol:.005},
-      vix:{base:D.equities.indices[4].val,vol:.025},
-      ust10:{base:y10,vol:.003},
-      dxy:{base:(D.fx.find(f=>f.name==='DXY')||D.fx[0]).val,vol:.003},
-      eur:{base:(D.fx.find(f=>f.name==='EURUSD')||D.fx[1]).val,vol:.003},
-      wti:{base:D.commodities.energy[0].spot,vol:.012},
-      gold:{base:D.commodities.metals[0].spot,vol:.006}};
-    if(sparkDef[id]) drawSparkline('hts-'+id, makeSparkData(sparkDef[id].base,22,sparkDef[id].vol));
+
+
   });
 }
 
@@ -3385,7 +3311,6 @@ function drawHeatSector(){
   const sectors=D.equities.sectors;
   // Treemap-like layout: weight tiles by mcap
   if(!sectors.length){ ctx.fillStyle='#444'; ctx.font='10px monospace'; ctx.fillText('Sector data loading…',10,20); return; }
-  const totalMcap=sectors.reduce((a,s)=>a+s.mcap,0);
   const cols=4, rows=Math.ceil(sectors.length/cols);
   const pad=2;
   const tW=Math.floor(W/cols), tH=Math.floor(H/rows);
@@ -3431,7 +3356,7 @@ function drawHeatSector(){
     if(idx>=0&&idx<sectors.length){
       const s=sectors[idx];
       const det=document.getElementById('heat-detail');
-      if(det) det.innerHTML=`<span style="color:var(--amber)">${s.name}</span> &nbsp; 1D: <span class="${s.d1>=0?'up':'dn'}">${s.d1>=0?'+':''}${s.d1.toFixed(2)}%</span> &nbsp; 1W: <span class="${s.w1>=0?'up':'dn'}">${s.w1>=0?'+':''}${s.w1.toFixed(2)}%</span> &nbsp; MktCap: $${s.mcap}T`;
+      if(det) det.innerHTML=`<span style="color:var(--amber)">${s.name}</span> &nbsp; 1D: <span class="${s.d1>=0?'up':'dn'}">${s.d1>=0?'+':''}${s.d1.toFixed(2)}%</span> &nbsp; 1W: <span class="${s.w1>=0?'up':'dn'}">${s.w1>=0?'+':''}${s.w1.toFixed(2)}%</span>`;
     }
   };
 }
@@ -3520,28 +3445,59 @@ WTITLES['SRCH'] = 'SEARCH RESULTS';
 WTITLES['SCRN'] = 'EQUITY SCREENER — US STOCKS';
 WTITLES['HOME'] = 'MARKET OVERVIEW';
 WTITLES['HEAT'] = 'HEATMAP';
-WTITLES['OPTIONS'] = 'OPTIONS FLOW & SENTIMENT';
-WTITLES['EARN']    = 'EARNINGS CALENDAR';
-WTITLES['ECON']    = 'ECONOMIC RELEASES — FRED';
-WTITLES['ROTATION']= 'SECTOR ROTATION TRACKER';
-WTITLES['LADDER']  = 'BOND LADDER — DURATION RISK';
 WSIZES['HELP']  = [680,560];
 WSIZES['WATCH'] = [560,480];
 WSIZES['SRCH']  = [560,360];
 WSIZES['SCRN']  = [920,580];
 WSIZES['HOME']  = [780,520];
 WSIZES['HEAT']  = [720,480];
-WSIZES['OPTIONS']= [720,500];
-WSIZES['EARN']  = [680,460];
-WSIZES['ECON']  = [680,480];
-WSIZES['ROTATION']=[760,480];
-WSIZES['LADDER']= [680,420];
 
 // ═══════════════════════════════════════════
 // WATCHLIST SYSTEM
 // ═══════════════════════════════════════════
 let WL = JSON.parse(localStorage.getItem('wl_v1') || '["AAPL","MSFT","NVDA","SPY","QQQ"]');
 function wlSave(){ try{ localStorage.setItem('wl_v1', JSON.stringify(WL)); }catch(e){} }
+
+// ── WATCHLIST DRAG-TO-REORDER ──
+let _wlDragTicker = null;
+
+function wlDragStart(e, ticker){
+  _wlDragTicker = ticker;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', ticker);
+  const row = document.getElementById('wlr-'+ticker);
+  if(row) setTimeout(()=>row.style.opacity='0.4', 0);
+}
+
+function wlDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  // Highlight target row
+  const row = e.currentTarget;
+  document.querySelectorAll('#wl-tbody tr').forEach(r=>r.style.background='');
+  if(row) row.style.background = '#0d1a0d';
+}
+
+function wlDrop(e, targetTicker){
+  e.preventDefault();
+  if(!_wlDragTicker || _wlDragTicker === targetTicker) return;
+  const fromIdx = WL.indexOf(_wlDragTicker);
+  const toIdx   = WL.indexOf(targetTicker);
+  if(fromIdx === -1 || toIdx === -1) return;
+  WL.splice(fromIdx, 1);
+  WL.splice(toIdx, 0, _wlDragTicker);
+  wlSave();
+  wlRefresh();
+}
+
+function wlDragEnd(e){
+  _wlDragTicker = null;
+  document.querySelectorAll('#wl-tbody tr').forEach(r=>{
+    r.style.opacity = '';
+    r.style.background = '';
+  });
+}
+
 
 function wlAdd(ticker){
   const t = ticker.toUpperCase().trim();
@@ -3590,23 +3546,33 @@ function rWATCH(){
       <table id="wl-table" style="width:100%;border-collapse:collapse">
         <thead>
           <tr style="position:sticky;top:0;background:#080808;z-index:1">
+            <th style="width:20px;border-bottom:1px solid #1a1a1a"></th>
             <th style="text-align:left;font-size:9px;color:#888;padding:5px 10px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">TICKER</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">LAST</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1D CHG</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1D%</th>
             <th style="text-align:right;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">1W%</th>
+            <th style="text-align:center;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">52W RANGE</th>
             <th style="text-align:center;font-size:9px;color:#888;padding:5px 8px;font-weight:600;letter-spacing:.5px;border-bottom:1px solid #1a1a1a">3M SPARK</th>
             <th style="padding:5px 6px;border-bottom:1px solid #1a1a1a"></th>
           </tr>
         </thead>
         <tbody id="wl-tbody">
-          ${WL.map(t=>`<tr id="wlr-${t}">
+          ${WL.map(t=>`<tr id="wlr-${t}" draggable="true" data-ticker="${t}"
+              ondragstart="wlDragStart(event,'${t}')"
+              ondragover="wlDragOver(event)"
+              ondrop="wlDrop(event,'${t}')"
+              ondragend="wlDragEnd(event)"
+              style="cursor:default">
+            <td style="padding:0 4px;color:#2a2a2a;font-size:14px;cursor:grab;text-align:center;width:20px"
+                title="Drag to reorder">⠿</td>
             <td style="padding:8px 10px;color:var(--amber);font-weight:600;font-size:11px;cursor:pointer"
               onclick="OW('EQS');setTimeout(()=>fetchEQS('${t}'),80)">${t}</td>
             <td id="wlp-${t}" style="text-align:right;padding:8px;color:#888;font-size:11px">…</td>
             <td id="wlc-${t}" style="text-align:right;padding:8px;font-size:11px">…</td>
             <td id="wlpct-${t}" style="text-align:right;padding:8px;font-size:11px">…</td>
             <td id="wl1w-${t}" style="text-align:right;padding:8px;font-size:10px;color:#666">…</td>
+            <td id="wl52-${t}" style="padding:4px 8px;text-align:center;min-width:80px"></td>
             <td style="padding:4px 8px;text-align:center"><canvas id="wls-${t}" width="70" height="28" style="display:block"></canvas></td>
             <td style="padding:4px 6px;text-align:center">
               <button onclick="wlRemove('${t}')" title="Remove from watchlist"
@@ -3619,11 +3585,12 @@ function rWATCH(){
       ${WL.length===0?'<div style="padding:24px;text-align:center;color:#444;font-size:11px">No tickers in watchlist.<br><span style="font-size:9px;color:#555">Type a ticker above and press Enter to add.</span></div>':''}
     </div>
     <div style="padding:5px 10px;border-top:1px solid #111;font-size:9px;color:#333;flex-shrink:0;display:flex;justify-content:space-between">
-      <span>★ to favorite from any EQS panel · prices refresh every 60s</span>
+      <span>Drag ⠿ to reorder · ★ to add from EQS · prices refresh every 60s</span>
       <span id="wl-lastupd"></span>
     </div>
   </div>`;
 }
+
 
 async function initWATCH(){
   if(!WL.length) return;
@@ -3649,7 +3616,9 @@ async function initWATCH(){
           // 1W% = (last / close_5_days_ago - 1) * 100
           const wkAgo = closes.length >= 6 ? closes[closes.length-6] : (closes[0]||prev);
           const pct1w = wkAgo>0 ? ((px-wkAgo)/wkAgo*100) : 0;
-          results[ticker]={px,chg,pct,pct1w,closes};
+          const hi52 = meta.fiftyTwoWeekHigh || null;
+          const lo52 = meta.fiftyTwoWeekLow  || null;
+          results[ticker]={px,chg,pct,pct1w,closes,hi52,lo52};
         }
       }catch(e){}
     }));
@@ -3677,6 +3646,20 @@ async function initWATCH(){
       if(p1wEl){
         const w1c = d.pct1w>0?'var(--green)':d.pct1w<0?'var(--red)':'#666';
         p1wEl.innerHTML = `<span style="color:${w1c}">${d.pct1w>=0?'+':''}${d.pct1w.toFixed(2)}%</span>`;
+      }
+      // 52W Range bar
+      const r52El = document.getElementById('wl52-'+ticker);
+      if(r52El && d.hi52 && d.lo52){
+        const pct52 = Math.min(Math.max((d.px-d.lo52)/(d.hi52-d.lo52)*100,0),100);
+        const barCol = pct52>80?'var(--green)':pct52<20?'var(--red)':'var(--amber)';
+        r52El.innerHTML = `
+          <div style="font-size:8px;color:#444;display:flex;justify-content:space-between;margin-bottom:2px">
+            <span>${d.lo52.toFixed(0)}</span><span>${d.hi52.toFixed(0)}</span>
+          </div>
+          <div style="width:72px;height:5px;background:#111;border-radius:2px;position:relative;margin:0 auto">
+            <div style="width:${pct52}%;height:100%;background:${barCol};border-radius:2px;opacity:.8"></div>
+            <div style="position:absolute;top:-2px;left:calc(${pct52}% - 2px);width:4px;height:9px;background:#fff;border-radius:1px;opacity:.7"></div>
+          </div>`;
       }
       // Sparkline
       if(cnv && d.closes.length>1){
@@ -3708,7 +3691,7 @@ function rHELP(){
   const panels = [
     {cmd:'HOME',    desc:'Market Overview · tiles, news, sectors, vol, FRED'},
     {cmd:'EQ',      desc:'Equity Monitor · SPX heatmap, sectors, rotation'},
-    {cmd:'FI',      desc:'Fixed Income · yield curve, tenors, auctions, duration, inflation'},
+    {cmd:'FI',      desc:'Fixed Income · yield curve, tenors, auctions, inflation'},
     {cmd:'FX',      desc:'FX & Rates · G10/EM pairs, DXY, calculator'},
     {cmd:'CMDTY',   desc:'Commodities · energy and metals, spot + 1D'},
     {cmd:'MACRO',   desc:'Macro · FRED data, central bank links, external calendars'},
@@ -4180,10 +4163,6 @@ async function yfFetchHistory(sym, range, interval){
 }
 
 
-async function fetchYahooStrip(){
-  // strip array is empty (mktstrip removed); this is a no-op kept for call-site compatibility
-  markFresh('YF');
-}
 
 // Seamless ticker: two identical strips side-by-side, JS scroll via rAF
 // When strip A scrolls fully off-screen, it's teleported to the right — no flash
@@ -4259,7 +4238,7 @@ async function buildTickerTape(){
 // CHART WINDOW — live price chart via Yahoo
 // ═══════════════════════════════════════════
 function rCHART(ticker){
-  ticker=(ticker||'SPY').toUpperCase();
+  ticker=(ticker||window._lastChartSym||'SPY').toUpperCase();
   _chartRange=_chartPrefs.range; _chartType=_chartPrefs.type;
   return `<div style="display:flex;flex-direction:column;height:100%;gap:0">
     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:5px 6px;border-bottom:1px solid #111;flex-shrink:0;background:#050505">
@@ -4335,6 +4314,7 @@ function fmtChartDate(ts, range){
 async function loadChartData(){
   const input = document.getElementById('chart-sym-input');
   const sym   = (input ? input.value.trim().toUpperCase() : 'SPY') || 'SPY';
+  window._lastChartSym = sym;
   const loader = document.getElementById('chart-loader');
   const label  = document.getElementById('chart-price-label');
   if(loader){ loader.style.display='flex'; loader.style.color='#3a3a3a'; loader.textContent='FETCHING '+sym+'…'; }
@@ -4590,7 +4570,13 @@ async function pollAllUpgraded(){
   const _ld = document.getElementById('ld-bar');
   const _ls = document.getElementById('ld-status');
   const _lscreen = document.getElementById('loading-screen');
-  const _ldSet = (pct, msg) => { if(_ld) _ld.style.width=pct+'%'; if(_ls) _ls.textContent=msg; };
+  const _ldSet = (pct, msg, statId, statVal) => {
+    if(_ld){ _ld.style.width=pct+'%'; }
+    if(_ls) _ls.textContent=msg;
+    const _glow=document.getElementById('ld-glow');
+    if(_glow){ _glow.style.opacity='0.8'; setTimeout(()=>{if(_glow)_glow.style.opacity='0';},400); }
+    if(statId&&statVal){ const el=document.getElementById('ldst-'+statId); if(el){el.textContent=statVal;el.style.color='#ffab00';} }
+  };
   _ldSet(5,'CONNECTING…');
   // Fire non-proxy fetches immediately (they have CORS support)
   const directFetches = Promise.allSettled([
@@ -4604,11 +4590,16 @@ async function pollAllUpgraded(){
   await new Promise(r=>setTimeout(r,200));
   _ldSet(20,'LOADING TREASURIES…');
   await fetchTreasuryYields();
+  _ldSet(30,'TREASURIES ●','fi','LIVE');
 
   _ldSet(40,'LOADING EQUITIES…');
   await new Promise(r=>setTimeout(r,400));
   await fetchEquityIndices();
+  _ldSet(50,'EQUITIES ●','eq','LIVE');
   // Fetch VVIX live (Yahoo Finance ^VVIX)
+  // Fetch VIX9D, VIX3M, VVIX for term structure
+  yfFetch('^VIX9D').then(q=>{ if(q) D._vix9d = q.price; });
+  yfFetch('^VIX3M').then(q=>{ if(q) D._vix3m = q.price; });
   yfFetch('^VVIX').then(q=>{
     if(!q) return;
     const el = document.getElementById('vvix-val');
@@ -4626,11 +4617,11 @@ async function pollAllUpgraded(){
   _ldSet(70,'LOADING COMMODITIES…');
   await new Promise(r=>setTimeout(r,400));
   await fetchCommodities();
+  _ldSet(80,'COMMODITIES ●','cm','LIVE');
 
   await new Promise(r=>setTimeout(r,200));
-  await fetchYahooStrip();
-
   await directFetches;
+  _ldSet(95,'FINALIZING…','fx','LIVE');
   refreshOpenWindows();
   // Dismiss loading screen on first successful poll
   if(_lscreen && !_lscreen.classList.contains('was-shown')){
@@ -4716,21 +4707,6 @@ function openNewsDetail(i){
   const tag=`<span class="news-tag ${n.tag}" style="font-size:9px;padding:1px 5px;border:1px solid">${n.tag.toUpperCase()}</span>`;
   body.innerHTML=`<div style="font-size:9px;color:#555;margin-bottom:8px">${n.ts} · ${n.src} ${tag}</div><div style="font-size:11px;color:#ddd;font-weight:600;margin-bottom:8px;line-height:1.4">${n.hl}</div>${n.body?`<div style="font-size:10px;color:#aaa;line-height:1.6">${n.body}</div>`:''}<a href="${n.url}" target="_blank" style="display:inline-block;margin-top:10px;font-size:9px;color:#3aaa3a">↗ Read full article</a>`;
 }
-
-window.addEventListener('load',()=>{
-  D.metadata.version='3.5-live';
-  updateStatusBar();
-
-
-
-// ═══════════════════════════════════════════
-// ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
-// ═══════════════════════════════════════════
-const ACC_DEFAULTS = {
-  fontSize:13, contrast:0, colorMode:'default',
-  reduceMotion:false, boldText:false, largeTargets:false, dyslexiaFont:false,
-};
-let ACC = {...ACC_DEFAULTS};
 
 function accSave(){ try{ sessionStorage.setItem('acc_v2',JSON.stringify(ACC)); }catch(e){} }
 function accLoad(){ try{ const s=sessionStorage.getItem('acc_v2'); if(s) ACC={...ACC_DEFAULTS,...JSON.parse(s)}; }catch(e){} }
@@ -4905,6 +4881,23 @@ function showAccessPanel(){
 // Apply on load + ⌃K shortcut
 accApply();
 document.addEventListener('keydown', e=>{ if(e.ctrlKey && e.key==='k'){ e.preventDefault(); showAccessPanel(); } });
+
+
+window.addEventListener('load',()=>{
+  D.metadata.version='3.5-live';
+  updateStatusBar();
+
+
+
+// ═══════════════════════════════════════════
+// ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
+// ═══════════════════════════════════════════
+const ACC_DEFAULTS = {
+  fontSize:13, contrast:0, colorMode:'default',
+  reduceMotion:false, boldText:false, largeTargets:false, dyslexiaFont:false,
+};
+let ACC = {...ACC_DEFAULTS};
+
 
 
   const s=document.createElement('script');

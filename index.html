@@ -661,7 +661,7 @@ const D = {
 
 
   // Runtime state (not part of data model, set by fetch functions)
-  _vix9d: null, _vix3m: null, _marketState: null,
+  _vix9d: null, _vix3m: null, _vvix: null, _marketState: null,
 
   metadata: {
     lastRefresh: null,
@@ -2516,7 +2516,7 @@ async function fetchRSSNews(){
 
 function refreshOpenWindows(){
   // Re-render open panels that depend on live data
-  const livePanels = ['FI','TREAS','EQ','FX','CMDTY','WATCH'];
+  const livePanels = ['FI','EQ','FX','CMDTY','WATCH'];
   livePanels.forEach(cmd=>{
     if(WR[cmd]){
       renderW(cmd, cmd, null);
@@ -2554,7 +2554,10 @@ function refreshOpenWindows(){
 // ── SEARCH CORPUS ──
 // Flat list of all searchable entities. Each entry: {key, label, meta, type, action}
 // Built once at runtime so it always reflects D contents.
+let _corpusCache = null;
+function invalidateCorpus(){ _corpusCache = null; }
 function buildSearchCorpus(){
+  if(_corpusCache) return _corpusCache;
   const C = [];
 
   // Panel commands
@@ -2563,7 +2566,7 @@ function buildSearchCorpus(){
     {key:'FI',      label:'Treasuries / Yield Curve',    meta:'Yield curve, duration, TIPS'},
     {key:'EQ',      label:'Equity Monitor',              meta:'Indices, sectors, heatmap'},
     {key:'FX',      label:'FX & Rates',                  meta:'G10 + EM currencies'},
-    {key:'CMDTY',   label:'Commodities & Energy',        meta:'Oil, metals, agriculture'},
+    {key:'CMDTY',   label:'Commodities & Energy',        meta:'Oil, metals, spot prices'},
     {key:'MACRO',   label:'Macro Calendar & CB',         meta:'Events, central banks'},
     {key:'HEAT',    label:'Heatmap — Sector / Curve',   meta:'2 visual modes'},
   ];
@@ -2628,8 +2631,8 @@ function buildSearchCorpus(){
 
   // Macro series
   const MACRO_SERIES = [
-    {key:'CPI',   label:'Consumer Price Index',     meta:'Inflation · INFL panel'},
-    {key:'CORECPI',label:'Core CPI (ex food/energy)',meta:'Inflation · INFL panel'},
+    {key:'CPI',   label:'Consumer Price Index',     meta:'Inflation · FI panel'},
+    {key:'CORECPI',label:'Core CPI (ex food/energy)',meta:'Inflation · FI panel'},
     {key:'PCE',   label:'Personal Consumption Expenditures',meta:'Fed target'},
     {key:'COREPCE',label:'Core PCE',                meta:'Fed preferred measure'},
     {key:'GDP',   label:'Gross Domestic Product',   meta:'MACRO panel'},
@@ -2638,19 +2641,19 @@ function buildSearchCorpus(){
     {key:'ISM',   label:'ISM Manufacturing / Services',meta:'MACRO panel'},
     {key:'PMI',   label:'Purchasing Managers Index',meta:'MACRO panel'},
     {key:'FEDRATE',label:'Federal Funds Rate',      meta:'MACRO · CB monitor'},
-    {key:'FEDFUNDS',label:'Fed Funds Rate (FRED)',  meta:'RATES panel'},
-    {key:'BREAKEVEN',label:'Inflation Breakevens',  meta:'INFL panel'},
-    {key:'5Y5Y',  label:'5Y5Y Forward Inflation',   meta:'INFL panel'},
-    {key:'MOVE',  label:'MOVE Index — Rates Vol',   meta:'VOL panel'},
-    {key:'VIX',   label:'CBOE VIX Volatility',      meta:'VOL panel'},
-    {key:'SKEW',  label:'CBOE SKEW Index',          meta:'VOL panel'},
+    {key:'FEDFUNDS',label:'Fed Funds Rate (FRED)',  meta:'MACRO panel'},
+    {key:'BREAKEVEN',label:'Inflation Breakevens',  meta:'FI → INFLATION tab'},
+    {key:'5Y5Y',  label:'5Y5Y Forward Inflation',   meta:'FI → INFLATION tab'},
+    {key:'MOVE',  label:'MOVE Index — Rates Vol',   meta:'HOME → VOL widget'},
+    {key:'VIX',   label:'CBOE VIX Volatility',      meta:'HOME → VOL widget'},
+    {key:'SKEW',  label:'CBOE SKEW Index',          meta:'HOME → VOL widget'},
     {key:'RECESSION',label:'Recession Probability', meta:'MACRO panel'},
   ];
   MACRO_SERIES.forEach(m=>C.push({...m, type:'macro',
     action:()=>macroSeriesAction(m.key)}));
 
   // Commodities
-  [...D.commodities.energy,...D.commodities.metals,...D.commodities.agriculture].filter(c=>c.spot!=null).forEach(c=>{
+  [...D.commodities.energy,...D.commodities.metals].filter(c=>c.spot!=null).forEach(c=>{
     C.push({key:c.name.replace(/\s+/g,'').toUpperCase(),
       label:c.name, meta:`${c.spot.toFixed(c.spot>100?1:3)} ${c.unit}`,
       type:'cmdty', action:()=>OW('CMDTY')});
@@ -2658,14 +2661,14 @@ function buildSearchCorpus(){
   // Commodity aliases
   [{key:'WTI',name:'WTI Crude'},{key:'BRENT',name:'Brent Crude'},
    {key:'GOLD',name:'Gold'},{key:'SILVER',name:'Silver'},
-   {key:'COPPER',name:'Copper'},{key:'NATGAS',name:'Nat Gas'},
-   {key:'CORN',name:'Corn'},{key:'WHEAT',name:'Wheat'}
+   {key:'COPPER',name:'Copper'},{key:'NATGAS',name:'Nat Gas'}
   ].forEach(a=>{
     if(!C.find(c=>c.key===a.key))
       C.push({key:a.key, label:a.name, meta:'Commodity', type:'cmdty', action:()=>OW('CMDTY')});
   });
 
 
+  _corpusCache = C;
   return C;
 }
 
@@ -2863,7 +2866,6 @@ function fxSetPair(pairName){
 // SCREENER
 // ═══════════════════════════════════════════
 
-// ── Static US stock univers
 // ── Finviz deep-link screener presets ──
 
 const EARN_SOURCES = [
@@ -3007,14 +3009,9 @@ function rHOME(){
   const t = D.fixedIncome.treasuries;
   const y2  = t.find(x=>x.tenor==='2Y')?.yield ?? 0;
   const y10 = t.find(x=>x.tenor==='10Y')?.yield ?? 0;
-  const s2_10 = (y10 - y2)*100;
   const spx   = D.equities.indices[0];
-  const ndx   = D.equities.indices[1];
-  const dow   = D.equities.indices[2];
   const vix   = D.equities.indices[4];
   const dxy   = D.fx.find(f=>f.name==='DXY')||D.fx[0];
-  const eur   = D.fx.find(f=>f.name==='EURUSD')||D.fx[1];
-  const wti   = D.commodities.energy[0];
   const gold  = D.commodities.metals[0];
 
   const _vixV = vix.val ?? 0;
@@ -3139,8 +3136,7 @@ function rHOME(){
           // VIX term structure data (fetched async)
           const _vix9d = D._vix9d||null;
           const _vix3m = D._vix3m||null;
-          const _vvixEl = document.getElementById('vvix-val');
-          const _vvixVal = _vvixEl?parseFloat(_vvixEl.textContent)||null:null;
+          const _vvixVal = D._vvix||null;
           // Contango/backwardation signal
           let _tsLabel='', _tsCol='#555';
           if(_vix9d&&_vix3m){
@@ -4602,6 +4598,7 @@ async function pollAllUpgraded(){
   yfFetch('^VIX3M').then(q=>{ if(q) D._vix3m = q.price; });
   yfFetch('^VVIX').then(q=>{
     if(!q) return;
+    D._vvix = q.price;
     const el = document.getElementById('vvix-val');
     const ec = document.getElementById('vvix-chg');
     const el2 = document.getElementById('vvix-lvl');
@@ -4622,6 +4619,7 @@ async function pollAllUpgraded(){
   await new Promise(r=>setTimeout(r,200));
   await directFetches;
   _ldSet(95,'FINALIZING…','fx','LIVE');
+  invalidateCorpus();
   refreshOpenWindows();
   // Dismiss loading screen on first successful poll
   if(_lscreen && !_lscreen.classList.contains('was-shown')){
@@ -4883,12 +4881,6 @@ accApply();
 document.addEventListener('keydown', e=>{ if(e.ctrlKey && e.key==='k'){ e.preventDefault(); showAccessPanel(); } });
 
 
-window.addEventListener('load',()=>{
-  D.metadata.version='3.5-live';
-  updateStatusBar();
-
-
-
 // ═══════════════════════════════════════════
 // ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
 // ═══════════════════════════════════════════
@@ -4898,8 +4890,9 @@ const ACC_DEFAULTS = {
 };
 let ACC = {...ACC_DEFAULTS};
 
-
-
+window.addEventListener('load',()=>{
+  D.metadata.version='3.5-live';
+  updateStatusBar();
   const s=document.createElement('script');
   s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
   s.onload=()=>{

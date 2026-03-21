@@ -116,16 +116,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   background-size:40px 40px;
   pointer-events:none;
 }
-.ld-logo{margin-bottom:20px;position:relative;display:flex;align-items:center;justify-content:center}
-.ld-tagline{font-size:9px;color:#333;letter-spacing:3px;margin-bottom:28px;text-transform:uppercase}
-.ld-bar-wrap{width:320px;height:1px;background:#1a1a1a;margin-bottom:20px;overflow:hidden;position:relative}
-.ld-bar{height:1px;background:linear-gradient(90deg,#cc8800,#ffab00,#ffdd66);width:0%;transition:width 0.4s ease}
-.ld-bar-glow{position:absolute;top:-4px;right:0;width:20px;height:8px;background:radial-gradient(#ffab00,transparent);opacity:0;transition:opacity 0.3s}
-.ld-status{font-size:9px;color:#333;letter-spacing:2px;height:14px;margin-bottom:40px}
-.ld-stats{display:flex;gap:32px;margin-top:0}
+.ld-logo{margin-bottom:24px;position:relative;display:flex;align-items:center;justify-content:center;animation:ldFadeIn 0.8s ease both}
+.ld-bar-wrap{width:340px;height:2px;background:#111;margin-bottom:18px;overflow:hidden;position:relative;border-radius:1px}
+.ld-bar{height:2px;background:linear-gradient(90deg,#996600,#ffab00,#ffdd88);width:0%;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);border-radius:1px;position:relative}
+.ld-bar::after{content:'';position:absolute;top:0;right:0;width:40px;height:100%;background:linear-gradient(90deg,transparent,rgba(255,221,136,0.6));animation:ldShimmer 1.2s ease-in-out infinite}
+.ld-bar-glow{position:absolute;top:-3px;right:-2px;width:6px;height:6px;background:#ffab00;border-radius:50%;box-shadow:0 0 8px 2px #ffab00;opacity:0;transition:opacity 0.3s}
+.ld-status{font-size:9px;color:#555;letter-spacing:2px;height:14px;margin-bottom:44px;transition:opacity 0.3s ease;animation:ldFadeIn 0.6s 0.3s ease both}
+.ld-stats{display:flex;gap:36px;margin-top:0;animation:ldFadeIn 0.6s 0.5s ease both}
 .ld-stat{text-align:center}
-.ld-stat-label{font-size:8px;color:#1e1e1e;letter-spacing:1.5px;margin-bottom:3px}
-.ld-stat-val{font-size:11px;color:#2a2a2a;font-weight:600;letter-spacing:1px}
+.ld-stat-label{font-size:8px;color:#3a3a3a;letter-spacing:1.5px;margin-bottom:4px}
+.ld-stat-val{font-size:10px;color:#3a3a3a;font-weight:600;letter-spacing:1px;transition:color 0.4s ease}
+@keyframes ldFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ldShimmer{0%,100%{opacity:0}50%{opacity:1}}
 #workspace{
   position:relative;width:100%;height:calc(100vh - 70px);
   background-color:#050608;
@@ -474,7 +476,7 @@ canvas{display:block}
 <body>
 
 <div id="loading-screen">
-  <div class="ld-logo"><svg viewBox="0 0 80 48" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;width:80px;height:48px">
+  <div class="ld-logo"><svg viewBox="0 0 148 48" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;width:148px;height:48px">
   <!-- Outer frame with corner ticks -->
   <rect x="1" y="1" width="46" height="46" fill="none" stroke="#ffab00" stroke-width="1.2"/>
   <!-- Corner accent ticks -->
@@ -494,8 +496,7 @@ canvas{display:block}
   <!-- Trend line -->
   <polyline points="10,32 18,24 26,16 34,9" fill="none" stroke="#ffdd88" stroke-width="1" stroke-dasharray="2,2" opacity="0.6"/>
   <!-- Wordmark -->
-  <text x="52" y="22" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#ffab00" letter-spacing="2">TERM</text>
-  <text x="52" y="34" font-family="IBM Plex Mono,monospace" font-size="6" font-weight="400" fill="#554400" letter-spacing="1.5">INAL</text>
+  <text x="52" y="28" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#ffab00" letter-spacing="2">TERMINAL</text>
 </svg></div>
   <div class="ld-bar-wrap">
     <div class="ld-bar" id="ld-bar"></div>
@@ -515,7 +516,7 @@ canvas{display:block}
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div id="logo"><svg viewBox="0 0 28 16" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;width:28px;height:16px">
+  <div id="logo"><svg viewBox="0 0 52 16" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;width:52px;height:16px">
   <!-- Square frame -->
   <rect x="0.5" y="0.5" width="15" height="15" fill="none" stroke="#ffab00" stroke-width="0.8"/>
   <!-- Rising bars -->
@@ -3070,7 +3071,7 @@ function rHOME(){
   return `<div id="home-wrap" style="display:flex;flex-direction:column;position:absolute;inset:0;overflow:hidden">
     <!-- HEADER -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)">
-      <span style="display:flex;align-items:center"><svg viewBox="0 0 28 16" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;width:28px;height:16px">
+      <span style="display:flex;align-items:center"><svg viewBox="0 0 52 16" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;width:52px;height:16px">
   <!-- Square frame -->
   <rect x="0.5" y="0.5" width="15" height="15" fill="none" stroke="#ffab00" stroke-width="0.8"/>
   <!-- Rising bars -->
@@ -3082,7 +3083,10 @@ function rHOME(){
   <text x="18" y="11.5" font-family="IBM Plex Mono,monospace" font-size="7" font-weight="700" fill="#ffab00" letter-spacing="1">TERM</text>
 </svg></span>
       <span style="font-size:10px;color:${mktStatus.col};letter-spacing:1px">${mktStatus.txt}</span>
-      <span id="home-clock" style="color:#555;font-size:10px">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}&nbsp;&nbsp;${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
+      <span style="color:#555;font-size:10px;white-space:nowrap">
+        <span id="home-date">${now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'America/Denver'})}</span>
+        &nbsp;&nbsp;<span id="home-clock" style="color:#444">${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})} MT</span>
+      </span>
     </div>
     <!-- DAILY SUMMARY -->
     ${buildMarketSummary()}
@@ -4568,9 +4572,7 @@ async function pollAllUpgraded(){
   const _lscreen = document.getElementById('loading-screen');
   const _ldSet = (pct, msg, statId, statVal) => {
     if(_ld){ _ld.style.width=pct+'%'; }
-    if(_ls) _ls.textContent=msg;
-    const _glow=document.getElementById('ld-glow');
-    if(_glow){ _glow.style.opacity='0.8'; setTimeout(()=>{if(_glow)_glow.style.opacity='0';},400); }
+    if(_ls){ _ls.style.opacity='0'; setTimeout(()=>{ if(_ls){_ls.textContent=msg;_ls.style.opacity='1';} },150); }
     if(statId&&statVal){ const el=document.getElementById('ldst-'+statId); if(el){el.textContent=statVal;el.style.color='#ffab00';} }
   };
   _ldSet(5,'CONNECTING…');
@@ -4905,14 +4907,7 @@ window.addEventListener('load',()=>{
     // Regular polling every 60s
     setInterval(pollAllUpgraded,60000);
     setInterval(buildTickerTape,120000);
-    // Live clock — updates every second
-    setInterval(()=>{
-      const el = document.getElementById('home-clock');
-      if(el){
-        const now = new Date();
-        el.textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'America/Denver'})+' MT';
-      }
-    }, 1000);
+    // Clock handled by initHOME setInterval
   };
   document.head.appendChild(s);
 });

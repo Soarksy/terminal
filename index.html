@@ -4706,6 +4706,15 @@ function openNewsDetail(i){
   body.innerHTML=`<div style="font-size:9px;color:#555;margin-bottom:8px">${n.ts} · ${n.src} ${tag}</div><div style="font-size:11px;color:#ddd;font-weight:600;margin-bottom:8px;line-height:1.4">${n.hl}</div>${n.body?`<div style="font-size:10px;color:#aaa;line-height:1.6">${n.body}</div>`:''}<a href="${n.url}" target="_blank" style="display:inline-block;margin-top:10px;font-size:9px;color:#3aaa3a">↗ Read full article</a>`;
 }
 
+// ═══════════════════════════════════════════
+// ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
+// ═══════════════════════════════════════════
+const ACC_DEFAULTS = {
+  fontSize:13, contrast:0, colorMode:'default',
+  reduceMotion:false, boldText:false, largeTargets:false, dyslexiaFont:false,
+};
+var ACC = {...ACC_DEFAULTS};
+
 function accSave(){ try{ sessionStorage.setItem('acc_v2',JSON.stringify(ACC)); }catch(e){} }
 function accLoad(){ try{ const s=sessionStorage.getItem('acc_v2'); if(s) ACC={...ACC_DEFAULTS,...JSON.parse(s)}; }catch(e){} }
 accLoad();
@@ -4880,15 +4889,6 @@ function showAccessPanel(){
 accApply();
 document.addEventListener('keydown', e=>{ if(e.ctrlKey && e.key==='k'){ e.preventDefault(); showAccessPanel(); } });
 
-
-// ═══════════════════════════════════════════
-// ACCESSIBILITY SYSTEM  (event-delegation — no inline onclick)
-// ═══════════════════════════════════════════
-const ACC_DEFAULTS = {
-  fontSize:13, contrast:0, colorMode:'default',
-  reduceMotion:false, boldText:false, largeTargets:false, dyslexiaFont:false,
-};
-let ACC = {...ACC_DEFAULTS};
 
 window.addEventListener('load',()=>{
   D.metadata.version='3.5-live';
